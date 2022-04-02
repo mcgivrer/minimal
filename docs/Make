@@ -1,0 +1,3 @@
+#!/bin/bash
+cat *.md >book.md
+pandoc book.md -o book.html
