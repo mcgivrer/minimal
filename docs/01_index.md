@@ -1,10 +1,27 @@
-# Game Project test
+# The Minimal Game Project
 
 ## Introduction
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Offendit eleifend moderatius ex vix, quem odio mazim et qui, purto expetendis cotidieque quo cu, veri persius vituperata ei nec. Vivendum intellegat et qui, ei denique consequuntur vix. Pri viderer tamquam ei. No dicam aperiam vis. Vivendum intellegat et qui, ei denique consequuntur vix. Sed no sumo stet, est ei quodsi feugait liberavisse, in pro quot facete definitiones. Pri posse graeco definitiones cu, id eam populo quaestio adipiscing, usu quod malorum te. Dolor labitur cu pro. Offendit eleifend moderatius ex vix, quem odio mazim et qui, purto expetendis cotidieque quo cu, veri persius vituperata ei nec. Vivendum intellegat et qui, ei denique consequuntur vix. Offendit eleifend moderatius ex vix, quem odio mazim et qui, purto expetendis cotidieque quo cu, veri persius vituperata ei nec. Ei qui diceret voluptua luptatum, te dolorum detracto hendrerit sed, ad per offendit consetetur.
+This minimalistic project exists to create and maintain a cvery simple game peoject template to start learning code with java with some entertainment of video game.
+The goal is to provide some basic practices of game development from scratch by using simple classes and moreover, ithout any external framework, on ly using the 
+java JDK 17+.
+
+let's dive int osome code to understand what is provided by this project.
 
 ## Preface
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Vivendum intellegat et qui, ei denique consequuntur vix. Scripta periculis ei eam, te pro movet reformidans. Vivendum intellegat et qui, ei denique consequuntur vix. No dicam aperiam vis. Scripta periculis ei eam, te pro movet reformidans. Scripta periculis ei eam, te pro movet reformidans. Pri posse graeco definitiones cu, id eam populo quaestio adipiscing, usu quod malorum te. Vivendum intellegat et qui, ei denique consequuntur vix. Offendit eleifend moderatius ex vix, quem odio mazim et qui, purto expetendis cotidieque quo cu, veri persius vituperata ei nec. Pri posse graeco definitiones cu, id eam populo quaestio adipiscing, usu quod malorum te. Pri posse graeco definitiones cu, id eam populo quaestio adipiscing, usu quod malorum te. Harum repudiandae sea at. Vivendum intellegat et qui, ei denique consequuntur vix. Vivendum intellegat et qui, ei denique consequuntur vix.
+I always wanted to develop a video game, since I was achild and knowing only the basic language on a [TI-99/4A from Texas Instrument](https://en.wikipedia.org/wiki/TI-99/4A "go ans see the wikipedia page for this antic computer").
+
+![the Texas Instrument TI-99/4A'](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/TI99-IMG_7132_%28filter_levels_crop%29.jpg/220px-TI99-IMG_7132_%28filter_levels_crop%29.jpg)
+
+Even with the famous "Extended Basic Cartridge", the only way to develop was to edit thousands of lines of code to create games.
+
+Many years after, I start working as a Consultant on C, C++, Pascal, VBA and finally, Java.
+
+But I've never develop any game ;)
+
+So, I decided to learn by myself to try and code something. 
+
+This small piece of code, even if its not the most beautiful one, is an experiment in this area.
+
 

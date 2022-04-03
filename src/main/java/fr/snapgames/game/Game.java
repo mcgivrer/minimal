@@ -6,15 +6,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.security.auth.login.Configuration;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -119,7 +116,7 @@ public class Game extends JPanel {
         }
     }
 
-    public class World {
+    public static class World {
         private Dimension playArea;
         private Vector2D gravity;
 
@@ -196,16 +193,20 @@ public class Game extends JPanel {
         public void update(double dt) {
 
             this.position.x += Math
-                    .ceil((target.position.x + (target.size.x) - ((double) (viewport.width) * 0.5f) - this.position.x)
+                    .ceil((target.position.x + (target.size.x * 0.5) - ((viewport.width) * 0.5) - this.position.x)
                             * tween * Math.min(dt, 10));
             this.position.y += Math
-                    .ceil((target.position.y + (target.size.y) - ((double) (viewport.height) * 0.5f) - this.position.y)
+                    .ceil((target.position.y + (target.size.y * 0.5) - ((viewport.height) * 0.5) - this.position.y)
                             * tween * Math.min(dt, 10));
         }
     }
 
     public interface Behavior {
-        void update(Game g, GameEntity e, double dt);
+        void update(Game game, GameEntity entity, double dt);
+
+        void input(Game game, GameEntity entity);
+
+        void draw(Game game, GameEntity entity, Graphics2D g);
     }
 
     public enum EntityType {
@@ -224,7 +225,7 @@ public class Game extends JPanel {
         public Vector2D position = new Vector2D(0, 0);
         public Vector2D speed = new Vector2D(0, 0);
         public Vector2D acceleration = new Vector2D(0, 0);
-        public Vector2D size = new Vector2D(0, 0);
+        public Vector2D size = new Vector2D(16, 16);
         public EntityType type = EntityType.RECTANGLE;
         public boolean stickToCamera = false;
         public double elasticity = 1.0;
@@ -243,8 +244,8 @@ public class Game extends JPanel {
          */
         public GameEntity(String name) {
             this.name = name;
-            attributes.put("maxSpeed", 12.0);
-            attributes.put("maxAcceleration", 4.0);
+            attributes.put("maxSpeed", 8.0);
+            attributes.put("maxAcceleration", 3.0);
             attributes.put("mass", 10.0);
         }
 
@@ -252,16 +253,18 @@ public class Game extends JPanel {
             for (Behavior b : behaviors) {
                 b.update(g, this, dt);
             }
-            this.acceleration = this.acceleration.addAll(this.forces);
-            this.acceleration = this.acceleration.multiply((double) attributes.get("mass"));
+            if (!isStickToCamera()) {
+                this.acceleration = this.acceleration.addAll(this.forces);
+                this.acceleration = this.acceleration.multiply((double) attributes.get("mass"));
 
-            this.acceleration.maximize((double) attributes.get("maxAcceleration"));
+                this.acceleration.maximize((double) attributes.get("maxAcceleration"));
 
-            this.speed = this.speed.add(this.acceleration.multiply(dt)).multiply(roughness);
-            this.speed.maximize((double) attributes.get("maxSpeed"));
+                this.speed = this.speed.add(this.acceleration.multiply(dt)).multiply(roughness);
+                this.speed.maximize((double) attributes.get("maxSpeed"));
 
-            this.position = this.position.add(this.speed.multiply(dt));
-            this.forces.clear();
+                this.position = this.position.add(this.speed.multiply(dt));
+                this.forces.clear();
+            }
         }
 
         public void draw(Graphics2D g) {
@@ -355,6 +358,10 @@ public class Game extends JPanel {
         public GameEntity addBehavior(Behavior b) {
             this.behaviors.add(b);
             return this;
+        }
+
+        public Object getAttribute(String attrName, Object defaultValue) {
+            return attributes.getOrDefault(attrName, defaultValue);
         }
     }
 
@@ -472,7 +479,7 @@ public class Game extends JPanel {
     }
 
     public static class I18n {
-        private static ResourceBundle messages = ResourceBundle.getBundle("i18n.messages");
+        private static final ResourceBundle messages = ResourceBundle.getBundle("i18n.messages");
 
         public static String get(String key) {
             return messages.getString(key);
@@ -519,19 +526,20 @@ public class Game extends JPanel {
 
     }
 
-    private void keyTyped(KeyEvent e) {
-        if (e.getKeyChar() == 'p') {
-            this.pause = !this.pause;
-        }
-    }
 
     // Frames to be rendered
-    double FPS = 1000000.0 / 60.0;
+    double FPS = 60.0;
+    double fpsDelay = 1000000.0 / 60.0;
     double scale = 2.0;
     // some internal flags
     boolean debug = true;
     boolean exit = false;
     boolean pause = false;
+
+    /**
+     * the Test mode is a flag to deactivate the while Loop in the {@link Game#loop} method.
+     */
+    private boolean testMode;
 
     // Internal components
     BufferedImage buffer;
@@ -542,15 +550,23 @@ public class Game extends JPanel {
     Input input;
     // Internal GameEntity cache
     Map<String, GameEntity> entities = new HashMap<>();
-
     World world;
-    GameEntity player = null;
-    Camera camera = null;
+    Camera currentCamera = null;
 
     public Game() {
+        this("/game.properties", false);
+    }
 
-        config = new Configuration("/game.properties");
+    public Game(String configFilePath, boolean testMode) {
+
+        this.testMode = testMode;
+        config = new Configuration(configFilePath);
+
         debug = config.getBoolean("game.debug", false);
+
+        FPS = config.getDouble("game.screen.fps", 60.0);
+        fpsDelay = 1000000.0 / FPS;
+
         input = new Input(this);
         String title = I18n.get("game.title");
         frame = new JFrame(title);
@@ -621,15 +637,47 @@ public class Game extends JPanel {
                 .stickToCamera(true);
         add(score);
 
-        player = new GameEntity("player")
+        GameEntity player = new GameEntity("player")
                 .setPosition(new Vector2D(worldWidth / 2.0, worldHeight / 2.0))
                 .setSize(new Vector2D(16, 16))
                 .setColor(Color.BLUE)
                 .setRoughness(1.0)
                 .setElasticity(0.21)
-                .setAttribute("maxSpeed", 12.0)
-                .setAttribute("maxAcceleration", 3.0)
-                .setAttribute("mass", 10.0);
+                .setAttribute("maxSpeed", 6.0)
+                .setAttribute("maxAcceleration", 2.0)
+                .setAttribute("mass", 8.0)
+                .addBehavior(new Behavior() {
+                    @Override
+                    public void update(Game game, GameEntity entity, double dt) {
+
+                    }
+
+                    @Override
+                    public void input(Game game, GameEntity entity) {
+                        double accel = (Double) entity.getAttribute("speedStep", 1.0);
+                        if (input.getKey(KeyEvent.VK_ESCAPE)) {
+                            game.exit = true;
+                        }
+
+                        if (input.getKey(KeyEvent.VK_UP)) {
+                            entity.forces.add(new Vector2D(0, -accel));
+                        }
+                        if (input.getKey(KeyEvent.VK_DOWN)) {
+                            entity.forces.add(new Vector2D(0, accel));
+                        }
+                        if (input.getKey(KeyEvent.VK_RIGHT)) {
+                            entity.forces.add(new Vector2D(accel, 0));
+                        }
+                        if (input.getKey(KeyEvent.VK_LEFT)) {
+                            entity.forces.add(new Vector2D(-accel, 0));
+                        }
+                    }
+
+                    @Override
+                    public void draw(Game game, GameEntity entity, Graphics2D g) {
+
+                    }
+                });
         add(player);
 
         for (int i = 0; i < 10; i++) {
@@ -645,16 +693,31 @@ public class Game extends JPanel {
                     .setAttribute("mass", 5.0)
                     .setAttribute("attractionDistance", 80.0)
                     .setAttribute("attractionForce", 2.0)
-                    .addBehavior((game, e1, dt) -> {
-                        // if player near this entity less than distance (attrDist),
-                        // a force (attrForce) is applied to entity to reach to player.
-                        GameEntity p = game.entities.get("player");
-                        double attrDist = (double) e1.attributes.get("attractionDistance");
-                        double attrForce = (double) e1.attributes.get("attractionForce");
-                        if (p.position.distance(e1.position.add(p.size.multiply(0.5))) < attrDist) {
-                            Vector2D v = p.position.substract(e1.position);
-                            e1.forces.add(v.normalize().multiply(attrForce));
+                    .addBehavior(new Behavior() {
+                        @Override
+                        public void input(Game g, GameEntity e) {
+
                         }
+
+                        @Override
+                        public void draw(Game game, GameEntity e, Graphics2D g) {
+
+                        }
+
+                        @Override
+                        public void update(Game game, GameEntity entity, double dt) {
+                            // if player near this entity less than distance (attrDist),
+                            // a force (attrForce) is applied to entity to reach to player.
+                            GameEntity p = game.entities.get("player");
+                            double attrDist = (double) entity.attributes.get("attractionDistance");
+                            double attrForce = (double) entity.attributes.get("attractionForce");
+                            if (p.position.distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
+                                Vector2D v = p.position.substract(entity.position);
+                                entity.forces.add(v.normalize().multiply(attrForce));
+                            }
+                        }
+
+                        ;
                     });
 
             add(e);
@@ -665,13 +728,9 @@ public class Game extends JPanel {
 
         Camera cam = new Camera("camera")
                 .setTarget(player)
-                .setTween(0.20)
+                .setTween(0.1)
                 .setViewport(new Dimension(vpWidth, vpHeight));
-        setDefaultCamera(cam);
-    }
-
-    public void setDefaultCamera(Camera cam) {
-        this.camera = cam;
+        setCurrentCamera(cam);
     }
 
     public void add(GameEntity e) {
@@ -697,28 +756,31 @@ public class Game extends JPanel {
 
             for (GameEntity entity : entities.values()) {
                 // draw Scene
-                if (Optional.ofNullable(camera).isPresent() && !entity.isStickToCamera()) {
-                    camera.preDraw(g);
+                if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
+                    currentCamera.preDraw(g);
+                }
+                for (Behavior b : entity.behaviors) {
+                    b.draw(this, entity, g);
                 }
                 entity.draw(g);
-                if (Optional.ofNullable(camera).isPresent() && !entity.isStickToCamera()) {
-                    camera.postDraw(g);
+                if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
+                    currentCamera.postDraw(g);
                 }
             }
             if (debug) {
                 drawDebugGrid(g, 32);
             }
-            if (Optional.ofNullable(camera).isPresent() && debug) {
-                drawCameraDebug(g, camera);
+            if (Optional.ofNullable(currentCamera).isPresent() && debug) {
+                drawCameraDebug(g, currentCamera);
             }
             if (pause) {
                 g.setColor(new Color(0.3f, 0.6f, 0.4f, 0.9f));
-                g.fillRect(0, (camera.viewport.height - 24) / 2, camera.viewport.width, 24);
+                g.fillRect(0, (currentCamera.viewport.height - 24) / 2, currentCamera.viewport.width, 24);
                 g.setColor(Color.WHITE);
                 g.setFont(g.getFont().deriveFont(14.0f).deriveFont(Font.BOLD));
                 String pauseTxt = I18n.get("game.state.pause.message");
                 int lng = g.getFontMetrics().stringWidth(pauseTxt);
-                g.drawString(pauseTxt, (camera.viewport.width - lng) / 2, (camera.viewport.height + 12) / 2);
+                g.drawString(pauseTxt, (currentCamera.viewport.width - lng) / 2, (currentCamera.viewport.height + 12) / 2);
             }
             g.dispose();
             // draw image to screen.
@@ -756,26 +818,28 @@ public class Game extends JPanel {
      */
     private void drawDebugGrid(Graphics2D g, int step) {
 
-        g.setColor(Color.LIGHT_GRAY);
         g.setFont(g.getFont().deriveFont(8.0f));
 
-        if (Optional.ofNullable(camera).isPresent()) {
-            camera.preDraw(g);
+        if (Optional.ofNullable(currentCamera).isPresent()) {
+            currentCamera.preDraw(g);
         }
+        g.setColor(Color.LIGHT_GRAY);
         for (int x = 0; x < world.getPlayArea().getWidth(); x += step) {
             g.drawLine(x, 0, x, (int) world.getPlayArea().getHeight());
         }
         for (int y = 0; y < world.getPlayArea().getHeight(); y += step) {
             g.drawLine(0, y, (int) world.getPlayArea().getWidth(), y);
         }
-        if (Optional.ofNullable(camera).isPresent()) {
-            camera.postDraw(g);
+        g.setColor(Color.CYAN);
+        g.drawRect(0, 0, (int) world.getPlayArea().getWidth(), (int) world.getPlayArea().getHeight());
+        if (Optional.ofNullable(currentCamera).isPresent()) {
+            currentCamera.postDraw(g);
         }
 
         g.setColor(Color.ORANGE);
         entities.forEach((k, v) -> {
-            if (Optional.ofNullable(camera).isPresent() && !v.isStickToCamera()) {
-                camera.preDraw(g);
+            if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
+                currentCamera.preDraw(g);
             }
 
             g.drawRect((int) v.position.x, (int) v.position.y,
@@ -785,8 +849,8 @@ public class Game extends JPanel {
                 g.drawString(s, (int) (v.position.x + v.size.x + 4.0), (int) v.position.y + il);
                 il += 10;
             }
-            if (Optional.ofNullable(camera).isPresent() && !v.isStickToCamera()) {
-                camera.postDraw(g);
+            if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
+                currentCamera.postDraw(g);
             }
 
         });
@@ -804,37 +868,35 @@ public class Game extends JPanel {
      * update game entities according to input
      */
     private void input() {
-        double accel = 10.0;
-        if (input.getKey(KeyEvent.VK_ESCAPE)) {
-            this.exit = true;
-        }
-
-        if (input.getKey(KeyEvent.VK_UP)) {
-            player.forces.add(new Vector2D(0, -accel));
-        }
-        if (input.getKey(KeyEvent.VK_DOWN)) {
-            player.forces.add(new Vector2D(0, accel));
-        }
-        if (input.getKey(KeyEvent.VK_RIGHT)) {
-            player.forces.add(new Vector2D(accel, 0));
-        }
-        if (input.getKey(KeyEvent.VK_LEFT)) {
-            player.forces.add(new Vector2D(-accel, 0));
+        for (GameEntity e : entities.values()) {
+            for (Behavior b : e.behaviors) {
+                b.input(this, e);
+            }
         }
     }
 
     /**
      * Update entities.
+     *
+     * @param elapsed elapsed time since previous call.
      */
-    private void update(double dt) {
+    public void update(double elapsed) {
         for (GameEntity entity : entities.values()) {
             entity.forces.add(world.getGravity().negate());
-            entity.update(this, dt);
+            entity.update(this, elapsed);
             constrainEntityToWorld(world, entity);
         }
-        camera.update(dt);
+        currentCamera.update(elapsed);
     }
 
+    /**
+     * Constrain the GameEntity ge to stay in the world play area.
+     *
+     * @param world the defne World for the Game
+     * @param ge    the GameEntity to be checked against world's play area constrains
+     * @see GameEntity
+     * @see World
+     */
     private void constrainEntityToWorld(World world, GameEntity ge) {
         if (world.isNotContaining(ge)) {
             if (ge.position.x + ge.size.x > world.getPlayArea().width) {
@@ -874,12 +936,11 @@ public class Game extends JPanel {
         long frames = 0;
         long realFPS = 0;
         long timeFrame = 0;
-
-        while (!exit) {
+        while (!exit && !testMode) {
             start = System.nanoTime() / 1000000.0;
             input();
             if (!pause) {
-                update(dt / 30.0);
+                update(dt * .04);
             }
 
             frames += 1;
@@ -891,19 +952,23 @@ public class Game extends JPanel {
             }
 
             draw(realFPS);
-            if (dt < FPS) {
-                try {
-                    Thread.sleep((long) (FPS - dt) / 1000);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
+            waitUntilStepEnd(dt);
 
             end = System.nanoTime() / 1000000.0;
             dt = end - start;
         }
 
+    }
+
+    private void waitUntilStepEnd(double dt) {
+        if (dt < fpsDelay) {
+            try {
+                Thread.sleep((long) (fpsDelay - dt) / 1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -915,6 +980,30 @@ public class Game extends JPanel {
         initialize(args);
         loop();
         close();
+    }
+
+
+    private void keyTyped(KeyEvent e) {
+        if (e.getKeyChar() == 'p') {
+            this.pause = !this.pause;
+        }
+    }
+
+    public Map<String, GameEntity> getEntities() {
+        return entities;
+    }
+
+    public void setCurrentCamera(Camera cam) {
+        this.currentCamera = cam;
+    }
+
+    public Camera getCurrentCamera() {
+        return currentCamera;
+    }
+
+
+    public void setWorld(World world) {
+        this.world = world;
     }
 
     /**

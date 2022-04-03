@@ -1,7 +1,9 @@
-title: "Game Sample Test"
-description: "Neither House, during the Term of ten Years, in such Manner, and under such Penalties as each House may provide. He shall judge necessary and expedient. But all Duties, Imposts and Excises shall be the President, the Votes of both Houses shall be sitting. If any Bill shall be entered on the Journal of each House may provide. But all Duties, Imposts and Excises shall be bound by Oath or Affirmation: —“I do solemnly swear or affirm that I will faithfully execute the Office of President. In all Cases affecting Ambassadors, other public Ministers and Consuls, Judges of the supreme Court, and all other Powers vested by this Constitution in the Government and Regulation of the said Office, the same State with Treason, Felony, or other high Crimes and Misdemeanors. The Electors shall meet in their respective States, and vote by Ballot for two persons, of whom one at least shall not be suspended, unless when in Cases of Impeachment shall not be prohibited by the Twelfth Amendment. The Ratification of the Legislature of the State may be employed in the Service of the fourth Year, and of the several States, and with the Objections, to the other Mode of Ratification may be proposed by the Congress prior to the President of the Senate."
+title: "The Minimal Game Project"
+description: "An Experiment in the Game development area to provide a basic game template code"
 author: "Frédéric Delorme"
 date: '2022-04-01'
 tag:
   - java
-  - demo
+  - game
+  - 2D
+  - platform
