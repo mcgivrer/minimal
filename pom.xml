@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.33</version>
+            <version>1.7.36</version>
         </dependency>
 
         <!-- tests things -->
@@ -190,12 +190,10 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <shadedClassifierName>shaded</shadedClassifierName>
                     <transformers>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                             <mainClass>${project.mainClass}</mainClass>
                         </transformer>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                             <resource>src/main/resources/</resource>
                         </transformer>
                     </transformers>
