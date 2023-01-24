@@ -1,91 +1,128 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.snapgames.game</groupId>
     <artifactId>game</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>Game</name>
     <description>A demonstration project on how to create sustainable project.</description>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>19</maven.compiler.source>
+        <maven.compiler.target>19</maven.compiler.target>
+        <maven.compiler.encoding>
+            UTF-8</maven.compiler.encoding>
+        <project.mainClass>com.demoapp.core.Application</project.mainClass>
+        <cucumber.version>7.7.0</cucumber.version>
+        <junit.version>
+            5.9.0</junit.version>
+        <junit-platform.version>1.9.0</junit-platform.version>
         <project.mainClass>fr.snapgames.game.Game</project.mainClass>
     </properties>
 
     <!-- Project Dependencies -->
+    <!-- tests things -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>
+                    org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.9.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.33</version>
+            <version>2.0.6</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.33</version>
+            <version>2.0.6</version>
         </dependency>
-
-        <!-- tests things -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>
+                org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>
+                test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <version>
+                ${junit-platform.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>7.2.3</version>
+            <artifactId>
+                cucumber-junit-platform-engine</artifactId>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.cucumber</groupId>
+            <groupId>
+                io.cucumber</groupId>
             <artifactId>cucumber-java8</artifactId>
-            <version>7.2.3</version>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>7.2.3</version>
+            <groupId>
+                io.cucumber</groupId>
+            <artifactId>cucumber-core</artifactId>
+            <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
+        <finalName>
+            ${project.artifactId}-${project.version}</finalName>
 
         <plugins>
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
             <!-- Compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <artifactId>
+                    maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
-                    <source>11</source>
-                    <target>11</target>
+                    <encoding>
+                        UTF-8</encoding>
+                    <source>19</source>
+                    <target>19</target>
                 </configuration>
             </plugin>
             <!-- Resource copying -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
+                    <encoding>
+                        UTF-8</encoding>
                 </configuration>
             </plugin>
 
             <!-- Compute coverage -->
             <plugin>
-                <groupId>org.jacoco</groupId>
+                <groupId>
+                    org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.8</version>
                 <executions>
                     <execution>
                         <goals>
@@ -93,7 +130,8 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>report</id>
+                        <id>
+                            report</id>
                         <phase>test</phase>
                         <goals>
                             <goal>report</goal>
@@ -104,12 +142,14 @@
 
             <!-- Sources -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.2.1</version>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
+                        <id>
+                            attach-sources</id>
                         <phase>verify</phase>
                         <goals>
                             <goal>jar-no-fork</goal>
@@ -121,19 +161,23 @@
 
             <!-- Javadoc -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.1</version>
                 <configuration>
-                    <encoding>utf-8</encoding>
+                    <encoding>
+                        utf-8</encoding>
                     <stylesheet>maven</stylesheet>
-                    <source>1.8</source>
+                    <source>19</source>
                     <show>public</show>
                     <failOnError>false</failOnError>
-                    <failOnWarnings>false</failOnWarnings>
+                    <failOnWarnings>
+                        false</failOnWarnings>
                     <useStandardDocletOptions>false</useStandardDocletOptions>
                     <linksource>false</linksource>
-                    <show>private</show>
+                    <show>
+                        private</show>
                     <nohelp>true</nohelp>
                     <overview>${project.basedir}/README.md</overview>
                     <bottom>
@@ -142,20 +186,22 @@
                     <!-- more links than can (or not) be added -->
                     <!--links>
                         <link>${project.issueManagement.url}</link>
-                        <link>${project.ciManagement.url}</link>
-                        <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
+                    <link>${project.ciManagement.url}</link>
+                    <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
                     </links-->
                     <!--doclet>ch.raffael.mddoclet.MarkdownDoclet</doclet>
                     <docletArtifact>
-                        <groupId>ch.raffael.markdown-doclet</groupId>
-                        <artifactId>markdown-doclet</artifactId>
+                    <groupId>ch.raffael.markdown-doclet</groupId>
+                    <artifactId>markdown-doclet</artifactId>
                         <version>1.4</version>
                     </docletArtifact-->
-                    <useStandardDocletOptions>true</useStandardDocletOptions>
+                    <useStandardDocletOptions>
+                        true</useStandardDocletOptions>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <id>
+                            attach-javadocs</id>
                         <phase>verify</phase>
                         <goals>
                             <goal>jar</goal>
@@ -166,12 +212,14 @@
 
             <!-- Build the minimalist JAR without dependencies (Normal Edition) -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
-                        <index>true</index>
+                        <index>
+                            true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>${project.mainClass}</mainClass>
@@ -182,28 +230,33 @@
 
             <!-- Shaded jar with all dependencies -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.4.1</version>
                 <configuration>
                     <!-- put your configurations here -->
-                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedArtifactAttached>
+                        true</shadedArtifactAttached>
                     <shadedClassifierName>shaded</shadedClassifierName>
                     <transformers>
                         <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>${project.mainClass}</mainClass>
+                            implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>
+                                ${project.mainClass}</mainClass>
                         </transformer>
                         <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-                            <resource>src/main/resources/</resource>
+                            implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                            <resource>
+                                src/main/resources/</resource>
                         </transformer>
                     </transformers>
                     <!-- end of config -->
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>
+                            package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
@@ -213,22 +266,26 @@
 
             <!-- Release -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.0.0-M7</version>
                 <configuration>
-                    <useReleaseProfile>false</useReleaseProfile>
+                    <useReleaseProfile>
+                        false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
                     <tagNameFormat>v${project.version}</tagNameFormat>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <autoVersionSubmodules>
+                        true</autoVersionSubmodules>
                 </configuration>
             </plugin>
 
             <!-- Execution -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>
+                    org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -237,13 +294,14 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>${project.mainClass}</mainClass>
+                    <mainClass>
+                        ${project.mainClass}</mainClass>
                     <arguments>
                         <!-- to be interpreted by a CLI parser.
 						<argument>d=0</argument>
-						<argument>w=320</argument>
+                        <argument>w=320</argument>
 						<argument>h=200</argument>
-						<argument>s=2</argument>
+                        <argument>s=2</argument>
 					-->
                     </arguments>
                 </configuration>
@@ -251,39 +309,48 @@
             <!-- Surefire reporting configuration -->
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.0.0-M7</version>
                 <configuration>
-                    <testFailureIgnore>true</testFailureIgnore>
+                    <testFailureIgnore>
+                        true</testFailureIgnore>
                     <includes>
                         <exclude>**/*BDDTests.java</exclude>
                     </includes>
                     <!-- I know the following line is bad, but... -->
-                    <argLine>--illegal-access=permit</argLine>
+                    <argLine>
+                        --illegal-access=permit</argLine>
                 </configuration>
             </plugin>
             <!-- Cucumber reporting -->
             <plugin>
-                <groupId>net.masterthought</groupId>
+                <groupId>
+                    net.masterthought</groupId>
                 <artifactId>maven-cucumber-reporting</artifactId>
-                <version>5.6.2</version>
+                <version>5.7.4</version>
                 <executions>
                     <execution>
-                        <id>execution</id>
+                        <id>
+                            execution</id>
                         <phase>verify</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <projectName>${project.name}</projectName>
-                            <outputDirectory>${project.build.directory}/site/cucumber-reports</outputDirectory>
+                            <projectName>
+                                ${project.name}</projectName>
+                            <outputDirectory>
+                                ${project.build.directory}/site/cucumber-reports</outputDirectory>
                             <jsonFiles>
                                 <!-- supports wildcard or name pattern -->
-                                <param>**/*.json</param>
+                                <param>
+                                    **/*.json</param>
                             </jsonFiles>
                             <skip>true</skip>
-                            <mergeFeaturesById>true</mergeFeaturesById>
+                            <mergeFeaturesById>
+                                true</mergeFeaturesById>
                             <buildNumber>4</buildNumber>
                         </configuration>
                     </execution>
@@ -291,30 +358,30 @@
             </plugin>
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-site-plugin -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.9.1</version>
+                <version>3.12.1</version>
             </plugin>
 
             <!-- packaging of the delivery solution
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
+            <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
-                <executions>
+            <executions>
                     <execution>
                         <id>create-archive</id>
-                        <phase>package</phase>
+            <phase>package</phase>
                         <goals>
                             <goal>single</goal>
-                        </goals>
+            </goals>
                     </execution>
                 </executions>
-                <configuration>
+            <configuration>
                     <descriptors>
-                        <descriptor>src/assembly/dep.xml</descriptor>
+            <descriptor>src/assembly/dep.xml</descriptor>
                     </descriptors>
-
-                </configuration>
+            </configuration>
             </plugin>
              -->
         </plugins>
@@ -322,33 +389,33 @@
         <resources>
             <resource>
                 <directory>src/assembly/scripts</directory>
-                <filtering>true</filtering>
+        <filtering>true</filtering>
                 <includes>
                     <include>launch.sh</include>
-                    <include>launch.bat</include>
+        <include>launch.bat</include>
                     <include>launch.ps1</include>
                 </includes>
-            </resource>
+        </resource>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
+        <filtering>true</filtering>
                 <excludes>
                     <exclude>**/*.ttf</exclude>
-                </excludes>
+        </excludes>
             </resource>
             <resource>
-                <directory>src/main/resources</directory>
+        <directory>src/main/resources</directory>
                 <filtering>false</filtering>
-                <includes>
+        <includes>
                     <include>**/*.ttf</include>
                 </includes>
-            </resource>
+        </resource>
             <resource>
                 <directory>src/changes</directory>
-                <filtering>false</filtering>
+        <filtering>false</filtering>
             </resource>
             <resource>
-                <directory>src/docs</directory>
+        <directory>src/docs</directory>
                 <filtering>false</filtering>
             </resource>
         </resources>
@@ -359,15 +426,18 @@
         <plugins>
             <!-- Generate the tests report -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>
+                    3.0.0-M7</version>
             </plugin>
             <!-- Code coverage -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>
+                    0.8.8</version>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -379,11 +449,13 @@
             </plugin>
             <!-- Javadoc reporting -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.3.2</version>
                 <configuration>
-                    <stylesheetfile>${project.basedir}/src/main/docs/css/site.css</stylesheetfile>
+                    <stylesheetfile>
+                        ${project.basedir}/src/main/docs/css/site.css</stylesheetfile>
                     <show>public</show>
                 </configuration>
             </plugin>
@@ -391,19 +463,23 @@
             <!-- Generate the Release Notes for this version (linked to jira issues
                       list) -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+                <groupId>
+                    org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.12.1</version>
                 <configuration>
-                    <includeOpenIssues>false</includeOpenIssues>
+                    <includeOpenIssues>
+                        false</includeOpenIssues>
                     <onlyMilestoneIssues>false</onlyMilestoneIssues>
-                    <columnNames>Id,Type,Key,Summary,Assignee,Status,Fix Version</columnNames>
+                    <columnNames>Id,Type,Key,Summary,Assignee,Status,Fix
+                        Version</columnNames>
                 </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
                             <report>jira-report</report>
-                            <report>changes-report</report>
+                            <report>
+                                changes-report</report>
                         </reports>
                     </reportSet>
                 </reportSets>
@@ -414,7 +490,8 @@
     </reporting>
 
     <organization>
-        <name>SnapGames</name>
+        <name>
+            SnapGames</name>
         <url>https://snapgames.fr</url>
     </organization>
 </project>

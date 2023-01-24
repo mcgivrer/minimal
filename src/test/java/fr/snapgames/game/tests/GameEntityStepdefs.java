@@ -1,11 +1,11 @@
-package features;
+package fr.snapgames.game.tests;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import fr.snapgames.game.Game;
 import fr.snapgames.game.Game.GameEntity;
 import io.cucumber.java8.En;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class GameEntityStepdefs implements En {

@@ -1,15 +1,11 @@
-package features;
+package fr.snapgames.game.tests;
+
+import java.awt.Dimension;
 
 import fr.snapgames.game.Game;
-import io.cucumber.java8.En;
-
-import fr.snapgames.game.Game.GameEntity;
-import fr.snapgames.game.Game.World;
-import fr.snapgames.game.Game.Camera;
 import fr.snapgames.game.Game.Vector2D;
-
-
-import java.awt.*;
+import fr.snapgames.game.Game.World;
+import io.cucumber.java8.En;
 
 public class GameStepdefs implements En {
     Game game;

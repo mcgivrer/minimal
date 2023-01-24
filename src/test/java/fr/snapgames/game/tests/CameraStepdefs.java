@@ -1,16 +1,18 @@
-package features;
+package fr.snapgames.game.tests;
 
-import fr.snapgames.game.Game;
-import fr.snapgames.game.Game.GameEntity;
-import io.cucumber.java8.En;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import fr.snapgames.game.Game.Camera;
-
-import java.awt.*;
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import static org.junit.Assert.*;
+import fr.snapgames.game.Game;
+import fr.snapgames.game.Game.Camera;
+import fr.snapgames.game.Game.GameEntity;
+import io.cucumber.java8.En;
+
 
 public class CameraStepdefs implements En {
     private Game game;
