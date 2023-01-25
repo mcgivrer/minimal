@@ -40,6 +40,14 @@
         <url>https://github.com/SnapGames/${project.name}/issues</url>
     </issueManagement>
 
+    <!--distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/SnapGames/${project.name}</url>
+        </repository>
+    </distributionManagement-->
+
     <!-- Project Dependencies -->
     <!-- tests things -->
     <dependencyManagement>
