@@ -20,34 +20,34 @@ public class CameraStepdefs implements En {
     public CameraStepdefs() {
         And("no Camera is set", () -> {
             game = (Game) TestContext.get("game", new Game());
-            game.setCurrentCamera(null);
+            game.getRenderer().setCurrentCamera(null);
         });
         And("I add a Camera named {string}", (String camName) -> {
             game = (Game) TestContext.get("game");
             Camera cam = new Camera(camName);
-            game.setCurrentCamera(cam);
+            game.getRenderer().setCurrentCamera(cam);
         });
         And("I add a Camera named {string} with tween at {double}", (String camName, Double tweenFactor) -> {
             game = (Game) TestContext.get("game");
             Camera cam = new Camera(camName).setTween(tweenFactor);
-            game.setCurrentCamera(cam);
+            game.getRenderer().setCurrentCamera(cam);
         });
         Then("the current Camera is not null", () -> {
             game = (Game) TestContext.get("game");
-            assertNotNull(game.getCurrentCamera());
+            assertNotNull(game.getRenderer().getCurrentCamera());
         });
         And("the current Camera name is {string}", (String camName) -> {
             game = (Game) TestContext.get("game");
-            assertEquals(camName, game.getCurrentCamera().name);
+            assertEquals(camName, game.getRenderer().getCurrentCamera().name);
         });
         And("set Camera {string} target as GameEntity {string}", (String camName, String targetName) -> {
             game = (Game) TestContext.get("game");
             GameEntity player = game.getEntities().get(targetName);
-            game.getCurrentCamera().setTarget(player);
+            game.getRenderer().getCurrentCamera().setTarget(player);
         });
         And("the current Camera {string} name is centered on {string}", (String camName, String targetName) -> {
             game = (Game) TestContext.get("game");
-            Camera cam = game.getCurrentCamera();
+            Camera cam = game.getRenderer().getCurrentCamera();
             GameEntity target = game.getEntities().get(targetName);
             Game.Vector2D targetPos = target.position;
             Game.Vector2D camPos = cam.position;
@@ -61,7 +61,7 @@ public class CameraStepdefs implements En {
         });
         And("set Camera {string} viewport as {int},{int}", (String camName, Integer vpWidth, Integer vpHeight) -> {
             game = (Game) TestContext.get("game");
-            Camera cam = game.getCurrentCamera();
+            Camera cam = game.getRenderer().getCurrentCamera();
             cam.viewport = new Dimension(vpWidth, vpHeight);
         });
 

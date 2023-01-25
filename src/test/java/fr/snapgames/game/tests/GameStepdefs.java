@@ -16,7 +16,7 @@ public class GameStepdefs implements En {
             World world = new World(
                     new Dimension(320,200),
                     new Vector2D(0,-0.981));
-            game.setWorld(world);
+            game.getPhysicEngine().setWorld(world);
             for (int i = 0; i < nbUpdate; i++) {
                 game.update(step);
             }

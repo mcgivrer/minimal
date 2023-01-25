@@ -1231,7 +1231,12 @@ public class Game extends JPanel {
         return entities;
     }
 
-    private PhysicEngine getPhysicEngine() {
+    public Renderer getRenderer() {
+        return renderer;
+    }
+
+
+    public PhysicEngine getPhysicEngine() {
         return pe;
     }
 
