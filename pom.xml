@@ -1,10 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.snapgames.game</groupId>
     <artifactId>game</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
     <name>minimal</name>
     <description>A demonstration project on how to create sustainable project.</description>
     <inceptionYear>2023</inceptionYear>
@@ -33,7 +31,7 @@
         <url>https://github.com/SnapGames/${project.name}</url>
         <connection>scm:git:git@github.com:SnapGames/${project.name}.git</connection>
         <developerConnection>scm:git:https://github.com/SnapGames/${project.name}.git</developerConnection>
-        <tag>v${project.version}</tag>
+        <tag>v0.0.2-SNAPSHOT</tag>
     </scm>
     <issueManagement>
         <system>GitHub</system>
@@ -285,14 +283,12 @@
                     </shadedArtifactAttached>
                     <shadedClassifierName>shaded</shadedClassifierName>
                     <transformers>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                             <mainClass>
                                 ${project.mainClass}
                             </mainClass>
                         </transformer>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                             <resource>
                                 src/main/resources/
                             </resource>
