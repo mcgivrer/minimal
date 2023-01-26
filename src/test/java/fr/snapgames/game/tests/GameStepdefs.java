@@ -2,9 +2,9 @@ package fr.snapgames.game.tests;
 
 import java.awt.Dimension;
 
-import fr.snapgames.game.Game;
-import fr.snapgames.game.Game.Vector2D;
-import fr.snapgames.game.Game.World;
+import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.math.Vector2D;
+import fr.snapgames.game.core.math.World;
 import io.cucumber.java8.En;
 
 public class GameStepdefs implements En {

@@ -8,9 +8,10 @@ import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import fr.snapgames.game.Game;
-import fr.snapgames.game.Game.Camera;
-import fr.snapgames.game.Game.GameEntity;
+import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.entity.Camera;
+import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.math.Vector2D;
 import io.cucumber.java8.En;
 
 
@@ -49,8 +50,8 @@ public class CameraStepdefs implements En {
             game = (Game) TestContext.get("game");
             Camera cam = game.getRenderer().getCurrentCamera();
             GameEntity target = game.getEntities().get(targetName);
-            Game.Vector2D targetPos = target.position;
-            Game.Vector2D camPos = cam.position;
+            Vector2D targetPos = target.position;
+            Vector2D camPos = cam.position;
             // define the area covered by the target
             Rectangle2D.Double r = new Rectangle2D.Double(targetPos.x, targetPos.y, target.size.x, target.size.y);
             // check is center of viewport area is in the target covered area.

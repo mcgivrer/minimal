@@ -3,8 +3,9 @@ package fr.snapgames.game.tests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import fr.snapgames.game.Game;
-import fr.snapgames.game.Game.GameEntity;
+import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.math.Vector2D;
 import io.cucumber.java8.En;
 
 
@@ -21,7 +22,7 @@ public class GameEntityStepdefs implements En {
         });
         Then("I Add a new GameEntity named {string}", (String entityName) -> {
             game = (Game) TestContext.get("game");
-            game.add(new Game.GameEntity(entityName));
+            game.add(new GameEntity(entityName));
         });
         And("the entities map size is {int}", (Integer nbEntities) -> {
             assertEquals(nbEntities.intValue(), game.getEntities().size());
@@ -29,7 +30,7 @@ public class GameEntityStepdefs implements En {
         And("I Add a new GameEntity named {string} at {double},{double}", (String entityName, Double posX, Double posY) -> {
             game = (Game) TestContext.get("game");
             GameEntity e = new GameEntity(entityName)
-                    .setPosition(new Game.Vector2D(posX, posY));
+                    .setPosition(new Vector2D(posX, posY));
             game.add(e);
         });
         And("the GameEntity {string} is stick to camera", (String entityName) -> {
