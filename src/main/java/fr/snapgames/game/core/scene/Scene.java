@@ -1,8 +1,11 @@
 package fr.snapgames.game.core.scene;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.io.InputHandler;
+
+import java.util.Map;
 
 public interface Scene {
 
@@ -23,4 +26,8 @@ public interface Scene {
     void draw(Game g, Renderer r);
 
     void dispose(Game g);
+
+    Map<String, GameEntity> getEntities();
+
+    GameEntity getEntity(String name);
 }

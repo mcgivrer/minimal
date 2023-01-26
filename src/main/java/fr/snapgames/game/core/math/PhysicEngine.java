@@ -61,13 +61,13 @@ public class PhysicEngine {
             entity.forces.add(world.getGravity().negate());
 
             // compute acceleration
-            entity.acceleration = entity.acceleration.addAll(entity.forces);
+            entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(entity.material.density);
             entity.acceleration = entity.acceleration.multiply((double) entity.getAttribute("mass", 1.0));
 
             entity.acceleration.maximize((double) entity.getAttribute("maxAcceleration", 1.0));
 
             // compute velocity
-            entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed)).multiply(entity.roughness);
+            entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed)).multiply(entity.material.roughness);
             entity.speed.maximize((double) entity.getAttribute("maxSpeed", 1.0));
 
             // compute position
@@ -98,7 +98,7 @@ public class PhysicEngine {
             if (ge.position.y < 0) {
                 ge.position.y = 0;
             }
-            ge.speed = ge.speed.multiply(-ge.elasticity);
+            ge.speed = ge.speed.multiply(-ge.material.elasticity);
         }
     }
 }

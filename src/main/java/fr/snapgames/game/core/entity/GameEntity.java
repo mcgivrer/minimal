@@ -2,6 +2,7 @@ package fr.snapgames.game.core.entity;
 
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.PhysicType;
 import fr.snapgames.game.core.math.Vector2D;
 
@@ -22,10 +23,9 @@ public class GameEntity {
     public Vector2D acceleration = new Vector2D(0, 0);
     public Vector2D size = new Vector2D(16, 16);
     public EntityType type = EntityType.RECTANGLE;
-    public boolean stickToCamera = false;
-    public double elasticity = 1.0;
-    public double roughness = 1.0;
     public double rotation = 0.0;
+
+    public boolean stickToCamera = false;
     public List<Vector2D> forces = new ArrayList<>();
     public Color color = Color.RED;
     public Map<String, Object> attributes = new HashMap<>();
@@ -34,6 +34,8 @@ public class GameEntity {
     public boolean active;
     public long life = -1;
     public long duration;
+
+    public Material material;
     public PhysicType physicType = PhysicType.DYNAMIC;
 
     /**
@@ -45,6 +47,7 @@ public class GameEntity {
         this.name = name;
         this.active = true;
         this.physicType = PhysicType.DYNAMIC;
+        this.material = Material.DEFAULT;
         attributes.put("maxSpeed", 8.0);
         attributes.put("maxAcceleration", 3.0);
         attributes.put("mass", 10.0);
@@ -60,7 +63,7 @@ public class GameEntity {
 
             this.acceleration.maximize((double) attributes.get("maxAcceleration"));
 
-            this.speed = this.speed.add(this.acceleration.multiply(dt)).multiply(roughness);
+            this.speed = this.speed.add(this.acceleration.multiply(dt)).multiply(material.roughness);
             this.speed.maximize((double) attributes.get("maxSpeed"));
 
             this.position = this.position.add(this.speed.multiply(dt));
@@ -103,15 +106,11 @@ public class GameEntity {
         return this;
     }
 
-    public GameEntity setRoughness(double r) {
-        this.roughness = r;
+    public GameEntity setMaterial(Material m) {
+        this.material = m;
         return this;
     }
 
-    public GameEntity setElasticity(double e) {
-        this.elasticity = e;
-        return this;
-    }
 
     public Collection<String> getDebugInfo() {
         List<String> ls = new ArrayList<>();
@@ -119,6 +118,12 @@ public class GameEntity {
         ls.add(String.format("pos: %04.2f,%04.2f", this.position.x, this.position.y));
         ls.add(String.format("spd: %04.2f,%04.2f", this.speed.x, this.speed.y));
         ls.add(String.format("acc: %04.2f,%04.2f", this.acceleration.x, this.acceleration.y));
+        ls.add(String.format("mat: %s[%04.2f,%04.2f,%04.2f]",
+                this.material.name,
+                this.material.density,
+                this.material.elasticity,
+                this.material.roughness));
+
         return ls;
     }
 

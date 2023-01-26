@@ -7,9 +7,10 @@ import java.awt.geom.Ellipse2D;
 import java.util.Optional;
 
 /**
- * @author : M313104
- * @mailto : buy@mail.com
- * @created : 26/01/2023
+ * TextEntityRenderer plugin to draw TextEntity on screen.
+ * 
+ * @author Frédéric Delorme
+ * @since 0.0.2
  **/
 public class GameEntityRenderer implements RendererPlugin<GameEntity> {
     @Override

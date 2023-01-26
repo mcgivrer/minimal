@@ -2,22 +2,18 @@ package fr.snapgames.game.core;
 
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.Configuration;
-import fr.snapgames.game.core.entity.Camera;
-import fr.snapgames.game.core.entity.EntityType;
 import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.entity.TextEntity;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
-import fr.snapgames.game.core.math.Vector2D;
-import fr.snapgames.game.core.math.World;
+import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
+import fr.snapgames.game.demo101.scenes.DemoScene;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.*;
 
@@ -77,6 +73,7 @@ public class Game extends JPanel {
         renderer = new Renderer(this);
         pe = new PhysicEngine(this);
         scm = new SceneManager(this);
+        scm.initialize(this);
     }
 
     private void createFrame() {
@@ -128,161 +125,21 @@ public class Game extends JPanel {
      */
     private void initialize(String[] args) {
         config.parseArguments(args);
-        create((Graphics2D) frame.getGraphics());
 
         // add entities to the services.
         renderer.addEntities(entities.values());
         pe.addEntities(entities.values());
+
+        scm.activateDefaultScene();
+
+        create((Graphics2D) frame.getGraphics());
+
     }
 
     private void create(Graphics2D g) {
-
-        // define world play area with constrains
-        int worldWidth = config.getInteger("game.world.width", 1000);
-        int worldHeight = config.getInteger("game.world.height", 1000);
-        World world = new World(new Dimension(worldWidth, worldHeight),
-                new Vector2D(0, -0.981));
-        getPhysicEngine().setWorld(world);
-        // Add a score display
-        int viewportWidth = config.getInteger("game.camera.viewport.width", 320);
-        TextEntity score = (TextEntity) new TextEntity("score")
-                .setText("00000")
-                .setFont(g.getFont().deriveFont(20.0f))
-                .setPosition(new Vector2D(viewportWidth - 80, 25))
-                .setSize(new Vector2D(16, 16))
-                .setColor(Color.WHITE)
-                .stickToCamera(true)
-                .addBehavior(new Behavior<TextEntity>() {
-                    @Override
-                    public void update(Game game, TextEntity entity, double dt) {
-                        GameEntity p = game.entities.get("player");
-                        int score = (int) p.getAttribute("score", 0);
-                        entity.setText(String.format("%05d", score));
-                    }
-
-                    @Override
-                    public void input(Game game, TextEntity entity) {
-
-                    }
-
-                    @Override
-                    public void draw(Game game, Graphics2D g, TextEntity entity) {
-
-                    }
-                });
-        add(score);
-        // Create a player
-        GameEntity player = new GameEntity("player")
-                .setPosition(new Vector2D(worldWidth / 2.0, worldHeight / 2.0))
-                .setSize(new Vector2D(16, 16))
-                .setColor(Color.BLUE)
-                .setRoughness(1.0)
-                .setElasticity(0.21)
-                .setAttribute("maxSpeed", 6.0)
-                .setAttribute("maxAcceleration", 2.0)
-                .setAttribute("mass", 8.0)
-                .addBehavior(new Behavior<GameEntity>() {
-                    @Override
-                    public void update(Game game, GameEntity entity, double dt) {
-
-                    }
-
-                    @Override
-                    public void input(Game game, GameEntity entity) {
-                        double accel = (Double) entity.getAttribute("speedStep", 1.0);
-                        if (inputHandler.getKey(KeyEvent.VK_ESCAPE)) {
-                            game.exit = true;
-                        }
-
-                        if (inputHandler.getKey(KeyEvent.VK_UP)) {
-                            entity.forces.add(new Vector2D(0, -accel));
-                        }
-                        if (inputHandler.getKey(KeyEvent.VK_DOWN)) {
-                            entity.forces.add(new Vector2D(0, accel));
-                        }
-                        if (inputHandler.getKey(KeyEvent.VK_RIGHT)) {
-                            entity.forces.add(new Vector2D(accel, 0));
-                        }
-                        if (inputHandler.getKey(KeyEvent.VK_LEFT)) {
-                            entity.forces.add(new Vector2D(-accel, 0));
-                        }
-                    }
-
-                    @Override
-                    public void draw(Game game, Graphics2D g, GameEntity entity) {
-
-                    }
-                });
-        add(player);
-
-        // Create enemies Entity.
-        for (int i = 0; i < 10; i++) {
-            GameEntity e = new GameEntity("en_" + i)
-                    .setPosition(new Vector2D(Math.random() * worldWidth, Math.random() * worldHeight))
-                    .setSize(new Vector2D(12, 12))
-                    .setColor(Color.RED)
-                    .setType(EntityType.CIRCLE)
-                    .setRoughness(1.0)
-                    .setElasticity(0.1)
-                    .setAttribute("maxSpeed", 8.0)
-                    .setAttribute("maxAcceleration", 2.5)
-                    .setAttribute("mass", 5.0)
-                    .setAttribute("attractionDistance", 40.0)
-                    .setAttribute("attractionForce", 2.0)
-                    .addBehavior(new Behavior<GameEntity>() {
-                        @Override
-                        public void input(Game g, GameEntity e) {
-
-                        }
-
-                        @Override
-                        public void draw(Game game, Graphics2D g, GameEntity e) {
-                            if (game.debug) {
-                                double attrDist = (double) e.getAttribute("attractionDistance", 0);
-                                if (attrDist > 0) {
-                                    g.setColor(Color.YELLOW);
-                                    Ellipse2D el = new Ellipse2D.Double(
-                                            e.position.x - (attrDist), e.position.y - (attrDist),
-                                            e.size.x + (attrDist * 2.0), e.size.y + (attrDist * 2.0));
-                                    g.draw(el);
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void update(Game game, GameEntity entity, double dt) {
-                            // if player near this entity less than distance (attrDist),
-                            // a force (attrForce) is applied to entity to reach to player.
-                            GameEntity p = game.entities.get("player");
-                            double attrDist = (double) entity.attributes.get("attractionDistance");
-                            double attrForce = (double) entity.attributes.get("attractionForce");
-                            if (p.position.distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
-                                Vector2D v = p.position.substract(entity.position);
-                                entity.forces.add(v.normalize().multiply(attrForce));
-                            }
-                            if (p.position.distance(entity.position.add(p.size.multiply(0.5))) < entity.size.add(p.size)
-                                    .multiply(0.25).length()) {
-                                entity.setActive(false);
-                                int score = (int) p.getAttribute("score", 0);
-                                score += 20;
-                                p.setAttribute("score", score);
-
-                            }
-                        }
-                    });
-
-            add(e);
-        }
-
-        // define Camera to track player.
-        int vpWidth = config.getInteger("game.camera.viewport.width", 320);
-        int vpHeight = config.getInteger("game.camera.viewport.height", 200);
-
-        Camera cam = new Camera("camera")
-                .setTarget(player)
-                .setTween(0.1)
-                .setViewport(new Dimension(vpWidth, vpHeight));
-        renderer.setCurrentCamera(cam);
+        Scene s = scm.getActiveScene();
+        s.loadResources(this);
+        s.create(this);
     }
 
     public void add(GameEntity e) {
@@ -304,11 +161,13 @@ public class Game extends JPanel {
      * update game entities according to input
      */
     private void input() {
-        for (GameEntity e : entities.values()) {
+        Scene s = scm.getActiveScene();
+        for (GameEntity e : s.getEntities().values()) {
             for (Behavior b : e.behaviors) {
                 b.input(this, e);
             }
         }
+        scm.getActiveScene().input(this, inputHandler);
     }
 
     /**
@@ -319,6 +178,7 @@ public class Game extends JPanel {
     public void update(double elapsed) {
         pe.update(elapsed);
         renderer.getCurrentCamera().update(elapsed);
+        scm.getActiveScene().update(this, elapsed);
     }
 
     /**
@@ -405,6 +265,14 @@ public class Game extends JPanel {
         return pause;
     }
 
+    public void setExit(boolean b) {
+        exit = true;
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
     public Configuration getConfiguration() {
         return config;
     }
@@ -413,9 +281,10 @@ public class Game extends JPanel {
         return renderer;
     }
 
-    public JFrame getFrame() {
-        return frame;
+    public InputHandler getInputHandler() {
+        return inputHandler;
     }
+
 
     public PhysicEngine getPhysicEngine() {
         return pe;
