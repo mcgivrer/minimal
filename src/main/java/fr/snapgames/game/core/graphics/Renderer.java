@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Renderer service to draw every GameEntity on screen.
- * 
+ *
  * @author Frédéric Delorme
  * @since 0.0.2
  **/
@@ -83,7 +83,7 @@ public class Renderer {
                     currentCamera.postDraw(g);
                 }
             });
-            if (game.getDebug()) {
+            if (game.getDebug() > 0) {
                 drawDebugGrid(g, 32);
                 if (Optional.ofNullable(currentCamera).isPresent()) {
                     drawCameraDebug(g, currentCamera);
@@ -120,7 +120,7 @@ public class Renderer {
                 g2.drawImage(buffer, 0, 18,
                         null);
                 g2.scale(1.0 / scale, 1.0 / scale);
-                if (game.getDebug()) {
+                if (game.getDebug() > 0) {
                     g2.setColor(Color.ORANGE);
                     long realFPS = (long) stats.get("fps");
                     g2.setFont(g2.getFont().deriveFont(11.0f));

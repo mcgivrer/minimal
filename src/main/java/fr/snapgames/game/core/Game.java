@@ -4,6 +4,7 @@ import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Renderer;
+import fr.snapgames.game.core.io.GameKeyListener;
 import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
@@ -32,8 +33,9 @@ public class Game extends JPanel {
     double FPS = 60.0;
     double fpsDelay = 1000000.0 / 60.0;
     double scale = 2.0;
+    // debug level
+    int debug = 0;
     // some internal flags
-    boolean debug = true;
     boolean exit = false;
     boolean pause = false;
 
@@ -63,7 +65,7 @@ public class Game extends JPanel {
     public Game(String configFilePath, boolean testMode) {
         this.testMode = testMode;
         config = new Configuration(configFilePath);
-        debug = config.getBoolean("game.debug", false);
+        debug = config.getInteger("game.debug", 0);
         FPS = config.getDouble("game.screen.fps", 60.0);
         fpsDelay = 1000000.0 / FPS;
 
@@ -78,6 +80,7 @@ public class Game extends JPanel {
 
     private void createFrame() {
         inputHandler = new InputHandler(this);
+        inputHandler.addListener(new GameKeyListener(this));
         String title = I18n.get("game.title");
         frame = new JFrame(title);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -257,7 +260,7 @@ public class Game extends JPanel {
         return entities;
     }
 
-    public boolean getDebug() {
+    public int getDebug() {
         return debug;
     }
 
@@ -301,4 +304,7 @@ public class Game extends JPanel {
         game.run(args);
     }
 
+    public void setDebug(int debug) {
+        this.debug = debug;
+    }
 }

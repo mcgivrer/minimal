@@ -27,7 +27,13 @@ public class GameEntity {
 
     public boolean stickToCamera = false;
     public List<Vector2D> forces = new ArrayList<>();
+
     public Color color = Color.RED;
+    public Color shadowColor;
+    public int shadowWidth;
+    public Color borderColor;
+    public int borderWidth;
+
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior> behaviors = new ArrayList<>();
     public BufferedImage image;
@@ -134,6 +140,26 @@ public class GameEntity {
 
     public GameEntity setColor(Color color) {
         this.color = color;
+        return this;
+    }
+
+    public GameEntity setShadowColor(Color c) {
+        this.shadowColor = c;
+        return this;
+    }
+
+    public GameEntity setShadowWidth(int sw) {
+        this.shadowWidth = sw;
+        return this;
+    }
+
+    public GameEntity setBorderColor(Color c) {
+        this.borderColor = c;
+        return this;
+    }
+
+    public GameEntity setBorderWidth(int sw) {
+        this.borderWidth = sw;
         return this;
     }
 

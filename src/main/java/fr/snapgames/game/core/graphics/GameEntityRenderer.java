@@ -8,7 +8,7 @@ import java.util.Optional;
 
 /**
  * TextEntityRenderer plugin to draw TextEntity on screen.
- * 
+ *
  * @author Frédéric Delorme
  * @since 0.0.2
  **/
@@ -37,17 +37,34 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
                 }
                 break;
             case RECTANGLE:
+                if (Optional.ofNullable(e.borderColor).isPresent()) {
+                    Stroke b = g.getStroke();
+                    g.setColor(e.borderColor);
+                    g.setStroke(new BasicStroke(e.borderWidth));
+                    g.drawRect(
+                            (int) e.position.x, (int) e.position.y,
+                            (int) e.size.x, (int) e.size.y);
+                    g.setStroke(b);
+                }
                 g.setColor(e.color);
                 g.fillRect(
                         (int) e.position.x, (int) e.position.y,
                         (int) e.size.x, (int) e.size.y);
                 break;
             case CIRCLE:
+                Ellipse2D el = new Ellipse2D.Double(
+                        e.position.x, e.position.y,
+                        e.size.x, e.size.y);
+                if (Optional.ofNullable(e.borderColor).isPresent()) {
+                    Stroke b = g.getStroke();
+                    g.setColor(e.borderColor);
+                    g.setColor(e.borderColor);
+                    g.draw(el);
+                    g.setStroke(b);
+                }
                 g.setColor(e.color);
                 g.setPaint(e.color);
-                g.fill(new Ellipse2D.Double(
-                        e.position.x, e.position.y,
-                        e.size.x, e.size.y));
+                g.fill(el);
                 break;
         }
     }

@@ -54,6 +54,8 @@ public class DemoScene extends AbstractScene {
                 .setPosition(new Vector2D(viewportWidth - 80, 25))
                 .setSize(new Vector2D(16, 16))
                 .setColor(Color.WHITE)
+                .setShadowColor(Color.BLACK)
+                .setShadowWidth(2)
                 .stickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
                     @Override
@@ -139,7 +141,7 @@ public class DemoScene extends AbstractScene {
 
                         @Override
                         public void draw(Game game, Graphics2D g, GameEntity e) {
-                            if (game.getDebug()) {
+                            if (game.getDebug() > 0) {
                                 double attrDist = (double) e.getAttribute("attractionDistance", 0);
                                 if (attrDist > 0) {
                                     g.setColor(Color.YELLOW);

@@ -11,6 +11,7 @@ public class TextEntity extends GameEntity {
     public String text;
     public Font font;
 
+
     /**
      * Create a new TextEntity with a name.
      *
@@ -29,6 +30,7 @@ public class TextEntity extends GameEntity {
         this.font = font;
         return this;
     }
+
 
     @Override
     public Collection<String> getDebugInfo() {
