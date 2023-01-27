@@ -4,8 +4,8 @@ import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.math.World;
-import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.demo101.scenes.DemoScene;
+import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -61,9 +61,7 @@ public class DemoListener implements KeyListener {
      * @param nb         the number of balls to create.
      */
     private void addNewBalls(String objectName, int nb) {
-        scene.createEnemies(objectName, nb,
-                (int) world.getPlayArea().getWidth(),
-                (int) world.getPlayArea().getHeight());
+        scene.createCoins(objectName, nb, world, new CoinBehavior());
     }
 
     /**

@@ -78,7 +78,6 @@ public class PhysicEngine {
             entity.forces.add(world.getGravity().negate());
 
             // compute acceleration
-
             double density = entity.material != null ? entity.material.density : world.getMaterial().density;
             entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(density);
             entity.acceleration = entity.acceleration.multiply((double) entity.mass);
@@ -86,7 +85,6 @@ public class PhysicEngine {
             entity.acceleration.maximize((double) entity.getAttribute("maxAcceleration", maxAcceleration));
 
             // compute velocity
-
             entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed));
             if (entity.contact == 0) {
                 entity.speed = entity.speed.multiply(world.getMaterial().roughness);
@@ -97,7 +95,9 @@ public class PhysicEngine {
 
             // compute position
             entity.position = entity.position.add(entity.speed.multiply(elapsed));
+            entity.getChild().forEach(c -> updateEntity(c, elapsed));
             entity.forces.clear();
+
         }
     }
 
