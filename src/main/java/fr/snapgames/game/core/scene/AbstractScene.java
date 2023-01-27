@@ -44,7 +44,7 @@ public abstract class AbstractScene implements Scene {
         this.name = name;
     }
 
-    protected void add(GameEntity ge) {
+    public void add(GameEntity ge) {
         game.getRenderer().addEntity(ge);
         game.getPhysicEngine().addEntity(ge);
         this.entities.put(ge.name, ge);

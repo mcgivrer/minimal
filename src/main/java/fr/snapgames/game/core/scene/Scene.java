@@ -30,4 +30,6 @@ public interface Scene {
     Map<String, GameEntity> getEntities();
 
     GameEntity getEntity(String name);
+
+    void add(GameEntity e);
 }

@@ -10,7 +10,6 @@ import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
-import fr.snapgames.game.demo101.scenes.DemoScene;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -52,10 +51,8 @@ public class Game extends JPanel {
     private I18n i18n;
     private JFrame frame;
     private InputHandler inputHandler;
-    // Internal GameEntity cache
-    private Map<String, GameEntity> entities = new HashMap<>();
     private Renderer renderer;
-    private PhysicEngine pe;
+    private PhysicEngine physicEngine;
     private SceneManager scm;
 
     public Game() {
@@ -73,7 +70,7 @@ public class Game extends JPanel {
 
         // create services
         renderer = new Renderer(this);
-        pe = new PhysicEngine(this);
+        physicEngine = new PhysicEngine(this);
         scm = new SceneManager(this);
         scm.initialize(this);
     }
@@ -129,10 +126,6 @@ public class Game extends JPanel {
     private void initialize(String[] args) {
         config.parseArguments(args);
 
-        // add entities to the services.
-        renderer.addEntities(entities.values());
-        pe.addEntities(entities.values());
-
         scm.activateDefaultScene();
 
         create((Graphics2D) frame.getGraphics());
@@ -143,10 +136,6 @@ public class Game extends JPanel {
         Scene s = scm.getActiveScene();
         s.loadResources(this);
         s.create(this);
-    }
-
-    public void add(GameEntity e) {
-        entities.put(e.name, e);
     }
 
     /**
@@ -179,7 +168,7 @@ public class Game extends JPanel {
      * @param elapsed elapsed time since previous call.
      */
     public void update(double elapsed) {
-        pe.update(elapsed);
+        physicEngine.update(elapsed);
         renderer.getCurrentCamera().update(elapsed);
         scm.getActiveScene().update(this, elapsed);
     }
@@ -187,9 +176,10 @@ public class Game extends JPanel {
     /**
      * Request to close this Window frame.
      */
-    public void close() {
+    public void dispose() {
         dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
         frame.dispose();
+        config.save();
     }
 
     /**
@@ -247,17 +237,13 @@ public class Game extends JPanel {
     public void run(String[] args) {
         initialize(args);
         loop();
-        close();
+        dispose();
     }
 
     public void keyTyped(KeyEvent e) {
         if (e.getKeyChar() == 'p') {
             this.pause = !this.pause;
         }
-    }
-
-    public Map<String, GameEntity> getEntities() {
-        return entities;
     }
 
     public int getDebug() {
@@ -290,7 +276,11 @@ public class Game extends JPanel {
 
 
     public PhysicEngine getPhysicEngine() {
-        return pe;
+        return physicEngine;
+    }
+
+    public SceneManager getSceneManager() {
+        return scm;
     }
 
     /**
@@ -307,4 +297,5 @@ public class Game extends JPanel {
     public void setDebug(int debug) {
         this.debug = debug;
     }
+
 }

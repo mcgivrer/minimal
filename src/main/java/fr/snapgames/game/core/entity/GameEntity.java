@@ -2,6 +2,7 @@ package fr.snapgames.game.core.entity;
 
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
 import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.PhysicType;
 import fr.snapgames.game.core.math.Vector2D;
@@ -43,6 +44,7 @@ public class GameEntity {
 
     public Material material;
     public PhysicType physicType = PhysicType.DYNAMIC;
+    private Class<?> renderedByPlugin;
 
     /**
      * Create a new GameEntity with a name.
@@ -178,6 +180,15 @@ public class GameEntity {
 
     public GameEntity setActive(boolean active) {
         this.active = active;
+        return this;
+    }
+
+    public Class<?> getRenderedBy() {
+        return renderedByPlugin;
+    }
+
+    public GameEntity setDrawnBy(Class<?> rendererPluginClass) {
+        this.renderedByPlugin = rendererPluginClass;
         return this;
     }
 }

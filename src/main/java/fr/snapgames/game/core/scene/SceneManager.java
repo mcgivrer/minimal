@@ -45,9 +45,9 @@ public class SceneManager {
                 try {
                     Class<? extends Scene> sceneToAdd = (Class<? extends Scene>) Class.forName(kv[1]);
                     availableScenes.put(kv[0], sceneToAdd);
-                    System.out.printf("Add scene %s:%s", kv[0], kv[1]);
+                    System.out.printf("SceneManager:Add scene %s:%s%n", kv[0], kv[1]);
                 } catch (ClassNotFoundException e) {
-                    System.err.printf("Unable to load class %s", kv[1]);
+                    System.err.printf("SceneManager:Unable to load class %s%n", kv[1]);
                 }
             });
         }
@@ -74,13 +74,14 @@ public class SceneManager {
                 s.create(game);
                 this.activeScene = s;
                 this.activeScene.initialize(game);
+                System.out.printf("SceneManager:Scene %s instance has been activated%n", sceneClass.getName());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                      NoSuchMethodException e) {
-                System.out.printf("Unable to create Scene {0} instance:" + e.getMessage(), sceneClass.getName());
+                System.err.printf("SceneManager:Unable to create Scene %S instance:%s%n", sceneClass.getName(), e.getMessage());
             }
         } else {
             System.err.printf(
-                    "The Scene %s does not exists in configuration file for key '%s'.%n",
+                    "SceneManager:The Scene %s does not exists in configuration file for key '%s'.%n",
                     name, name);
         }
 

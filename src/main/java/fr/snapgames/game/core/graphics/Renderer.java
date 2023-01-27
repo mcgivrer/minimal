@@ -5,6 +5,9 @@ import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.graphics.plugins.GameEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
+import fr.snapgames.game.core.graphics.plugins.TextEntityRenderer;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.World;
 
@@ -122,7 +125,7 @@ public class Renderer {
                 g2.scale(1.0 / scale, 1.0 / scale);
                 if (game.getDebug() > 0) {
                     g2.setColor(Color.ORANGE);
-                    long realFPS = (long) stats.get("fps");
+                    long realFPS = (stats.containsKey("fps") ? (long) stats.get("fps") : 0);
                     g2.setFont(g2.getFont().deriveFont(11.0f));
                     g2.drawString("FPS:" + realFPS, 40, 50);
                 }
@@ -136,7 +139,9 @@ public class Renderer {
 
     private void drawEntity(Graphics2D g, GameEntity entity) {
         if (plugins.containsKey(entity.getClass())) {
-            ((RendererPlugin) plugins.get(entity.getClass())).draw(this, g, entity);
+            RendererPlugin rp =((RendererPlugin) plugins.get(entity.getClass()));
+            rp.draw(this, g, entity);
+            entity.setDrawnBy(rp.getClass());
         } else {
             System.err.printf("Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
         }

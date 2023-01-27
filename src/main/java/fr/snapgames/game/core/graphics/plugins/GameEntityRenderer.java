@@ -1,6 +1,7 @@
-package fr.snapgames.game.core.graphics;
+package fr.snapgames.game.core.graphics.plugins;
 
 import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.graphics.Renderer;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;

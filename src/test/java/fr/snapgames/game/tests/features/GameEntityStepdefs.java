@@ -1,4 +1,4 @@
-package fr.snapgames.game.tests;
+package fr.snapgames.game.tests.features;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,27 +15,28 @@ public class GameEntityStepdefs implements En {
 
     public GameEntityStepdefs() {
         Given("a Game is instantiated", () -> {
+            TestContext.clear();
             game = (Game) TestContext.get("game", new Game("/test.properties", true));
         });
         And("the entities map is empty", () -> {
-            assertTrue(game.getEntities().isEmpty());
+            assertTrue(game.getSceneManager().getActiveScene().getEntities().isEmpty());
         });
         Then("I Add a new GameEntity named {string}", (String entityName) -> {
             game = (Game) TestContext.get("game");
-            game.add(new GameEntity(entityName));
+            game.getSceneManager().getActiveScene().add(new GameEntity(entityName));
         });
         And("the entities map size is {int}", (Integer nbEntities) -> {
-            assertEquals(nbEntities.intValue(), game.getEntities().size());
+            assertEquals(nbEntities.intValue(), game.getSceneManager().getActiveScene().getEntities().size());
         });
-        And("I Add a new GameEntity named {string} at {double},{double}", (String entityName, Double posX, Double posY) -> {
+        And("I add a new GameEntity named {string} at {double},{double}", (String entityName, Double posX, Double posY) -> {
             game = (Game) TestContext.get("game");
             GameEntity e = new GameEntity(entityName)
                     .setPosition(new Vector2D(posX, posY));
-            game.add(e);
+            game.getSceneManager().getActiveScene().add(e);
         });
         And("the GameEntity {string} is stick to camera", (String entityName) -> {
             game = (Game) TestContext.get("game");
-            GameEntity e = game.getEntities().get(entityName);
+            GameEntity e = game.getSceneManager().getActiveScene().getEntities().get(entityName);
             e.stickToCamera(true);
         });
     }

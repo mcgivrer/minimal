@@ -1,4 +1,4 @@
-package fr.snapgames.game.tests;
+package fr.snapgames.game.tests.features;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,26 +41,27 @@ public class CameraStepdefs implements En {
             game = (Game) TestContext.get("game");
             assertEquals(camName, game.getRenderer().getCurrentCamera().name);
         });
-        And("set Camera {string} target as GameEntity {string}", (String camName, String targetName) -> {
+        And("I set Camera {string} target as GameEntity {string}", (String camName, String targetName) -> {
             game = (Game) TestContext.get("game");
-            GameEntity player = game.getEntities().get(targetName);
+            GameEntity player = game.getSceneManager().getActiveScene().getEntities().get(targetName);
             game.getRenderer().getCurrentCamera().setTarget(player);
         });
         And("the current Camera {string} name is centered on {string}", (String camName, String targetName) -> {
             game = (Game) TestContext.get("game");
             Camera cam = game.getRenderer().getCurrentCamera();
-            GameEntity target = game.getEntities().get(targetName);
+            GameEntity target = game.getSceneManager().getActiveScene().getEntities().get(targetName);
             Vector2D targetPos = target.position;
             Vector2D camPos = cam.position;
             // define the area covered by the target
             Rectangle2D.Double r = new Rectangle2D.Double(targetPos.x, targetPos.y, target.size.x, target.size.y);
             // check is center of viewport area is in the target covered area.
             assertTrue(r.contains(
-                    new Point2D.Double(
-                            camPos.x + (cam.viewport.width * 0.5),
-                            camPos.y + (cam.viewport.height * 0.5))));
+                            new Point2D.Double(
+                                    camPos.x + (cam.viewport.width * 0.5),
+                                    camPos.y + (cam.viewport.height * 0.5))),
+                    String.format("The %s camera does not match the %s target position by %s", cam.name, target.name, camPos.distance(targetPos)));
         });
-        And("set Camera {string} viewport as {int},{int}", (String camName, Integer vpWidth, Integer vpHeight) -> {
+        And("I set Camera {string} viewport as {int},{int}", (String camName, Integer vpWidth, Integer vpHeight) -> {
             game = (Game) TestContext.get("game");
             Camera cam = game.getRenderer().getCurrentCamera();
             cam.viewport = new Dimension(vpWidth, vpHeight);

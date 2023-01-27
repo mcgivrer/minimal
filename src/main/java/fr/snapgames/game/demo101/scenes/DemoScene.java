@@ -121,7 +121,69 @@ public class DemoScene extends AbstractScene {
         add(player);
 
         // Create enemies Entity.
-        for (int i = 0; i < 10; i++) {
+        createEnemies(20, worldWidth, worldHeight);
+
+        // define Camera to track player.
+        int vpWidth = config.getInteger("game.camera.viewport.width", 320);
+        int vpHeight = config.getInteger("game.camera.viewport.height", 200);
+
+        Camera cam = new Camera("camera")
+                .setTarget(player)
+                .setTween(0.1)
+                .setViewport(new Dimension(vpWidth, vpHeight));
+        renderer.setCurrentCamera(cam);
+    }
+
+    /**
+     * Create nb enemies in the world area delimited by worldWidth x worldHeight.
+     * @param nb nb enemies to create
+     * @param worldWidth width of the world
+     * @param worldHeight
+     */
+    private void createEnemies(int nb, int worldWidth, int worldHeight) {
+        Behavior<GameEntity> enemyBehavior = new Behavior<GameEntity>() {
+            @Override
+            public void input(Game g, GameEntity e) {
+
+            }
+
+            @Override
+            public void draw(Game game, Graphics2D g, GameEntity e) {
+                if (game.getDebug() > 0) {
+                    double attrDist = (double) e.getAttribute("attractionDistance", 0);
+                    if (attrDist > 0) {
+                        g.setColor(Color.YELLOW);
+                        Ellipse2D el = new Ellipse2D.Double(
+                                e.position.x - (attrDist), e.position.y - (attrDist),
+                                e.size.x + (attrDist * 2.0), e.size.y + (attrDist * 2.0));
+                        g.draw(el);
+                    }
+                }
+            }
+
+            @Override
+            public void update(Game game, GameEntity entity, double dt) {
+                // if player near this entity less than distance (attrDist),
+                // a force (attrForce) is applied to entity to reach to player.
+                GameEntity p = getEntity("player");
+                double attrDist = (double) entity.attributes.get("attractionDistance");
+                double attrForce = (double) entity.attributes.get("attractionForce");
+                if (p.position.distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
+                    Vector2D v = p.position.substract(entity.position);
+                    entity.forces.add(v.normalize().multiply(attrForce));
+                }
+                if (p.position.distance(entity.position.add(p.size.multiply(0.75))) < entity.size.add(p.size)
+                        .multiply(0.25).length()) {
+                    entity.setActive(false);
+                    int score = (int) p.getAttribute("score", 0);
+                    score += 20;
+                    p.setAttribute("score", score);
+
+                }
+            }
+        };
+
+        for (int i = 0; i < nb; i++) {
             GameEntity e = new GameEntity("en_" + i)
                     .setPosition(new Vector2D(Math.random() * worldWidth, Math.random() * worldHeight))
                     .setSize(new Vector2D(12, 12))
@@ -133,60 +195,10 @@ public class DemoScene extends AbstractScene {
                     .setAttribute("mass", 5.0)
                     .setAttribute("attractionDistance", 40.0)
                     .setAttribute("attractionForce", 2.0)
-                    .addBehavior(new Behavior<GameEntity>() {
-                        @Override
-                        public void input(Game g, GameEntity e) {
-
-                        }
-
-                        @Override
-                        public void draw(Game game, Graphics2D g, GameEntity e) {
-                            if (game.getDebug() > 0) {
-                                double attrDist = (double) e.getAttribute("attractionDistance", 0);
-                                if (attrDist > 0) {
-                                    g.setColor(Color.YELLOW);
-                                    Ellipse2D el = new Ellipse2D.Double(
-                                            e.position.x - (attrDist), e.position.y - (attrDist),
-                                            e.size.x + (attrDist * 2.0), e.size.y + (attrDist * 2.0));
-                                    g.draw(el);
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void update(Game game, GameEntity entity, double dt) {
-                            // if player near this entity less than distance (attrDist),
-                            // a force (attrForce) is applied to entity to reach to player.
-                            GameEntity p = getEntity("player");
-                            double attrDist = (double) entity.attributes.get("attractionDistance");
-                            double attrForce = (double) entity.attributes.get("attractionForce");
-                            if (p.position.distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
-                                Vector2D v = p.position.substract(entity.position);
-                                entity.forces.add(v.normalize().multiply(attrForce));
-                            }
-                            if (p.position.distance(entity.position.add(p.size.multiply(0.5))) < entity.size.add(p.size)
-                                    .multiply(0.25).length()) {
-                                entity.setActive(false);
-                                int score = (int) p.getAttribute("score", 0);
-                                score += 20;
-                                p.setAttribute("score", score);
-
-                            }
-                        }
-                    });
+                    .addBehavior(enemyBehavior);
 
             add(e);
         }
-
-        // define Camera to track player.
-        int vpWidth = config.getInteger("game.camera.viewport.width", 320);
-        int vpHeight = config.getInteger("game.camera.viewport.height", 200);
-
-        Camera cam = new Camera("camera")
-                .setTarget(player)
-                .setTween(0.1)
-                .setViewport(new Dimension(vpWidth, vpHeight));
-        renderer.setCurrentCamera(cam);
     }
 
     @Override
