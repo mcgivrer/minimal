@@ -83,6 +83,8 @@ public class SceneManager {
             System.err.printf(
                     "SceneManager:The Scene %s does not exists in configuration file for key '%s'.%n",
                     name, name);
+            System.err.printf(
+                    "SceneManager:Known scenes are '%s'.%n", scenes.entrySet().toString());
         }
 
     }

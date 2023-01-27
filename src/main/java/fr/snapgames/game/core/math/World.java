@@ -30,4 +30,14 @@ public class World {
                 || ge.position.y < 0
                 || ge.position.y + ge.size.y > playArea.height;
     }
+
+    public World setPlayArea(Dimension pa) {
+        this.playArea = pa;
+        return this;
+    }
+
+    public World setGravity(Vector2D g) {
+        this.gravity = g;
+        return this;
+    }
 }

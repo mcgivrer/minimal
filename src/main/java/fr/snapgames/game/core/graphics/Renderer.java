@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Renderer service to draw every GameEntity on screen.
@@ -96,6 +97,10 @@ public class Renderer {
                 drawPauseMode(g);
             }
             g.dispose();
+            stats.put("Pause", game.isUpdatePause() ? "On" : "Off");
+            stats.put("Obj", entities.size());
+            stats.put("Scn", game.getSceneManager().getActiveScene().getName());
+            stats.put("Dbg", game.getDebug());
             // draw image to screen.
             drawToScreen(stats);
         }
@@ -105,7 +110,7 @@ public class Renderer {
         g.setColor(new Color(0.3f, 0.6f, 0.4f, 0.9f));
         g.fillRect(0, (currentCamera.viewport.height - 24) / 2, currentCamera.viewport.width, 24);
         g.setColor(Color.WHITE);
-        g.setFont(g.getFont().deriveFont(14.0f).deriveFont(Font.BOLD));
+        g.setFont(g.getFont().deriveFont(Font.ITALIC, 14.0f).deriveFont(Font.BOLD));
         String pauseTxt = I18n.get("game.state.pause.message");
         int lng = g.getFontMetrics().stringWidth(pauseTxt);
         g.drawString(pauseTxt, (currentCamera.viewport.width - lng) / 2, (currentCamera.viewport.height + 12) / 2);
@@ -124,10 +129,12 @@ public class Renderer {
                         null);
                 g2.scale(1.0 / scale, 1.0 / scale);
                 if (game.getDebug() > 0) {
+                    g2.setColor(new Color(0.3f, 0.0f, 0.0f, 0.8f));
+                    g2.fillRect(0, frame.getHeight() - 32, frame.getWidth(), 32);
                     g2.setColor(Color.ORANGE);
-                    long realFPS = (stats.containsKey("fps") ? (long) stats.get("fps") : 0);
-                    g2.setFont(g2.getFont().deriveFont(11.0f));
-                    g2.drawString("FPS:" + realFPS, 40, 50);
+                    String displayLine = prepareStatsString(stats);
+                    g2.setFont(g2.getFont().deriveFont(15.0f));
+                    g2.drawString(displayLine, 16, frame.getHeight() - 16);
                 }
                 g2.dispose();
                 if (frame.getBufferStrategy() != null) {
@@ -137,13 +144,20 @@ public class Renderer {
         }
     }
 
+    private String prepareStatsString(Map<String, Object> stats) {
+        return "[" + stats.entrySet().stream().map(entry ->
+                        entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining("|")) + "]";
+    }
+
     private void drawEntity(Graphics2D g, GameEntity entity) {
+        entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
-            RendererPlugin rp =((RendererPlugin) plugins.get(entity.getClass()));
+            RendererPlugin rp = ((RendererPlugin) plugins.get(entity.getClass()));
             rp.draw(this, g, entity);
             entity.setDrawnBy(rp.getClass());
         } else {
-            System.err.printf("Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
+            System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
         }
     }
 
@@ -175,26 +189,29 @@ public class Renderer {
             currentCamera.postDraw(g);
         }
 
-        g.setColor(Color.ORANGE);
         entities.values().stream()
                 .filter(e -> e.isActive())
+                .sorted((e1, e2) -> {
+                    return e1.getLayer() > e2.getLayer() ? 1 : e1.getPriority() > e2.getPriority() ? 1 : -1;
+                })
                 .forEach(v -> {
                     if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
                         currentCamera.preDraw(g);
                     }
-
-                    g.drawRect((int) v.position.x, (int) v.position.y,
-                            (int) v.size.x, (int) v.size.y);
-                    int il = 0;
-                    for (String s : v.getDebugInfo()) {
-                        g.drawString(s, (int) (v.position.x + v.size.x + 4.0), (int) v.position.y + il);
-                        il += 10;
+                    if (plugins.containsKey(v.getClass())) {
+                        RendererPlugin rp = ((RendererPlugin) plugins.get(v.getClass()));
+                        rp.drawDebug(this, g, v);
+                    } else {
+                        System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", v.getClass().getName());
                     }
+
                     if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
                         currentCamera.postDraw(g);
                     }
 
                 });
+
+        g.setColor(Color.ORANGE);
         g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
