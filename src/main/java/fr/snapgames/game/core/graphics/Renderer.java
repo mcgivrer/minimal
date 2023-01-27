@@ -60,10 +60,6 @@ public class Renderer {
         this.plugins.put(rendererPlugin.getObjectClass(), rendererPlugin);
     }
 
-    public void setCurrentCamera(Camera cam) {
-        this.currentCamera = cam;
-    }
-
     public void draw(Map<String, Object> stats) {
         if (Optional.ofNullable(buffer).isPresent()) {
             Graphics2D g = buffer.createGraphics();
@@ -169,7 +165,7 @@ public class Renderer {
      */
     private void drawDebugGrid(Graphics2D g, int step) {
         World world = game.getPhysicEngine().getWorld();
-        g.setFont(g.getFont().deriveFont(8.0f));
+        g.setFont(g.getFont().deriveFont(8.5f));
 
         if (Optional.ofNullable(currentCamera).isPresent()) {
             currentCamera.preDraw(g);
@@ -188,7 +184,14 @@ public class Renderer {
         if (Optional.ofNullable(currentCamera).isPresent()) {
             currentCamera.postDraw(g);
         }
+        if (game.getDebug() > 1) {
+            drawDebugOnEntitites(g);
+        }
+        g.setColor(Color.ORANGE);
+        g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
+    }
 
+    private void drawDebugOnEntitites(Graphics2D g) {
         entities.values().stream()
                 .filter(e -> e.isActive())
                 .sorted((e1, e2) -> {
@@ -210,9 +213,6 @@ public class Renderer {
                     }
 
                 });
-
-        g.setColor(Color.ORANGE);
-        g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
     private void drawCameraDebug(Graphics2D g, Camera camera) {
@@ -221,6 +221,11 @@ public class Renderer {
         g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
         g.drawString(String.format("targ: %s", camera.target.name), 20, 44);
 
+    }
+
+
+    public void setCurrentCamera(Camera cam) {
+        this.currentCamera = cam;
     }
 
     public Camera getCurrentCamera() {

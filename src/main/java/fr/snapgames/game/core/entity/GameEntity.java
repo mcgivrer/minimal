@@ -16,6 +16,7 @@ import java.util.List;
  * Entity manipulated by Game.
  *
  * @author Frédéric Delorme
+ * @since 0.0.1
  */
 public class GameEntity {
     public String name = "noname";

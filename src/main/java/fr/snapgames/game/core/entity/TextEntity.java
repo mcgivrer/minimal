@@ -5,6 +5,9 @@ import java.util.Collection;
 
 /**
  * A Specialization of GameEntity to support Text
+ *
+ * @author Frédéric Delorme
+ * @since 0.0.1
  */
 public class TextEntity extends GameEntity {
 

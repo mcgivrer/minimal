@@ -113,12 +113,9 @@ public class DemoScene extends AbstractScene {
                     @Override
                     public void input(Game game, GameEntity entity) {
                         double accel = (Double) entity.getAttribute("speedStep", 1.0);
-                        if (inputHandler.getKey(KeyEvent.VK_ESCAPE)) {
-                            game.setExit(true);
-                        }
 
                         if (inputHandler.getKey(KeyEvent.VK_UP)) {
-                            entity.forces.add(new Vector2D(0, -accel));
+                            entity.forces.add(new Vector2D(0, -accel * 3.0));
                         }
                         if (inputHandler.getKey(KeyEvent.VK_DOWN)) {
                             entity.forces.add(new Vector2D(0, accel));
@@ -170,7 +167,7 @@ public class DemoScene extends AbstractScene {
 
             @Override
             public void draw(Game game, Graphics2D g, GameEntity e) {
-                if (game.getDebug() > 0) {
+                if (game.getDebug() > 2) {
                     double attrDist = (double) e.getAttribute("attractionDistance", 0);
                     if (attrDist > 0) {
                         g.setColor(Color.YELLOW);

@@ -6,6 +6,9 @@ import java.awt.*;
 
 /**
  * The Behavior interface to define specific processing on a GameEntity.
+ *
+ * @author Frédéric Delorme
+ * @since 0.0.1
  */
 public interface Behavior<T> {
     void update(Game game, T entity, double dt);
