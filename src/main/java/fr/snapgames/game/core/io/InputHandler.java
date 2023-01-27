@@ -19,6 +19,10 @@ public class InputHandler implements KeyListener {
     Game game;
     Map<Integer, KeyEvent> events = new ConcurrentHashMap<>();
     List<KeyListener> listeners = new ArrayList<>();
+    private boolean ctrlDown;
+    private boolean shiftDown;
+    private boolean altDown;
+    private boolean altGrDown;
 
     public InputHandler(Game g) {
         this.game = g;
@@ -33,12 +37,21 @@ public class InputHandler implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        checkMetaKeys(e);
         events.put(e.getKeyCode(), e);
         listeners.forEach(kl -> kl.keyPressed(e));
     }
 
+    private void checkMetaKeys(KeyEvent e) {
+        ctrlDown = e.isControlDown();
+        shiftDown = e.isShiftDown();
+        altDown = e.isAltDown();
+        altGrDown = e.isAltGraphDown();
+    }
+
     @Override
     public void keyReleased(KeyEvent e) {
+        checkMetaKeys(e);
         events.remove(e.getKeyCode());
         listeners.forEach(kl -> kl.keyReleased(e));
 
@@ -50,5 +63,21 @@ public class InputHandler implements KeyListener {
 
     public void addListener(KeyListener keyListener) {
         listeners.add(keyListener);
+    }
+
+    public boolean isCtrlPressed() {
+        return ctrlDown;
+    }
+
+    public boolean isShiftPressed() {
+        return shiftDown;
+    }
+
+    public boolean isAltPressed() {
+        return altDown;
+    }
+
+    public boolean isAltGrPressed() {
+        return altGrDown;
     }
 }

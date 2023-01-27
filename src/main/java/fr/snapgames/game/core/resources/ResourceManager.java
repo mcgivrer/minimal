@@ -3,6 +3,7 @@ package fr.snapgames.game.core.resources;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public class ResourceManager {
 
-    private static Map<String, Object> resources = new ConcurrentHashMap<>();
+    private static Map<String, Object> resources = new HashMap<>();
 
     public static BufferedImage loadImage(String filePath) {
         if (!addResource(filePath)) return null;

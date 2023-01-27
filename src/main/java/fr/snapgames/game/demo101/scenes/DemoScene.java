@@ -102,8 +102,9 @@ public class DemoScene extends AbstractScene {
                 .setImage(playerImg)
                 .setColor(Color.BLUE)
                 .setMaterial(Material.RUBBER)
-                .setAttribute("maxVelocity", 6.0)
-                .setAttribute("maxAcceleration", 2.0)
+                .setAttribute("maxVelocity", 10.0)
+                .setAttribute("maxAcceleration", 8.0)
+                .setAttribute("speedStep", 0.4)
                 .setMass(8.0)
                 .setLayer(2)
                 .setPriority(1)
@@ -116,6 +117,8 @@ public class DemoScene extends AbstractScene {
                     @Override
                     public void input(Game game, GameEntity entity) {
                         double accel = (Double) entity.getAttribute("speedStep", 1.0);
+                        accel = inputHandler.isShiftPressed() ? accel * 4.0 : accel;
+                        accel = inputHandler.isCtrlPressed() ? accel * 2.0 : accel;
 
                         if (inputHandler.getKey(KeyEvent.VK_UP)) {
                             entity.forces.add(new Vector2D(0, -accel * 3.0));
