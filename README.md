@@ -1,5 +1,7 @@
 # README
 
+[![Java CI with Maven](https://github.com/SnapGames/minimal/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/SnapGames/minimal/actions/workflows/maven.yml)
+
 This is a small Minimalistic Game project , based on a master Game Java class, with some subclasses to let keep the code
 ass short as possible.
 
