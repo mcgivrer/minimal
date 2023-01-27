@@ -125,7 +125,9 @@ public class PhysicEngine {
                 ge.contact += 8;
 
             }
-            ge.speed = ge.speed.multiply(-ge.material.elasticity);
+            if (ge.contact > 0) {
+                ge.speed = ge.speed.multiply(-ge.material.elasticity);
+            }
         }
     }
 }
