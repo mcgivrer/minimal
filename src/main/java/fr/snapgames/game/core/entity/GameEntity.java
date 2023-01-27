@@ -19,7 +19,8 @@ import java.util.List;
  * @since 0.0.1
  */
 public class GameEntity {
-    public String name = "noname";
+    public static long index = 0;
+    public String name = "noname" + (index++);
     public Vector2D position = new Vector2D(0, 0);
     public Vector2D speed = new Vector2D(0, 0);
     public Vector2D acceleration = new Vector2D(0, 0);

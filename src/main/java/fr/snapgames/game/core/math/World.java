@@ -10,6 +10,7 @@ import java.awt.*;
 public class World {
     private Dimension playArea;
     private Vector2D gravity;
+    private Material material = Material.AIR;
 
     public World(Dimension area, Vector2D gravity) {
         this.playArea = area;
@@ -39,5 +40,14 @@ public class World {
     public World setGravity(Vector2D g) {
         this.gravity = g;
         return this;
+    }
+
+    public World setMaterial(Material mat) {
+        this.material = mat;
+        return this;
+    }
+
+    public Material getMaterial() {
+        return material;
     }
 }

@@ -70,19 +70,24 @@ public class Renderer {
             g.setColor(clearColor);
             g.clearRect(0, 0, buffer.getWidth(), buffer.getHeight());
             // draw all entities according to Camera
-            entities.values().stream().filter(e -> e.isActive()).forEach(entity -> {
-                // draw Scene
-                if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
-                    currentCamera.preDraw(g);
-                }
-                for (Behavior b : entity.behaviors) {
-                    b.draw(game, g, entity);
-                }
-                drawEntity(g, entity);
-                if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
-                    currentCamera.postDraw(g);
-                }
-            });
+            entities.values().stream()
+                    .filter(e -> e.isActive())
+                    .sorted((e1, e2) -> {
+                        return e1.getLayer() > e2.getLayer() ? 1 : e1.getPriority() > e2.getPriority() ? 1 : -1;
+                    })
+                    .forEach(entity -> {
+                        // draw Scene
+                        if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
+                            currentCamera.preDraw(g);
+                        }
+                        for (Behavior b : entity.behaviors) {
+                            b.draw(game, g, entity);
+                        }
+                        drawEntity(g, entity);
+                        if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
+                            currentCamera.postDraw(g);
+                        }
+                    });
             if (game.getDebug() > 0) {
                 drawDebugGrid(g, 32);
                 if (Optional.ofNullable(currentCamera).isPresent()) {
@@ -100,6 +105,11 @@ public class Renderer {
             // draw image to screen.
             drawToScreen(stats);
         }
+        // remove inactive object.
+        entities.values().stream()
+                .filter(e -> !e.isActive())
+                .collect(Collectors.toList())
+                .forEach(ed -> entities.remove(ed.name));
     }
 
     private void drawPauseMode(Graphics2D g) {
@@ -184,14 +194,14 @@ public class Renderer {
         if (Optional.ofNullable(currentCamera).isPresent()) {
             currentCamera.postDraw(g);
         }
-        if (game.getDebug() > 1) {
-            drawDebugOnEntitites(g);
+        if (game.getDebug() > 2) {
+            drawEntitesDebug(g);
         }
         g.setColor(Color.ORANGE);
         g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
-    private void drawDebugOnEntitites(Graphics2D g) {
+    private void drawEntitesDebug(Graphics2D g) {
         entities.values().stream()
                 .filter(e -> e.isActive())
                 .sorted((e1, e2) -> {

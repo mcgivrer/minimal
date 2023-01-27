@@ -15,6 +15,7 @@ import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
+import fr.snapgames.game.demo101.scenes.io.DemoListener;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -54,6 +55,8 @@ public class DemoScene extends AbstractScene {
         int worldHeight = config.getInteger("game.world.height", 640);
         pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
 
+        g.getInputHandler().addListener(new DemoListener(g, this));
+
         //Add Background Image
         GameEntity backgroundImage = new GameEntity("backgroundImage")
                 .setImage(backgroundImg)
@@ -70,8 +73,8 @@ public class DemoScene extends AbstractScene {
                 .setColor(Color.WHITE)
                 .setShadowColor(Color.BLACK)
                 .setShadowWidth(2)
-                .setLayer(1)
-                .setPriority(1)
+                .setLayer(2)
+                .setPriority(3)
                 .stickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
                     @Override
@@ -98,7 +101,7 @@ public class DemoScene extends AbstractScene {
                 .setPosition(new Vector2D(worldWidth / 2.0, worldHeight / 2.0))
                 .setImage(playerImg)
                 .setColor(Color.BLUE)
-                .setMaterial(Material.DEFAULT)
+                .setMaterial(Material.RUBBER)
                 .setAttribute("maxVelocity", 6.0)
                 .setAttribute("maxAcceleration", 2.0)
                 .setMass(8.0)
@@ -138,7 +141,7 @@ public class DemoScene extends AbstractScene {
         add(player);
 
         // Create enemies Entity.
-        createEnemies(20, worldWidth, worldHeight);
+        createEnemies("ball_", 20, worldWidth, worldHeight);
 
         // define Camera to track player.
         int vpWidth = config.getInteger("game.camera.viewport.width", 320);
@@ -158,7 +161,7 @@ public class DemoScene extends AbstractScene {
      * @param worldWidth  width of the world
      * @param worldHeight
      */
-    private void createEnemies(int nb, int worldWidth, int worldHeight) {
+    public void createEnemies(String namePattern, int nb, int worldWidth, int worldHeight) {
         Behavior<GameEntity> enemyBehavior = new Behavior<GameEntity>() {
             @Override
             public void input(Game g, GameEntity e) {
@@ -167,7 +170,7 @@ public class DemoScene extends AbstractScene {
 
             @Override
             public void draw(Game game, Graphics2D g, GameEntity e) {
-                if (game.getDebug() > 2) {
+                if (game.getDebug() > 1) {
                     double attrDist = (double) e.getAttribute("attractionDistance", 0);
                     if (attrDist > 0) {
                         g.setColor(Color.YELLOW);
@@ -186,29 +189,29 @@ public class DemoScene extends AbstractScene {
                 GameEntity p = getEntity("player");
                 double attrDist = (double) entity.attributes.get("attractionDistance");
                 double attrForce = (double) entity.attributes.get("attractionForce");
-                if (p.position.distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
+
+                if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
                     Vector2D v = p.position.substract(entity.position);
                     entity.forces.add(v.normalize().multiply(attrForce));
                 }
-                if (p.position.distance(entity.position.add(p.size.multiply(0.75))) < entity.size.add(p.size)
+                if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.25))) < entity.size.add(p.size)
                         .multiply(0.25).length()) {
                     entity.setActive(false);
                     int score = (int) p.getAttribute("score", 0);
                     score += 20;
                     p.setAttribute("score", score);
-
                 }
             }
         };
 
         for (int i = 0; i < nb; i++) {
-            GameEntity e = new GameEntity("en_" + i)
+            GameEntity e = new GameEntity(namePattern + GameEntity.index)
                     .setPosition(new Vector2D(Math.random() * worldWidth, Math.random() * worldHeight))
                     .setImage(coinImg)
-                    .setMaterial(Material.DEFAULT)
+                    .setMaterial(Material.SUPER_BALL)
                     .setMass(5.0)
-                    .setLayer(1)
-                    .setPriority(1)
+                    .setLayer(4)
+                    .setPriority(4)
                     .setAttribute("maxVelocity", 4.0)
                     .setAttribute("maxAcceleration", 5.0)
                     .setAttribute("attractionDistance", 80.0)
