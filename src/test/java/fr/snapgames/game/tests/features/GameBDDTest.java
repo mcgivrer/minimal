@@ -1,4 +1,4 @@
-package fr.snapgames.game.tests;
+package fr.snapgames.game.tests.features;
 
 import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
@@ -15,7 +15,7 @@ import static io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME;
  */
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("fr/snapgames/game/stepdefs")
+//@SelectClasspathResource("fr/snapgames/game/stepdefs")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "fr.snapgames.game.tests")
 @ConfigurationParameter(key = "cucumber.features", value = "src/test/resources/features")
 @ConfigurationParameter(key = "plugin", value = "usage")
