@@ -1,0 +1,15 @@
+# STart with a VNC service with a new dedicated Docker image
+image:
+  file: .gitpod.Dockerfile
+
+# List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
+tasks:
+  - init: echo 'init script' # runs during prebuild
+    command: . /home/gitpod/.sdkman/bin/sdkman-init.sh && \
+             sdk env install && \
+             sdk end use
+
+# List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
+ports:
+  - port: 3000
+    onOpen: open-preview

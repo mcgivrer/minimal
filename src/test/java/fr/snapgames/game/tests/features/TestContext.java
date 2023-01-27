@@ -1,4 +1,4 @@
-package features;
+package fr.snapgames.game.tests.features;
 
 import java.util.HashMap;
 import java.util.Map;
