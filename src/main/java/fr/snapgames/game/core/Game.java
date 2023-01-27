@@ -8,6 +8,7 @@ import fr.snapgames.game.core.io.GameKeyListener;
 import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
+import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
 
@@ -59,7 +60,7 @@ public class Game extends JPanel {
         this("/game.properties", false);
     }
 
-    public Game(String configFilePath, boolean testMode) {
+    public Game(String configFilePath, boolean mode) {
         this.testMode = testMode;
         config = new Configuration(configFilePath);
         debug = config.getInteger("game.debug", 0);
@@ -96,6 +97,7 @@ public class Game extends JPanel {
         frame.setPreferredSize(dim);
         frame.setMinimumSize(dim);
         frame.setMaximumSize(dim);
+        frame.setIconImage(ResourceManager.loadImage("/images/sg-logo-image.png"));
 
         setBackground(Color.BLACK);
         frame.setIgnoreRepaint(true);
@@ -142,10 +144,12 @@ public class Game extends JPanel {
      * Draw all things on screen.
      *
      * @param realFPS displayed Frame Per Seconds.
+     * @param realUPS
      */
-    private void draw(long realFPS) {
+    private void draw(long realFPS, long realUPS) {
         Map<String, Object> stats = new HashMap<>();
         stats.put("fps", realFPS);
+        stats.put("ups", realUPS);
         renderer.draw(stats);
     }
 
@@ -193,12 +197,16 @@ public class Game extends JPanel {
         // FPS measure
         long frames = 0;
         long realFPS = 0;
+
+        long ups = 0;
+        long realUPS = 0;
         long timeFrame = 0;
         while (!exit && !testMode) {
             start = System.nanoTime() / 1000000.0;
             input();
             if (!pause) {
                 update(dt * .04);
+                ups += 1;
             }
 
             frames += 1;
@@ -206,10 +214,12 @@ public class Game extends JPanel {
             if (timeFrame > 1000) {
                 realFPS = frames;
                 frames = 0;
+                realUPS = ups;
+                ups = 0;
                 timeFrame = 0;
             }
 
-            draw(realFPS);
+            draw(realFPS, realUPS);
             waitUntilStepEnd(dt);
 
             end = System.nanoTime() / 1000000.0;

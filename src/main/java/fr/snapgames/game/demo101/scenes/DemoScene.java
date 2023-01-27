@@ -13,16 +13,22 @@ import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.math.World;
+import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 
 /**
  * @author Frédéric Delorme
  **/
 public class DemoScene extends AbstractScene {
+
+    private BufferedImage playerImg;
+    private BufferedImage backgroundImg;
+    private BufferedImage coinImg;
 
     public DemoScene(Game g, String name) {
         super(g, name);
@@ -35,27 +41,37 @@ public class DemoScene extends AbstractScene {
 
     @Override
     public void loadResources(Game g) {
+        backgroundImg = ResourceManager.loadImage("/images/backgrounds/forest.jpg");
+        playerImg = ResourceManager.loadImage("/images/sprites01.png").getSubimage(0, 0, 32, 32);
+        coinImg = ResourceManager.loadImage("/images/tiles01.png").getSubimage(8 * 16, 6 * 16, 16, 16);
 
     }
 
     @Override
     public void create(Game g) {
         // define world play area with constrains
-        int worldWidth = config.getInteger("game.world.width", 1000);
-        int worldHeight = config.getInteger("game.world.height", 1000);
-        World world = new World(new Dimension(worldWidth, worldHeight),
-                new Vector2D(0, -0.981));
-        pe.setWorld(world);
+        int worldWidth = config.getInteger("game.world.width", 1008);
+        int worldHeight = config.getInteger("game.world.height", 640);
+        pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
+
+        //Add Background Image
+        GameEntity backgroundImage = new GameEntity("backgroundImage")
+                .setImage(backgroundImg)
+                .setLayer(0)
+                .setPriority(1);
+        add(backgroundImage);
+
         // Add a score display
         int viewportWidth = config.getInteger("game.camera.viewport.width", 320);
         TextEntity score = (TextEntity) new TextEntity("score")
                 .setText("00000")
                 .setFont(g.getFont().deriveFont(20.0f))
                 .setPosition(new Vector2D(viewportWidth - 80, 25))
-                .setSize(new Vector2D(16, 16))
                 .setColor(Color.WHITE)
                 .setShadowColor(Color.BLACK)
                 .setShadowWidth(2)
+                .setLayer(1)
+                .setPriority(1)
                 .stickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
                     @Override
@@ -80,12 +96,14 @@ public class DemoScene extends AbstractScene {
         // Create a player
         GameEntity player = new GameEntity("player")
                 .setPosition(new Vector2D(worldWidth / 2.0, worldHeight / 2.0))
-                .setSize(new Vector2D(16, 16))
+                .setImage(playerImg)
                 .setColor(Color.BLUE)
                 .setMaterial(Material.DEFAULT)
-                .setAttribute("maxSpeed", 6.0)
+                .setAttribute("maxVelocity", 6.0)
                 .setAttribute("maxAcceleration", 2.0)
-                .setAttribute("mass", 8.0)
+                .setMass(8.0)
+                .setLayer(2)
+                .setPriority(1)
                 .addBehavior(new Behavior<GameEntity>() {
                     @Override
                     public void update(Game game, GameEntity entity, double dt) {
@@ -106,9 +124,11 @@ public class DemoScene extends AbstractScene {
                             entity.forces.add(new Vector2D(0, accel));
                         }
                         if (inputHandler.getKey(KeyEvent.VK_RIGHT)) {
+                            entity.setDirection(1);
                             entity.forces.add(new Vector2D(accel, 0));
                         }
                         if (inputHandler.getKey(KeyEvent.VK_LEFT)) {
+                            entity.setDirection(-1);
                             entity.forces.add(new Vector2D(-accel, 0));
                         }
                     }
@@ -136,8 +156,9 @@ public class DemoScene extends AbstractScene {
 
     /**
      * Create nb enemies in the world area delimited by worldWidth x worldHeight.
-     * @param nb nb enemies to create
-     * @param worldWidth width of the world
+     *
+     * @param nb          nb enemies to create
+     * @param worldWidth  width of the world
      * @param worldHeight
      */
     private void createEnemies(int nb, int worldWidth, int worldHeight) {
@@ -186,15 +207,15 @@ public class DemoScene extends AbstractScene {
         for (int i = 0; i < nb; i++) {
             GameEntity e = new GameEntity("en_" + i)
                     .setPosition(new Vector2D(Math.random() * worldWidth, Math.random() * worldHeight))
-                    .setSize(new Vector2D(12, 12))
-                    .setColor(Color.RED)
-                    .setType(EntityType.CIRCLE)
+                    .setImage(coinImg)
                     .setMaterial(Material.DEFAULT)
-                    .setAttribute("maxSpeed", 8.0)
-                    .setAttribute("maxAcceleration", 2.5)
-                    .setAttribute("mass", 5.0)
-                    .setAttribute("attractionDistance", 40.0)
-                    .setAttribute("attractionForce", 2.0)
+                    .setMass(5.0)
+                    .setLayer(1)
+                    .setPriority(1)
+                    .setAttribute("maxVelocity", 4.0)
+                    .setAttribute("maxAcceleration", 5.0)
+                    .setAttribute("attractionDistance", 80.0)
+                    .setAttribute("attractionForce", 3.0)
                     .addBehavior(enemyBehavior);
 
             add(e);

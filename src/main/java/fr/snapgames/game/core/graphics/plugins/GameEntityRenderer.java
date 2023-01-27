@@ -24,7 +24,7 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
         switch (e.type) {
             case IMAGE:
                 if (Optional.ofNullable(e.image).isPresent()) {
-                    boolean direction = e.speed.x > 0;
+                    boolean direction = e.direction > 0;
                     if (direction) {
                         g.drawImage(e.image,
                                 (int) e.position.x, (int) e.position.y,
@@ -68,5 +68,18 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
                 g.fill(el);
                 break;
         }
+    }
+
+    @Override
+    public void drawDebug(Renderer r, Graphics2D g, GameEntity v) {
+        g.setColor(Color.ORANGE);
+        g.drawRect((int) v.position.x, (int) v.position.y,
+                (int) v.size.x, (int) v.size.y);
+        int il = 0;
+        for (String s : v.getDebugInfo()) {
+            g.drawString(s, (int) (v.position.x + v.size.x + 4.0), (int) v.position.y + il);
+            il += 10;
+        }
+
     }
 }

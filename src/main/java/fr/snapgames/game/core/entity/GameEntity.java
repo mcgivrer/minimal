@@ -37,14 +37,24 @@ public class GameEntity {
 
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior> behaviors = new ArrayList<>();
+
     public BufferedImage image;
+
     public boolean active;
-    public long life = -1;
+    public long life;
     public long duration;
 
     public Material material;
     public PhysicType physicType = PhysicType.DYNAMIC;
+    public double mass;
+
+    public int direction;
+    public int contact;
+
     private Class<?> renderedByPlugin;
+
+    private int layer;
+    private int priority;
 
     /**
      * Create a new GameEntity with a name.
@@ -56,27 +66,15 @@ public class GameEntity {
         this.active = true;
         this.physicType = PhysicType.DYNAMIC;
         this.material = Material.DEFAULT;
+        this.direction = 1;
+        this.life = -1;
+        this.duration = -1;
+        this.layer = 1;
+        this.priority = 1;
+
         attributes.put("maxSpeed", 8.0);
         attributes.put("maxAcceleration", 3.0);
-        attributes.put("mass", 10.0);
-    }
 
-    public void update(Game g, double dt) {
-        for (Behavior b : behaviors) {
-            b.update(g, this, dt);
-        }
-        if (!isStickToCamera()) {
-            this.acceleration = this.acceleration.addAll(this.forces);
-            this.acceleration = this.acceleration.multiply((double) attributes.get("mass"));
-
-            this.acceleration.maximize((double) attributes.get("maxAcceleration"));
-
-            this.speed = this.speed.add(this.acceleration.multiply(dt)).multiply(material.roughness);
-            this.speed.maximize((double) attributes.get("maxSpeed"));
-
-            this.position = this.position.add(this.speed.multiply(dt));
-            this.forces.clear();
-        }
     }
 
     public GameEntity setPosition(Vector2D pos) {
@@ -104,7 +102,11 @@ public class GameEntity {
     }
 
     public GameEntity setImage(BufferedImage i) {
-        this.image = i;
+        if (Optional.ofNullable(i).isPresent()) {
+            this.image = i;
+            setType(EntityType.IMAGE);
+            setSize(new Vector2D(i.getWidth(), i.getHeight()));
+        }
         return this;
     }
 
@@ -119,6 +121,10 @@ public class GameEntity {
         return this;
     }
 
+    public GameEntity setMass(double m) {
+        this.mass = m;
+        return this;
+    }
 
     public Collection<String> getDebugInfo() {
         List<String> ls = new ArrayList<>();
@@ -190,5 +196,28 @@ public class GameEntity {
     public GameEntity setDrawnBy(Class<?> rendererPluginClass) {
         this.renderedByPlugin = rendererPluginClass;
         return this;
+    }
+
+    public GameEntity setDirection(int d) {
+        this.direction = d;
+        return this;
+    }
+
+    public GameEntity setLayer(int l) {
+        this.layer = l;
+        return this;
+    }
+
+    public GameEntity setPriority(int p) {
+        this.priority = p;
+        return this;
+    }
+
+    public int getLayer() {
+        return layer;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 }

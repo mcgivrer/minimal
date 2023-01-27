@@ -1,7 +1,9 @@
 package fr.snapgames.game.core.config;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.math.Vector2D;
 
+import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -93,6 +95,47 @@ public class Configuration {
             return parameters.getProperty(key);
         }
         return defaultValue;
+    }
+
+
+    /**
+     * Retrieve a value as Dimension from {@link Configuration} from a string format "dim([width],[height])".
+     *
+     * @param key          name of the configuration key to be loaded
+     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @return the corresponding Dimension value
+     */
+    public Dimension getDimension(String key, Dimension defaultValue) {
+        String param = parameters.getProperty(key, "");
+        if (!param.equals("") && param.startsWith("dim(") && param.endsWith(")")) {
+            String[] k = param.substring("dim(".length(), param.length() - 1).split(",");
+            int width = Integer.valueOf(k[0]);
+            int height = Integer.valueOf(k[0]);
+            return new Dimension(width, height);
+        } else {
+            System.err.printf("Configuration: Dimension value not found for %s, use %s as default value.%n", key, defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Retrieve a value as Vector2D from {@link Configuration} from a string format "dim([width],[height])".
+     *
+     * @param key          name of the configuration key to be loaded
+     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @return the corresponding Vector2D value
+     */
+    public Vector2D getVector2D(String key, Vector2D defaultValue) {
+        String param = parameters.getProperty(key, "");
+        if (!param.equals("") && param.startsWith("v2d(") && param.endsWith(")")) {
+            String[] k = param.substring("v2d(".length(), param.length() - 1).split(",");
+            double x = Double.valueOf(k[0]);
+            double y = Double.valueOf(k[1]);
+            return new Vector2D(x, y);
+        } else {
+            System.err.printf("Configuration: Dimension value not found for %s, use %s as default value.%n", key, defaultValue);
+            return defaultValue;
+        }
     }
 
     /**
