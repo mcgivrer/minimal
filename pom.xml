@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.snapgames.game</groupId>
     <artifactId>game</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <name>minimal</name>
     <description>A demonstration project on how to create sustainable project.</description>
     <inceptionYear>2023</inceptionYear>
@@ -21,7 +21,7 @@
             5.9.0
         </junit.version>
         <junit-platform.version>1.9.0</junit-platform.version>
-        <project.mainClass>fr.snapgames.game.Game</project.mainClass>
+        <project.mainClass>fr.snapgames.game.core.Game</project.mainClass>
     </properties>
 
     <!-- Project eco-system definition -->
