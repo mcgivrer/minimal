@@ -2,24 +2,21 @@ package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.Configuration;
-import fr.snapgames.game.core.entity.Camera;
-import fr.snapgames.game.core.entity.EntityType;
-import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.entity.TextEntity;
+import fr.snapgames.game.core.behaviors.LightBehavior;
+import fr.snapgames.game.core.entity.*;
 import fr.snapgames.game.core.graphics.Renderer;
-import fr.snapgames.game.core.io.InputHandler;
-import fr.snapgames.game.core.math.Material;
-import fr.snapgames.game.core.math.PhysicEngine;
-import fr.snapgames.game.core.math.Vector2D;
-import fr.snapgames.game.core.math.World;
+import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
+import fr.snapgames.game.core.math.*;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
+import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
+import fr.snapgames.game.demo101.scenes.behaviors.RainEffectBehavior;
+import fr.snapgames.game.demo101.scenes.behaviors.StormBehavior;
 import fr.snapgames.game.demo101.scenes.io.DemoListener;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
@@ -38,6 +35,7 @@ public class DemoScene extends AbstractScene {
     @Override
     public void initialize(Game g) {
         super.initialize(g);
+        g.getRenderer().addPlugin(new ParticlesEntityRenderer());
     }
 
     @Override
@@ -53,7 +51,7 @@ public class DemoScene extends AbstractScene {
         // define world play area with constrains
         int worldWidth = config.getInteger("game.world.width", 1008);
         int worldHeight = config.getInteger("game.world.height", 640);
-        pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
+        World world = pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
 
         g.getInputHandler().addListener(new DemoListener(g, this));
 
@@ -67,7 +65,7 @@ public class DemoScene extends AbstractScene {
         // Add a score display
         int viewportWidth = config.getInteger("game.camera.viewport.width", 320);
         TextEntity score = (TextEntity) new TextEntity("score")
-                .setText("00000")
+                .setText("")
                 .setFont(g.getFont().deriveFont(20.0f))
                 .setPosition(new Vector2D(viewportWidth - 80, 25))
                 .setColor(Color.WHITE)
@@ -144,7 +142,16 @@ public class DemoScene extends AbstractScene {
         add(player);
 
         // Create enemies Entity.
-        createEnemies("ball_", 20, worldWidth, worldHeight);
+        createCoins("coin_", 20, world, new CoinBehavior());
+        add(createRain("rain", 500, world));
+
+
+        // add an ambiant light
+        Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.4f)
+                .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
+                .addBehavior(new LightBehavior())
+                .addBehavior(new StormBehavior(500, 4, 50));
+        add(ambiantLight);
 
         // define Camera to track player.
         int vpWidth = config.getInteger("game.camera.viewport.width", 320);
@@ -157,59 +164,45 @@ public class DemoScene extends AbstractScene {
         renderer.setCurrentCamera(cam);
     }
 
+    private ParticlesEntity createRain(String entityName, int nbParticles, World world) {
+        ParticlesEntity pes = (ParticlesEntity) new ParticlesEntity(entityName)
+                .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(), 0.0))
+                .setSize(new Vector2D(
+                        world.getPlayArea().getWidth(),
+                        world.getPlayArea().getHeight()))
+                .setLayer(1)
+                .setPriority(1)
+                .addBehavior(new RainEffectBehavior(world, Color.CYAN));
+        for (int i = 0; i < nbParticles; i++) {
+            GameEntity p = new GameEntity(pes.name + "_" + i)
+                    .setType(EntityType.CIRCLE)
+                    .setPhysicType(PhysicType.DYNAMIC)
+                    .setSize(new Vector2D(1.0, 1.0))
+                    .setPosition(
+                            new Vector2D(
+                                    world.getPlayArea().getWidth() * Math.random(),
+                                    world.getPlayArea().getHeight() * Math.random()))
+                    .setColor(Color.CYAN)
+                    .setLayer(1)
+                    .setPriority(i)
+                    .setMass(0.1)
+                    .setMaterial(Material.AIR);
+            pes.getChild().add(p);
+        }
+        return pes;
+    }
+
     /**
      * Create nb enemies in the world area delimited by worldWidth x worldHeight.
      *
-     * @param nb          nb enemies to create
-     * @param worldWidth  width of the world
-     * @param worldHeight
+     * @param nb    nb enemies to create
+     * @param world a World object.
      */
-    public void createEnemies(String namePattern, int nb, int worldWidth, int worldHeight) {
-        Behavior<GameEntity> enemyBehavior = new Behavior<GameEntity>() {
-            @Override
-            public void input(Game g, GameEntity e) {
-
-            }
-
-            @Override
-            public void draw(Game game, Graphics2D g, GameEntity e) {
-                if (game.getDebug() > 1) {
-                    double attrDist = (double) e.getAttribute("attractionDistance", 0);
-                    if (attrDist > 0) {
-                        g.setColor(Color.YELLOW);
-                        Ellipse2D el = new Ellipse2D.Double(
-                                e.position.x - (attrDist), e.position.y - (attrDist),
-                                e.size.x + (attrDist * 2.0), e.size.y + (attrDist * 2.0));
-                        g.draw(el);
-                    }
-                }
-            }
-
-            @Override
-            public void update(Game game, GameEntity entity, double dt) {
-                // if player near this entity less than distance (attrDist),
-                // a force (attrForce) is applied to entity to reach to player.
-                GameEntity p = getEntity("player");
-                double attrDist = (double) entity.attributes.get("attractionDistance");
-                double attrForce = (double) entity.attributes.get("attractionForce");
-
-                if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
-                    Vector2D v = p.position.substract(entity.position);
-                    entity.forces.add(v.normalize().multiply(attrForce));
-                }
-                if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.25))) < entity.size.add(p.size)
-                        .multiply(0.25).length()) {
-                    entity.setActive(false);
-                    int score = (int) p.getAttribute("score", 0);
-                    score += 20;
-                    p.setAttribute("score", score);
-                }
-            }
-        };
-
+    public void createCoins(String namePattern, int nb, World world, Behavior<?> b) {
         for (int i = 0; i < nb; i++) {
             GameEntity e = new GameEntity(namePattern + GameEntity.index)
-                    .setPosition(new Vector2D(Math.random() * worldWidth, Math.random() * worldHeight))
+                    .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(),
+                            Math.random() * world.getPlayArea().getHeight()))
                     .setImage(coinImg)
                     .setMaterial(Material.SUPER_BALL)
                     .setMass(5.0)
@@ -219,7 +212,8 @@ public class DemoScene extends AbstractScene {
                     .setAttribute("maxAcceleration", 5.0)
                     .setAttribute("attractionDistance", 80.0)
                     .setAttribute("attractionForce", 3.0)
-                    .addBehavior(enemyBehavior);
+                    .setAttribute("value", (int) (Math.random() * 50.0) - 15)
+                    .addBehavior(b);
 
             add(e);
         }
