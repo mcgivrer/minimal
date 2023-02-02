@@ -32,7 +32,7 @@ public class LightRenderer implements RendererPlugin<Light> {
             case CONE -> {
                 // TODO implement the CONE light type
             }
-            case AMBIANT -> {
+            case AMBIENT -> {
                 g.setColor(l.color);
                 g.fillRect(0, 0, (int) l.size.x, (int) l.size.y);
             }

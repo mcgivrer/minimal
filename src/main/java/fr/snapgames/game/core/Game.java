@@ -138,7 +138,6 @@ public class Game extends JPanel {
     private void create(Graphics2D g) {
         Scene s = scm.getActiveScene();
         s.loadResources(this);
-        s.create(this);
     }
 
     /**

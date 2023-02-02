@@ -3,6 +3,7 @@ package fr.snapgames.game.core.entity;
 import fr.snapgames.game.core.math.Vector2D;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 /**
  * Camera used to see/follow entity in game viewport.
@@ -15,7 +16,7 @@ public class Camera {
     public Vector2D position;
     public GameEntity target;
     public double rotation = 0.0f, tween = 0.0f;
-    public Dimension viewport;
+    public Rectangle2D viewport;
 
     public Camera(String name) {
         this.name = name;
@@ -28,7 +29,7 @@ public class Camera {
         return this;
     }
 
-    public Camera setViewport(Dimension dim) {
+    public Camera setViewport(Rectangle2D dim) {
         this.viewport = dim;
         return this;
     }
@@ -57,10 +58,10 @@ public class Camera {
     public void update(double dt) {
 
         this.position.x += Math
-                .ceil((target.position.x + (target.size.x * 0.5) - ((viewport.width) * 0.5) - this.position.x)
+                .ceil((target.position.x + (target.size.x * 0.5) - ((viewport.getWidth()) * 0.5) - this.position.x)
                         * tween * Math.min(dt, 10));
         this.position.y += Math
-                .ceil((target.position.y + (target.size.y * 0.5) - ((viewport.height) * 0.5) - this.position.y)
+                .ceil((target.position.y + (target.size.y * 0.5) - ((viewport.getHeight()) * 0.5) - this.position.y)
                         * tween * Math.min(dt, 10));
     }
 }

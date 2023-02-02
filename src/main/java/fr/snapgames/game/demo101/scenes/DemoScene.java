@@ -62,6 +62,9 @@ public class DemoScene extends AbstractScene {
                 .setPriority(1);
         add(backgroundImage);
 
+        // create Stars
+        createStars("star", 500, world, false);
+
         // Add a score display
         int viewportWidth = config.getInteger("game.camera.viewport.width", 320);
         TextEntity score = (TextEntity) new TextEntity("score")
@@ -70,8 +73,8 @@ public class DemoScene extends AbstractScene {
                 .setPosition(new Vector2D(viewportWidth - 80, 25))
                 .setColor(Color.WHITE)
                 .setShadowColor(Color.BLACK)
-                .setShadowWidth(2)
-                .setLayer(2)
+                .setShadowWidth(3)
+                .setLayer(20)
                 .setPriority(3)
                 .stickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
@@ -104,7 +107,7 @@ public class DemoScene extends AbstractScene {
                 .setAttribute("maxAcceleration", 8.0)
                 .setAttribute("speedStep", 0.4)
                 .setMass(8.0)
-                .setLayer(2)
+                .setLayer(10)
                 .setPriority(1)
                 .addBehavior(new Behavior<GameEntity>() {
                     @Override
@@ -146,12 +149,16 @@ public class DemoScene extends AbstractScene {
         add(createRain("rain", 500, world));
 
 
-        // add an ambiant light
-        Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.4f)
+        // add an ambient light
+        Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
+                .setLayer(2)
+                .setPriority(1)
                 .addBehavior(new LightBehavior())
                 .addBehavior(new StormBehavior(500, 4, 50));
         add(ambiantLight);
+        // add some spotlights
+        createSpotLights("spot", 10, world);
 
         // define Camera to track player.
         int vpWidth = config.getInteger("game.camera.viewport.width", 320);
@@ -160,8 +167,42 @@ public class DemoScene extends AbstractScene {
         Camera cam = new Camera("camera")
                 .setTarget(player)
                 .setTween(0.1)
-                .setViewport(new Dimension(vpWidth, vpHeight));
+                .setViewport(new Rectangle2D.Double(0, 0, vpWidth, vpHeight));
         renderer.setCurrentCamera(cam);
+    }
+
+    private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
+        for (int i = 0; i < nbStars; i++) {
+            GameEntity star = new GameEntity(prefixEntityName + "_" + i)
+                    .setType(EntityType.CIRCLE)
+                    .setPhysicType(PhysicType.STATIC)
+                    .setPosition(RandomUtils.ramdomVector(world.getPlayArea()))
+                    .setSize(new Vector2D(1.0, 1.0))
+                    .setColor(Color.WHITE)
+                    .setLayer(5)
+                    .setPriority(1 + i)
+                    .setActive(active);
+            add(star);
+        }
+    }
+
+    private void createSpotLights(String prefixEntityName, int nbLights, World world) {
+        for (int i = 0; i < nbLights; i++) {
+            Light l = (Light) new Light(prefixEntityName + "_" + i,
+                    world.getPlayArea().width * Math.random(),
+                    200.0 + (world.getPlayArea().height - 200) * Math.random(),
+                    200.0 * Math.random(),
+                    1.0f)
+                    .setLayer(2)
+                    .setPriority(1 + i)
+                    .setColor(RandomUtils.randomColorMinMax(
+                            0.6f, 1.0f,
+                            0.6f, 1.0f,
+                            0.6f, 1.0f,
+                            0.6f, 1.0f))
+                    .addBehavior(new LightBehavior());
+            add(l);
+        }
     }
 
     private ParticlesEntity createRain(String entityName, int nbParticles, World world) {
@@ -207,7 +248,7 @@ public class DemoScene extends AbstractScene {
                     .setMaterial(Material.SUPER_BALL)
                     .setMass(5.0)
                     .setLayer(4)
-                    .setPriority(4)
+                    .setPriority(4 + i)
                     .setAttribute("maxVelocity", 4.0)
                     .setAttribute("maxAcceleration", 5.0)
                     .setAttribute("attractionDistance", 80.0)

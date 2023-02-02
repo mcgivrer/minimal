@@ -96,6 +96,7 @@ public class PhysicEngine {
             entity.position = entity.position.add(entity.speed.multiply(elapsed));
             entity.getChild().forEach(c -> updateEntity(c, elapsed));
             entity.forces.clear();
+            entity.updateBox();
 
         }
     }

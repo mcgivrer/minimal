@@ -30,7 +30,7 @@ public class Light extends GameEntity {
     }
 
     /**
-     * Create a {@link LightType#AMBIANT} light with a name, and corresponding to the playArea, and with the required intensity.
+     * Create a {@link LightType#AMBIENT} light with a name, and corresponding to the playArea, and with the required intensity.
      *
      * @param name      name of that ambiant light
      * @param playArea  the area covered by this ambiant light
@@ -40,7 +40,7 @@ public class Light extends GameEntity {
         this(name);
         setPosition(new Vector2D());
         setSize(new Vector2D(playArea.getWidth(), playArea.getHeight()));
-        this.lightType = LightType.AMBIANT;
+        this.lightType = LightType.AMBIENT;
         this.intensity = intensity;
     }
 
