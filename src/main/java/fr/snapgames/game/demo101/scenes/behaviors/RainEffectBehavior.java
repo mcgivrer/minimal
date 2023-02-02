@@ -8,6 +8,12 @@ import fr.snapgames.game.core.math.World;
 
 import java.awt.*;
 
+/**
+ * Rain Effect behavior to simulate falling rain
+ *
+ * @author Frédéric Delorme
+ * @since 0.0.3
+ */
 public class RainEffectBehavior implements Behavior {
 
     private World world;
@@ -30,7 +36,7 @@ public class RainEffectBehavior implements Behavior {
                     Math.random() * 10.0, 0.0));
             p.forces.add(world.getGravity());
 
-            if (p.position.y -p.size.y > pe.size.y ||
+            if (p.position.y - p.size.y > pe.size.y ||
                     p.position.x > pe.size.x ||
                     p.position.x < 0.0 ||
                     p.position.y < 0.0) {

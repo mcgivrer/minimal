@@ -21,7 +21,7 @@ public class LightBehavior implements Behavior<Light> {
                     entity.setPosition(entity.getTarget().position);
                 }
             }
-            case AMBIANT -> {
+            case AMBIENT -> {
                 // Nothing special to change for this type of light.
             }
         }

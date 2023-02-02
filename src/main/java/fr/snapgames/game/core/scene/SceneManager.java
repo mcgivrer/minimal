@@ -71,9 +71,9 @@ public class SceneManager {
                 Scene s = sceneClass.getConstructor(Game.class, String.class).newInstance(game, name);
                 scenes.put(name, s);
                 s.initialize(game);
+                s.loadResources(game);
                 s.create(game);
                 this.activeScene = s;
-                this.activeScene.initialize(game);
                 System.out.printf("SceneManager:Scene %s instance has been activated%n", sceneClass.getName());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                      NoSuchMethodException e) {

@@ -17,8 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InputHandler implements KeyListener {
     Game game;
-    Map<Integer, KeyEvent> events = new ConcurrentHashMap<>();
-    List<KeyListener> listeners = new ArrayList<>();
+    private Map<Integer, KeyEvent> events = new ConcurrentHashMap<>();
+    private List<KeyListener> listeners = new ArrayList<>();
     private boolean ctrlDown;
     private boolean shiftDown;
     private boolean altDown;

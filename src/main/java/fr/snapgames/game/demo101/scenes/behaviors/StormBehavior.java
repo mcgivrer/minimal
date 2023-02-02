@@ -6,6 +6,12 @@ import fr.snapgames.game.core.entity.Light;
 
 import java.awt.*;
 
+/**
+ * Simulate Storm lightning effect (WIP)
+ *
+ * @author Frédéric Delorme
+ * @since 0.0.3
+ */
 public class StormBehavior implements Behavior<Light> {
     private final int maxNbLightning;
     private final int maxDelayLightning;

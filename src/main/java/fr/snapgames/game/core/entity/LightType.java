@@ -16,7 +16,7 @@ public enum LightType {
      */
     CONE,
     /**
-     * a global ambiant
+     * a global ambient
      */
-    AMBIANT
+    AMBIENT
 }
