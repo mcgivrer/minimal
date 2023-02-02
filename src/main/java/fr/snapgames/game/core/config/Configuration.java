@@ -21,6 +21,9 @@ import java.util.Properties;
  * </ul>
  * from these properties.
  * The user can also {@link Configuration#save()} values after changes.
+ *
+ * @author Frédéric Delorme
+ * @since 0.0.1
  */
 public class Configuration {
     private final Properties parameters = new Properties();

@@ -16,9 +16,11 @@ import java.util.List;
  * Entity manipulated by Game.
  *
  * @author Frédéric Delorme
+ * @since 0.0.1
  */
 public class GameEntity {
-    public String name = "noname";
+    public static long index = 0;
+    public String name = "noname" + (index++);
     public Vector2D position = new Vector2D(0, 0);
     public Vector2D speed = new Vector2D(0, 0);
     public Vector2D acceleration = new Vector2D(0, 0);
@@ -37,6 +39,8 @@ public class GameEntity {
 
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior> behaviors = new ArrayList<>();
+
+    private List<GameEntity> child = new ArrayList<>();
 
     public BufferedImage image;
 
@@ -146,6 +150,15 @@ public class GameEntity {
         return this;
     }
 
+    public GameEntity addChild(GameEntity ge) {
+        child.add(ge);
+        return this;
+    }
+
+    public List<GameEntity> getChild() {
+        return child;
+    }
+
     public GameEntity setColor(Color color) {
         this.color = color;
         return this;
@@ -219,5 +232,10 @@ public class GameEntity {
 
     public int getPriority() {
         return priority;
+    }
+
+    public GameEntity setPhysicType(PhysicType pt) {
+        this.physicType = pt;
+        return this;
     }
 }

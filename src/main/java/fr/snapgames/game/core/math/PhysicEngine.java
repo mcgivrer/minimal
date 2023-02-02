@@ -69,6 +69,7 @@ public class PhysicEngine {
     }
 
     public void updateEntity(GameEntity entity, double elapsed) {
+
         for (Behavior b : entity.behaviors) {
             b.update(game, entity, elapsed);
         }
@@ -77,22 +78,26 @@ public class PhysicEngine {
             entity.forces.add(world.getGravity().negate());
 
             // compute acceleration
-            entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(entity.material.density);
+            double density = entity.material != null ? entity.material.density : world.getMaterial().density;
+            entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(density);
             entity.acceleration = entity.acceleration.multiply((double) entity.mass);
 
             entity.acceleration.maximize((double) entity.getAttribute("maxAcceleration", maxAcceleration));
 
             // compute velocity
-
             entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed));
-            if (entity.contact > 0) {
-                entity.speed = entity.speed.multiply(entity.material.roughness);
+            if (entity.contact == 0) {
+                entity.speed = entity.speed.multiply(world.getMaterial().roughness);
+            } else {
+                entity.speed = entity.speed.multiply(entity.material.roughness * world.getMaterial().roughness);
             }
             entity.speed.maximize((double) entity.getAttribute("maxVelocity", maxVelocity));
 
             // compute position
             entity.position = entity.position.add(entity.speed.multiply(elapsed));
+            entity.getChild().forEach(c -> updateEntity(c, elapsed));
             entity.forces.clear();
+
         }
     }
 
@@ -109,23 +114,26 @@ public class PhysicEngine {
         if (world.isNotContaining(ge)) {
             if (ge.position.x + ge.size.x > world.getPlayArea().width) {
                 ge.position.x = world.getPlayArea().width - ge.size.x;
+                ge.speed.x = ge.speed.x * -ge.material.elasticity;
                 ge.contact += 1;
             }
             if (ge.position.x < 0) {
                 ge.position.x = 0;
+                ge.speed.x = ge.speed.x * -ge.material.elasticity;
                 ge.contact += 2;
             }
             if (ge.position.y + ge.size.y > world.getPlayArea().height) {
                 ge.position.y = world.getPlayArea().height - ge.size.y;
+                ge.speed.y = ge.speed.y * -ge.material.elasticity;
                 ge.contact += 4;
 
             }
             if (ge.position.y < 0) {
                 ge.position.y = 0;
+                ge.speed.y = ge.speed.y * -ge.material.elasticity;
                 ge.contact += 8;
 
             }
-            ge.speed = ge.speed.multiply(-ge.material.elasticity);
         }
     }
 }

@@ -79,13 +79,14 @@ public class Game extends JPanel {
     private void createFrame() {
         inputHandler = new InputHandler(this);
         inputHandler.addListener(new GameKeyListener(this));
+
         String title = I18n.get("game.title");
         frame = new JFrame(title);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         double scale = config.getDouble("game.screen.scale", 2.0);
-        int width = (int) (scale * config.getInteger("game.screen.width", 320));
-        int height = (int) (scale * config.getInteger("game.screen.height", 200));
+        int width = (int) (scale * config.getInteger("game.camera.viewport.width", 320));
+        int height = (int) (scale * config.getInteger("game.camera.viewport.height", 200));
         Dimension dim = new Dimension(width, height);
 
         // define Window content and size.

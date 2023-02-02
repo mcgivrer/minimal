@@ -8,6 +8,7 @@ import java.awt.*;
  * Camera used to see/follow entity in game viewport.
  *
  * @author Frédéric Delorme
+ * @since 0.0.2
  */
 public class Camera {
     public String name;
