@@ -58,8 +58,7 @@ public class PhysicEngine {
 
     public void update(double elapsed) {
         entities.values().stream()
-                .filter(e -> e.isActive()
-                        && e.physicType.equals(PhysicType.DYNAMIC))
+                .filter(e -> e.isActive())
                 .forEach(entity -> {
                     updateEntity(entity, elapsed);
                     if (Optional.ofNullable(world).isPresent()) {
@@ -73,7 +72,7 @@ public class PhysicEngine {
         for (Behavior b : entity.behaviors) {
             b.update(game, entity, elapsed);
         }
-        if (!entity.isStickToCamera()) {
+        if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
             // apply gravity
             entity.forces.add(world.getGravity().negate());
 

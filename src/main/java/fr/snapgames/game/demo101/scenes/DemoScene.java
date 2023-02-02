@@ -2,6 +2,7 @@ package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
+import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.entity.*;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
@@ -10,10 +11,12 @@ import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
 import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
 import fr.snapgames.game.demo101.scenes.behaviors.RainEffectBehavior;
+import fr.snapgames.game.demo101.scenes.behaviors.StormBehavior;
 import fr.snapgames.game.demo101.scenes.io.DemoListener;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
@@ -141,6 +144,15 @@ public class DemoScene extends AbstractScene {
         // Create enemies Entity.
         createCoins("coin_", 20, world, new CoinBehavior());
         add(createRain("rain", 500, world));
+
+
+        // add an ambiant light
+        Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.4f)
+                .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
+                .addBehavior(new LightBehavior())
+                .addBehavior(new StormBehavior(500, 4, 50));
+        add(ambiantLight);
+
         // define Camera to track player.
         int vpWidth = config.getInteger("game.camera.viewport.width", 320);
         int vpHeight = config.getInteger("game.camera.viewport.height", 200);

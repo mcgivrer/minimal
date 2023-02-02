@@ -5,10 +5,7 @@ import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.graphics.plugins.GameEntityRenderer;
-import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
-import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
-import fr.snapgames.game.core.graphics.plugins.TextEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.*;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.World;
 
@@ -45,8 +42,10 @@ public class Renderer {
         this.scale = config.getDouble("game.screen.scale", 2.0);
         this.frame = game.getFrame();
         this.buffer = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        // Add required renderer plugins
         this.addPlugin(new GameEntityRenderer());
         this.addPlugin(new TextEntityRenderer());
+        this.addPlugin(new LightRenderer());
     }
 
     public void addEntities(Collection<GameEntity> entities) {
@@ -132,7 +131,7 @@ public class Renderer {
                     return;
                 }
                 Graphics2D g2 = (Graphics2D) frame.getBufferStrategy().getDrawGraphics();
-                int titleBar = frame.getInsets().top-frame.getInsets().bottom;
+                int titleBar = frame.getInsets().top - frame.getInsets().bottom;
                 g2.scale(scale, scale);
                 g2.drawImage(buffer,
                         0, titleBar, frame.getWidth(), frame.getHeight(),
