@@ -57,14 +57,14 @@ public class CameraStepdefs implements En {
             // check is center of viewport area is in the target covered area.
             assertTrue(r.contains(
                             new Point2D.Double(
-                                    camPos.x + (cam.viewport.width * 0.5),
-                                    camPos.y + (cam.viewport.height * 0.5))),
+                                    camPos.x + (cam.viewport.getWidth() * 0.5),
+                                    camPos.y + (cam.viewport.getHeight() * 0.5))),
                     String.format("The %s camera does not match the %s target position by %s", cam.name, target.name, camPos.distance(targetPos)));
         });
         And("I set Camera {string} viewport as {int},{int}", (String camName, Integer vpWidth, Integer vpHeight) -> {
             game = (Game) TestContext.get("game");
             Camera cam = game.getRenderer().getCurrentCamera();
-            cam.viewport = new Dimension(vpWidth, vpHeight);
+            cam.viewport = new Rectangle2D.Double(0, 0, vpWidth, vpHeight);
         });
 
 

@@ -1,6 +1,6 @@
 package fr.snapgames.game.core.graphics;
 
-import fr.snapgames.game.core.*;
+import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.Camera;
@@ -12,9 +12,8 @@ import fr.snapgames.game.core.math.World;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
