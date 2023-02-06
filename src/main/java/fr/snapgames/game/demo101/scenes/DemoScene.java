@@ -146,8 +146,9 @@ public class DemoScene extends AbstractScene {
 
         // Create enemies Entity.
         createCoins("coin_", 20, world, new CoinBehavior());
-        add(createRain("rain", 500, world));
 
+        // create Rain effect with a ParticleEntity.
+        createRain("rain", 500, world);
 
         // add an ambient light
         Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
@@ -157,6 +158,7 @@ public class DemoScene extends AbstractScene {
                 .addBehavior(new LightBehavior())
                 .addBehavior(new StormBehavior(500, 4, 50));
         add(ambiantLight);
+
         // add some spotlights
         createSpotLights("spot", 10, world);
 
@@ -172,6 +174,15 @@ public class DemoScene extends AbstractScene {
     }
 
     private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
+        ParticlesEntity stars = (ParticlesEntity) new ParticlesEntity(prefixEntityName)
+                .setPhysicType(PhysicType.STATIC)
+                .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(), 0.0))
+                .setSize(new Vector2D(
+                        world.getPlayArea().getWidth(),
+                        world.getPlayArea().getHeight()))
+                .setLayer(5)
+                .setPriority(1)
+                .setActive(active);
         for (int i = 0; i < nbStars; i++) {
             GameEntity star = new GameEntity(prefixEntityName + "_" + i)
                     .setType(EntityType.CIRCLE)
@@ -182,8 +193,9 @@ public class DemoScene extends AbstractScene {
                     .setLayer(5)
                     .setPriority(1 + i)
                     .setActive(active);
-            add(star);
+            stars.addChild(star);
         }
+        add(stars);
     }
 
     private void createSpotLights(String prefixEntityName, int nbLights, World world) {
@@ -205,7 +217,7 @@ public class DemoScene extends AbstractScene {
         }
     }
 
-    private ParticlesEntity createRain(String entityName, int nbParticles, World world) {
+    private void createRain(String entityName, int nbParticles, World world) {
         ParticlesEntity pes = (ParticlesEntity) new ParticlesEntity(entityName)
                 .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(), 0.0))
                 .setSize(new Vector2D(
@@ -230,7 +242,7 @@ public class DemoScene extends AbstractScene {
                     .setMaterial(Material.AIR);
             pes.getChild().add(p);
         }
-        return pes;
+        add(pes);
     }
 
     /**

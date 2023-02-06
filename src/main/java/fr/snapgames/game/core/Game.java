@@ -46,20 +46,34 @@ public class Game extends JPanel {
     private boolean testMode;
 
     // Internal components
-    private BufferedImage buffer;
-    private Color clearColor = Color.BLACK;
     private Configuration config;
-    private I18n i18n;
     private JFrame frame;
+
+    // all the services.
     private InputHandler inputHandler;
     private Renderer renderer;
     private PhysicEngine physicEngine;
     private SceneManager scm;
 
+    /**
+     * Create Game by loading configuration from the default game.properties file, with no test mode activated.
+     *
+     * @see Game#Game(String, boolean)
+     */
     public Game() {
         this("/game.properties", false);
     }
 
+    /**
+     * This the entry point of our {@link Game}, providing a path to a configuration file to take in account to configure all the Game engine,
+     * and set a flag to activate or not a specific test mode.
+     *
+     * @param configFilePath the path to the *.properties configuration file.
+     * @param mode           if true, set the Game in test mode and the GameLoop will not occur:
+     *                       only ONE loop in the game loop will be achieved, to let the unit test manage
+     *                       the looping strategy for test purpose.
+     * @see Configuration
+     */
     public Game(String configFilePath, boolean mode) {
         this.testMode = testMode;
         config = new Configuration(configFilePath);
@@ -76,6 +90,21 @@ public class Game extends JPanel {
         scm.initialize(this);
     }
 
+    /**
+     * Create the Window where the magic happen !
+     * It gathers the required window size parameters from the translation file and configuration file with 4 main keys:
+     *
+     * <ul>
+     *     <li><code>game.title</code> from the I18n file, the title of the window</li>
+     *     <li><code>game.camera.viewport.width</code></li>
+     *     <li><code>game.camera.viewport.height</code></li>
+     *     <li><code>game.screen.scale</code></li>
+     *     <li><code>game.buffer.strategy</code></li>
+     * </ul>
+     *
+     * @see Configuration
+     * @see I18n
+     */
     private void createFrame() {
         inputHandler = new InputHandler(this);
         inputHandler.addListener(new GameKeyListener(this));
@@ -128,9 +157,7 @@ public class Game extends JPanel {
      */
     private void initialize(String[] args) {
         config.parseArguments(args);
-
         scm.activateDefaultScene();
-
         create((Graphics2D) frame.getGraphics());
 
     }

@@ -255,4 +255,8 @@ public class Renderer {
         return this.currentCamera;
     }
 
+    public void reset() {
+        pipeline.clear();
+        entities.clear();
+    }
 }
