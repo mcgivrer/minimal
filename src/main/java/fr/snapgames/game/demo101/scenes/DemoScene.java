@@ -6,6 +6,7 @@ import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.entity.*;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
+import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.math.*;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
@@ -18,6 +19,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 /**
  * @author Frédéric Delorme
@@ -27,6 +29,7 @@ public class DemoScene extends AbstractScene {
     private BufferedImage playerImg;
     private BufferedImage backgroundImg;
     private BufferedImage coinImg;
+    private DemoListener demoListener;
 
     public DemoScene(Game g, String name) {
         super(g, name);
@@ -53,7 +56,8 @@ public class DemoScene extends AbstractScene {
         int worldHeight = config.getInteger("game.world.height", 640);
         World world = pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
 
-        g.getInputHandler().addListener(new DemoListener(g, this));
+        demoListener = new DemoListener(g, this);
+        g.getInputHandler().addListener(demoListener);
 
         //Add Background Image
         GameEntity backgroundImage = new GameEntity("backgroundImage")
@@ -273,12 +277,25 @@ public class DemoScene extends AbstractScene {
     }
 
     @Override
+    public void input(Game g, InputHandler ih) {
+        if (ih.getKey(KeyEvent.VK_ESCAPE)) {
+            g.setExit(false);
+            g.getSceneManager().activate("title");
+        }
+    }
+
+    @Override
     public void draw(Game g, Renderer r) {
 
     }
 
     @Override
     public void dispose(Game g) {
-
+        getEntities().clear();
+        game.getPhysicEngine().reset();
+        game.getRenderer().reset();
+        if (Optional.ofNullable(demoListener).isPresent()) {
+            g.getInputHandler().removeListener(demoListener);
+        }
     }
 }

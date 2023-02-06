@@ -20,11 +20,13 @@ import java.util.List;
  * @since 0.0.2
  **/
 public class DemoListener implements KeyListener {
+    private final Game game;
     DemoScene scene;
     Configuration config;
     World world;
 
     public DemoListener(Game g, DemoScene scene) {
+        this.game = g;
         this.scene = scene;
         config = g.getConfiguration();
         world = g.getPhysicEngine().getWorld();
@@ -66,6 +68,10 @@ public class DemoListener implements KeyListener {
             }
             case KeyEvent.VK_R -> {
                 scene.getEntities().get("rain").setActive(!scene.getEntities().get("rain").isActive());
+            }
+
+            case KeyEvent.VK_BACK_SPACE -> {
+                game.getSceneManager().activate("title");
             }
         }
     }

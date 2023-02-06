@@ -258,5 +258,10 @@ public class Renderer {
     public void reset() {
         pipeline.clear();
         entities.clear();
+        currentCamera = null;
+    }
+
+    public BufferedImage getBuffer() {
+        return this.buffer;
     }
 }

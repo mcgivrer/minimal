@@ -109,7 +109,7 @@ public class Game extends JPanel {
         inputHandler = new InputHandler(this);
         inputHandler.addListener(new GameKeyListener(this));
 
-        String title = I18n.get("game.title");
+        String title = I18n.get("game.window.title");
         frame = new JFrame(title);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -200,7 +200,9 @@ public class Game extends JPanel {
      */
     public void update(double elapsed) {
         physicEngine.update(elapsed);
-        renderer.getCurrentCamera().update(elapsed);
+        if (Optional.ofNullable(renderer.getCurrentCamera()).isPresent()) {
+            renderer.getCurrentCamera().update(elapsed);
+        }
         scm.getActiveScene().update(this, elapsed);
     }
 
