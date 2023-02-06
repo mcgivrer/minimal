@@ -7,6 +7,7 @@ import fr.snapgames.game.core.math.Vector2D;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.util.Optional;
 
 public class CoinBehavior implements Behavior<GameEntity> {
     @Override
@@ -33,19 +34,21 @@ public class CoinBehavior implements Behavior<GameEntity> {
         // if player near this entity less than distance (attrDist),
         // a force (attrForce) is applied to entity to reach to player.
         GameEntity p = game.getSceneManager().getActiveScene().getEntity("player");
-        double attrDist = (double) entity.attributes.get("attractionDistance");
-        double attrForce = (double) entity.attributes.get("attractionForce");
+        if (Optional.ofNullable(p).isPresent()) {
+            double attrDist = (double) entity.attributes.get("attractionDistance");
+            double attrForce = (double) entity.attributes.get("attractionForce");
 
-        if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
-            Vector2D v = p.position.substract(entity.position);
-            entity.forces.add(v.normalize().multiply(attrForce));
-        }
-        if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.25))) < entity.size.add(p.size)
-                .multiply(0.25).length()) {
-            entity.setActive(false);
-            int score = (int) p.getAttribute("score", 0);
-            score += (int) p.getAttribute("value",20);
-            p.setAttribute("score", score);
+            if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
+                Vector2D v = p.position.substract(entity.position);
+                entity.forces.add(v.normalize().multiply(attrForce));
+            }
+            if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.25))) < entity.size.add(p.size)
+                    .multiply(0.25).length()) {
+                entity.setActive(false);
+                int score = (int) p.getAttribute("score", 0);
+                score += (int) p.getAttribute("value", 20);
+                p.setAttribute("score", score);
+            }
         }
     }
 

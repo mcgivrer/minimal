@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Internal Input listener.
@@ -18,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class InputHandler implements KeyListener {
     Game game;
     private Map<Integer, KeyEvent> events = new ConcurrentHashMap<>();
-    private List<KeyListener> listeners = new ArrayList<>();
+    private List<KeyListener> listeners = new CopyOnWriteArrayList<>();
     private boolean ctrlDown;
     private boolean shiftDown;
     private boolean altDown;
@@ -63,6 +64,10 @@ public class InputHandler implements KeyListener {
 
     public void addListener(KeyListener keyListener) {
         listeners.add(keyListener);
+    }
+
+    public void removeListener(KeyListener keyListener) {
+        listeners.remove(keyListener);
     }
 
     public boolean isCtrlPressed() {

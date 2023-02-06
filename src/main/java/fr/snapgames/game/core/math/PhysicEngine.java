@@ -136,4 +136,8 @@ public class PhysicEngine {
             }
         }
     }
+
+    public void reset() {
+        entities.clear();
+    }
 }

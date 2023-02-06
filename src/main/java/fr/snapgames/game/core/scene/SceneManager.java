@@ -130,6 +130,9 @@ public class SceneManager {
     public void activate(String name) {
         if (!scenes.containsKey(name) && availableScenes.containsKey(name)) {
             Class<? extends Scene> sceneClass = availableScenes.get(name);
+            if (Optional.ofNullable(activeScene).isPresent()) {
+                activeScene.dispose(game);
+            }
             try {
                 Scene s = sceneClass.getConstructor(Game.class, String.class).newInstance(game, name);
                 add(s);
@@ -140,7 +143,7 @@ public class SceneManager {
                 System.out.printf("SceneManager:Scene %s instance has been activated%n", sceneClass.getName());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                      NoSuchMethodException e) {
-                System.err.printf("SceneManager:Unable to create Scene %S instance:%s%n", sceneClass.getName(), e.getMessage());
+                System.err.printf("SceneManager:Unable to create Scene %s instance:%s%n", sceneClass.getName(), e.getMessage());
             }
         } else {
             System.err.printf(

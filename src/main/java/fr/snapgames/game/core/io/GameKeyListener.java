@@ -39,8 +39,5 @@ public class GameKeyListener implements KeyListener {
             int debug = game.getDebug() + 1 < 5 ? game.getDebug() + 1 : 0;
             game.setDebug(debug);
         }
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            game.setExit(true);
-        }
     }
 }
