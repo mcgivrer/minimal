@@ -74,7 +74,7 @@ public class DemoScene extends AbstractScene {
         TextEntity score = (TextEntity) new TextEntity("score")
                 .setText("")
                 .setFont(g.getFont().deriveFont(20.0f))
-                .setPosition(new Vector2D(viewportWidth - 80, 25))
+                .setPosition(new Vector2D(viewportWidth - 80, 35))
                 .setColor(Color.WHITE)
                 .setShadowColor(Color.BLACK)
                 .setShadowWidth(3)
@@ -152,7 +152,7 @@ public class DemoScene extends AbstractScene {
         createCoins("coin_", 20, world, new CoinBehavior());
 
         // create Rain effect with a ParticleEntity.
-        createRain("rain", 500, world);
+        createRain("rain", 200, world);
 
         // add an ambient light
         Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
@@ -229,7 +229,7 @@ public class DemoScene extends AbstractScene {
                         world.getPlayArea().getHeight()))
                 .setLayer(1)
                 .setPriority(1)
-                .addBehavior(new RainEffectBehavior(world, Color.CYAN));
+                .addBehavior(new RainEffectBehavior(world, Color.CYAN,world.getWind()));
         for (int i = 0; i < nbParticles; i++) {
             GameEntity p = new GameEntity(pes.name + "_" + i)
                     .setType(EntityType.CIRCLE)
