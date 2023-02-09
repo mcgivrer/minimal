@@ -10,6 +10,7 @@ import java.awt.*;
 public class World {
     private Dimension playArea;
     private Vector2D gravity;
+    private Vector2D wind = new Vector2D();
     private Material material = Material.AIR;
 
     public World(Dimension area, Vector2D gravity) {
@@ -49,5 +50,14 @@ public class World {
 
     public Material getMaterial() {
         return material;
+    }
+
+    public World setWind(Vector2D w) {
+        this.wind = w;
+        return this;
+    }
+
+    public Vector2D getWind() {
+        return wind;
     }
 }
