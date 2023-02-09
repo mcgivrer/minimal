@@ -48,6 +48,7 @@ public abstract class AbstractScene implements Scene {
         game.getRenderer().addEntity(ge);
         game.getPhysicEngine().addEntity(ge);
         this.entities.put(ge.name, ge);
+        ge.getChild().forEach(c -> this.entities.put(c.name, c));
     }
 
     public GameEntity getEntity(String name) {

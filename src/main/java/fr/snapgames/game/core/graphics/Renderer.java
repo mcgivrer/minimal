@@ -1,24 +1,21 @@
 package fr.snapgames.game.core.graphics;
 
-import fr.snapgames.game.core.*;
+import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.graphics.plugins.GameEntityRenderer;
-import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
-import fr.snapgames.game.core.graphics.plugins.TextEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.*;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.World;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +32,8 @@ public class Renderer {
     private Color clearColor = Color.BLACK;
     private double scale;
     private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
+    private List<GameEntity> pipeline = new CopyOnWriteArrayList<>();
+
     private Camera currentCamera;
     private Map<Class<?>, RendererPlugin<?>> plugins = new HashMap<>();
 
@@ -44,19 +43,30 @@ public class Renderer {
         this.scale = config.getDouble("game.screen.scale", 2.0);
         this.frame = game.getFrame();
         this.buffer = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        this.addPlugins(new GameEntityRenderer());
-        this.addPlugins(new TextEntityRenderer());
+        // Add required renderer plugins
+        addPlugin(new GameEntityRenderer());
+        addPlugin(new TextEntityRenderer());
+        addPlugin(new ParticlesEntityRenderer());
+        addPlugin(new LightRenderer());
     }
 
     public void addEntities(Collection<GameEntity> entities) {
-        entities.stream().forEach(e -> this.entities.put(e.name, e));
+        entities.stream().forEach(e -> addEntity(e));
     }
 
     public void addEntity(GameEntity e) {
+
         this.entities.put(e.name, e);
+        pipeline.add(e);
+        pipeline.sort((e1, e2) -> {
+            return e1.getLayer() > e2.getLayer() ? 1
+                    : e1.getPriority() == e2.getPriority() ? 0
+                    : e1.getPriority() > e2.getPriority() ? 1
+                    : -1;
+        });
     }
 
-    private void addPlugins(RendererPlugin<?> rendererPlugin) {
+    public void addPlugin(RendererPlugin<?> rendererPlugin) {
         this.plugins.put(rendererPlugin.getObjectClass(), rendererPlugin);
     }
 
@@ -66,15 +76,14 @@ public class Renderer {
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
             // clear scene
             g.setColor(clearColor);
             g.clearRect(0, 0, buffer.getWidth(), buffer.getHeight());
+
             // draw all entities according to Camera
-            entities.values().stream()
+            pipeline.stream()
                     .filter(e -> e.isActive())
-                    .sorted((e1, e2) -> {
-                        return e1.getLayer() > e2.getLayer() ? 1 : e1.getPriority() > e2.getPriority() ? 1 : -1;
-                    })
                     .forEach(entity -> {
                         // draw Scene
                         if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
@@ -88,7 +97,7 @@ public class Renderer {
                             currentCamera.postDraw(g);
                         }
                     });
-            if (game.getDebug() > 0) {
+            if (game.getDebug() > 1) {
                 drawDebugGrid(g, 32);
                 if (Optional.ofNullable(currentCamera).isPresent()) {
                     drawCameraDebug(g, currentCamera);
@@ -98,10 +107,10 @@ public class Renderer {
                 drawPauseMode(g);
             }
             g.dispose();
-            stats.put("Pause", game.isUpdatePause() ? "On" : "Off");
-            stats.put("Obj", entities.size());
-            stats.put("Scn", game.getSceneManager().getActiveScene().getName());
-            stats.put("Dbg", game.getDebug());
+            stats.put("pause", game.isUpdatePause() ? "On" : "Off");
+            stats.put("obj", game.getSceneManager().getActiveScene().getEntities().size());
+            stats.put("scn", game.getSceneManager().getActiveScene().getName());
+            stats.put("dbg", game.getDebug());
             // draw image to screen.
             drawToScreen(stats);
         }
@@ -114,12 +123,12 @@ public class Renderer {
 
     private void drawPauseMode(Graphics2D g) {
         g.setColor(new Color(0.3f, 0.6f, 0.4f, 0.9f));
-        g.fillRect(0, (currentCamera.viewport.height - 24) / 2, currentCamera.viewport.width, 24);
+        g.fillRect(0, ((int) currentCamera.viewport.getHeight() - 24) / 2, (int) currentCamera.viewport.getWidth(), 24);
         g.setColor(Color.WHITE);
         g.setFont(g.getFont().deriveFont(Font.ITALIC, 14.0f).deriveFont(Font.BOLD));
         String pauseTxt = I18n.get("game.state.pause.message");
         int lng = g.getFontMetrics().stringWidth(pauseTxt);
-        g.drawString(pauseTxt, (currentCamera.viewport.width - lng) / 2, (currentCamera.viewport.height + 12) / 2);
+        g.drawString(pauseTxt, ((int) currentCamera.viewport.getWidth() - lng) / 2, ((int) currentCamera.viewport.getHeight() + 12) / 2);
     }
 
     private void drawToScreen(Map<String, Object> stats) {
@@ -129,9 +138,11 @@ public class Renderer {
                     return;
                 }
                 Graphics2D g2 = (Graphics2D) frame.getBufferStrategy().getDrawGraphics();
-
+                int titleBar = frame.getInsets().top - frame.getInsets().bottom;
                 g2.scale(scale, scale);
-                g2.drawImage(buffer, 0, 18,
+                g2.drawImage(buffer,
+                        0, titleBar, frame.getWidth(), frame.getHeight(),
+                        0, 0, buffer.getWidth(), buffer.getHeight(),
                         null);
                 g2.scale(1.0 / scale, 1.0 / scale);
                 if (game.getDebug() > 0) {
@@ -156,7 +167,7 @@ public class Renderer {
                 .collect(Collectors.joining("|")) + "]";
     }
 
-    private void drawEntity(Graphics2D g, GameEntity entity) {
+    public void drawEntity(Graphics2D g, GameEntity entity) {
         entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
             RendererPlugin rp = ((RendererPlugin) plugins.get(entity.getClass()));
@@ -165,6 +176,7 @@ public class Renderer {
         } else {
             System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
         }
+        entity.getChild().forEach(c -> drawEntity(g, c));
     }
 
     /**
@@ -203,7 +215,7 @@ public class Renderer {
 
     private void drawEntitesDebug(Graphics2D g) {
         entities.values().stream()
-                .filter(e -> e.isActive())
+                .filter(e -> e.isActive() && inCameraViewport(currentCamera, e))
                 .sorted((e1, e2) -> {
                     return e1.getLayer() > e2.getLayer() ? 1 : e1.getPriority() > e2.getPriority() ? 1 : -1;
                 })
@@ -221,16 +233,22 @@ public class Renderer {
                     if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
                         currentCamera.postDraw(g);
                     }
-
                 });
     }
 
+    private boolean inCameraViewport(Camera currentCamera, GameEntity e) {
+        if (Optional.ofNullable(currentCamera).isPresent()) {
+            return currentCamera.viewport.contains(e.box);
+        } else {
+            return false;
+        }
+    }
+
     private void drawCameraDebug(Graphics2D g, Camera camera) {
-        g.drawRect(10, 10, camera.viewport.width - 20, camera.viewport.height - 20);
+        g.drawRect(10, 10, (int) camera.viewport.getWidth() - 20, (int) camera.viewport.getHeight() - 20);
         g.drawString(String.format("cam: %s", camera.name), 20, 20);
         g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
         g.drawString(String.format("targ: %s", camera.target.name), 20, 44);
-
     }
 
 
@@ -242,4 +260,13 @@ public class Renderer {
         return this.currentCamera;
     }
 
+    public void reset() {
+        pipeline.clear();
+        entities.clear();
+        currentCamera = null;
+    }
+
+    public BufferedImage getBuffer() {
+        return this.buffer;
+    }
 }

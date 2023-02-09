@@ -58,8 +58,7 @@ public class PhysicEngine {
 
     public void update(double elapsed) {
         entities.values().stream()
-                .filter(e -> e.isActive()
-                        && e.physicType.equals(PhysicType.DYNAMIC))
+                .filter(e -> e.isActive())
                 .forEach(entity -> {
                     updateEntity(entity, elapsed);
                     if (Optional.ofNullable(world).isPresent()) {
@@ -73,12 +72,11 @@ public class PhysicEngine {
         for (Behavior b : entity.behaviors) {
             b.update(game, entity, elapsed);
         }
-        if (!entity.isStickToCamera()) {
+        if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
             // apply gravity
             entity.forces.add(world.getGravity().negate());
 
             // compute acceleration
-
             double density = entity.material != null ? entity.material.density : world.getMaterial().density;
             entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(density);
             entity.acceleration = entity.acceleration.multiply((double) entity.mass);
@@ -86,7 +84,6 @@ public class PhysicEngine {
             entity.acceleration.maximize((double) entity.getAttribute("maxAcceleration", maxAcceleration));
 
             // compute velocity
-
             entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed));
             if (entity.contact == 0) {
                 entity.speed = entity.speed.multiply(world.getMaterial().roughness);
@@ -97,7 +94,10 @@ public class PhysicEngine {
 
             // compute position
             entity.position = entity.position.add(entity.speed.multiply(elapsed));
+            entity.getChild().forEach(c -> updateEntity(c, elapsed));
             entity.forces.clear();
+            entity.updateBox();
+
         }
     }
 
@@ -135,5 +135,9 @@ public class PhysicEngine {
 
             }
         }
+    }
+
+    public void reset() {
+        entities.clear();
     }
 }

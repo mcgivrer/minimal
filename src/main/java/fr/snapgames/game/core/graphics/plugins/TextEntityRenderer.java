@@ -26,14 +26,16 @@ public class TextEntityRenderer implements RendererPlugin<TextEntity> {
         e.size.y = g.getFontMetrics().getHeight();
         if (Optional.ofNullable(e.shadowColor).isPresent()) {
             g.setColor(e.shadowColor);
-            for (int d = 0; d < e.shadowWidth; d++) {
+            for (int d = 0; d <= e.shadowWidth; d++) {
                 g.drawString(e.text, (int) e.position.x + d, (int) e.position.y + d);
             }
         }
         if (Optional.ofNullable(e.borderColor).isPresent()) {
             g.setColor(e.borderColor);
-            for (int d = 0; d < e.borderWidth; d++) {
-                g.drawString(e.text, (int) e.position.x + d, (int) e.position.y + d);
+            for (int c = -e.borderWidth; c <= e.borderWidth; c++) {
+                for (int d = -e.borderWidth; d <= e.borderWidth; d++) {
+                    g.drawString(e.text, (int) e.position.x + d, (int) e.position.y + c);
+                }
             }
         }
 

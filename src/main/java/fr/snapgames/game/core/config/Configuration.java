@@ -18,6 +18,8 @@ import java.util.Properties;
  *     <li>Double,</li>
  *     <li>Boolean,</li>
  *     <li>String.</li>
+ *     <li>{@link Vector2D} a new mathematical 2 dimensions vector used in the {@link fr.snapgames.game.core.math.PhysicEngine} (mainly)</li>
+ *     <li>{@link fr.snapgames.game.core.math.Material} the physic engine required material definition to make math processing.</li>
  * </ul>
  * from these properties.
  * The user can also {@link Configuration#save()} values after changes.

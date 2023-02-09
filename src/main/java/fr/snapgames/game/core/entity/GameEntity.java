@@ -8,6 +8,8 @@ import fr.snapgames.game.core.math.PhysicType;
 import fr.snapgames.game.core.math.Vector2D;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
@@ -39,6 +41,9 @@ public class GameEntity {
 
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior> behaviors = new ArrayList<>();
+    public Rectangle2D box;
+
+    private List<GameEntity> child = new ArrayList<>();
 
     public BufferedImage image;
 
@@ -73,7 +78,7 @@ public class GameEntity {
         this.duration = -1;
         this.layer = 1;
         this.priority = 1;
-
+        this.box = new Rectangle2D.Double();
         attributes.put("maxSpeed", 8.0);
         attributes.put("maxAcceleration", 3.0);
 
@@ -146,6 +151,15 @@ public class GameEntity {
     public GameEntity setAttribute(String key, Object value) {
         attributes.put(key, value);
         return this;
+    }
+
+    public GameEntity addChild(GameEntity ge) {
+        child.add(ge);
+        return this;
+    }
+
+    public List<GameEntity> getChild() {
+        return child;
     }
 
     public GameEntity setColor(Color color) {
@@ -221,5 +235,14 @@ public class GameEntity {
 
     public int getPriority() {
         return priority;
+    }
+
+    public GameEntity setPhysicType(PhysicType pt) {
+        this.physicType = pt;
+        return this;
+    }
+
+    public void updateBox() {
+        this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
     }
 }
