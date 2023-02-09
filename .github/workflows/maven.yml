@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '19'
-        distribution: 'zulu-fx'
+        distribution: 'zulu'
         cache: maven
     - name: Build Maven with Xvfb
       run: |
