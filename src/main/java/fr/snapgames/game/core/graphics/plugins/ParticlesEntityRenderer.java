@@ -6,7 +6,7 @@ import fr.snapgames.game.core.graphics.Renderer;
 import java.awt.*;
 
 /**
- * ParticlesEntity renderer olugin
+ * ParticlesEntity renderer plugin
  *
  * @author Frédéric Delorme
  * @since 0.0.3

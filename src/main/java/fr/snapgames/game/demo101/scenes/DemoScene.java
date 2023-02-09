@@ -2,19 +2,24 @@ package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
+import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.entity.*;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
+import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.math.*;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
 import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
 import fr.snapgames.game.demo101.scenes.behaviors.RainEffectBehavior;
+import fr.snapgames.game.demo101.scenes.behaviors.StormBehavior;
 import fr.snapgames.game.demo101.scenes.io.DemoListener;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 /**
  * @author Frédéric Delorme
@@ -24,6 +29,7 @@ public class DemoScene extends AbstractScene {
     private BufferedImage playerImg;
     private BufferedImage backgroundImg;
     private BufferedImage coinImg;
+    private DemoListener demoListener;
 
     public DemoScene(Game g, String name) {
         super(g, name);
@@ -50,7 +56,8 @@ public class DemoScene extends AbstractScene {
         int worldHeight = config.getInteger("game.world.height", 640);
         World world = pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
 
-        g.getInputHandler().addListener(new DemoListener(g, this));
+        demoListener = new DemoListener(g, this);
+        g.getInputHandler().addListener(demoListener);
 
         //Add Background Image
         GameEntity backgroundImage = new GameEntity("backgroundImage")
@@ -59,6 +66,9 @@ public class DemoScene extends AbstractScene {
                 .setPriority(1);
         add(backgroundImage);
 
+        // create Stars
+        createStars("star", 500, world, false);
+
         // Add a score display
         int viewportWidth = config.getInteger("game.camera.viewport.width", 320);
         TextEntity score = (TextEntity) new TextEntity("score")
@@ -66,9 +76,11 @@ public class DemoScene extends AbstractScene {
                 .setFont(g.getFont().deriveFont(20.0f))
                 .setPosition(new Vector2D(viewportWidth - 80, 25))
                 .setColor(Color.WHITE)
+                .setBorderColor(Color.DARK_GRAY)
+                .setBorderWidth(1)
                 .setShadowColor(Color.BLACK)
                 .setShadowWidth(2)
-                .setLayer(2)
+                .setLayer(20)
                 .setPriority(3)
                 .stickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
@@ -101,7 +113,7 @@ public class DemoScene extends AbstractScene {
                 .setAttribute("maxAcceleration", 8.0)
                 .setAttribute("speedStep", 0.4)
                 .setMass(8.0)
-                .setLayer(2)
+                .setLayer(10)
                 .setPriority(1)
                 .addBehavior(new Behavior<GameEntity>() {
                     @Override
@@ -140,7 +152,22 @@ public class DemoScene extends AbstractScene {
 
         // Create enemies Entity.
         createCoins("coin_", 20, world, new CoinBehavior());
-        add(createRain("rain", 500, world));
+
+        // create Rain effect with a ParticleEntity.
+        createRain("rain", 500, world);
+
+        // add an ambient light
+        Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
+                .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
+                .setLayer(2)
+                .setPriority(1)
+                .addBehavior(new LightBehavior())
+                .addBehavior(new StormBehavior(500, 4, 50));
+        add(ambiantLight);
+
+        // add some spotlights
+        createSpotLights("spot", 10, world);
+
         // define Camera to track player.
         int vpWidth = config.getInteger("game.camera.viewport.width", 320);
         int vpHeight = config.getInteger("game.camera.viewport.height", 200);
@@ -148,11 +175,46 @@ public class DemoScene extends AbstractScene {
         Camera cam = new Camera("camera")
                 .setTarget(player)
                 .setTween(0.1)
-                .setViewport(new Dimension(vpWidth, vpHeight));
+                .setViewport(new Rectangle2D.Double(0, 0, vpWidth, vpHeight));
         renderer.setCurrentCamera(cam);
     }
 
-    private ParticlesEntity createRain(String entityName, int nbParticles, World world) {
+    private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
+
+        for (int i = 0; i < nbStars; i++) {
+            GameEntity star = new GameEntity(prefixEntityName + "_" + i)
+                    .setType(EntityType.CIRCLE)
+                    .setPhysicType(PhysicType.STATIC)
+                    .setPosition(RandomUtils.ramdomVector(world.getPlayArea()))
+                    .setSize(new Vector2D(1.0, 1.0))
+                    .setColor(Color.WHITE)
+                    .setLayer(5)
+                    .setPriority(1 + i)
+                    .setActive(active);
+            add(star);
+        }
+    }
+
+    private void createSpotLights(String prefixEntityName, int nbLights, World world) {
+        for (int i = 0; i < nbLights; i++) {
+            Light l = (Light) new Light(prefixEntityName + "_" + i,
+                    world.getPlayArea().width * Math.random(),
+                    200.0 + (world.getPlayArea().height - 200) * Math.random(),
+                    200.0 * Math.random(),
+                    1.0f)
+                    .setLayer(2)
+                    .setPriority(1 + i)
+                    .setColor(RandomUtils.randomColorMinMax(
+                            0.6f, 1.0f,
+                            0.6f, 1.0f,
+                            0.6f, 1.0f,
+                            0.6f, 1.0f))
+                    .addBehavior(new LightBehavior());
+            add(l);
+        }
+    }
+
+    private void createRain(String entityName, int nbParticles, World world) {
         ParticlesEntity pes = (ParticlesEntity) new ParticlesEntity(entityName)
                 .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(), 0.0))
                 .setSize(new Vector2D(
@@ -177,7 +239,7 @@ public class DemoScene extends AbstractScene {
                     .setMaterial(Material.AIR);
             pes.getChild().add(p);
         }
-        return pes;
+        add(pes);
     }
 
     /**
@@ -193,9 +255,9 @@ public class DemoScene extends AbstractScene {
                             Math.random() * world.getPlayArea().getHeight()))
                     .setImage(coinImg)
                     .setMaterial(Material.SUPER_BALL)
-                    .setMass(5.0)
+                    .setMass(25.0)
                     .setLayer(4)
-                    .setPriority(4)
+                    .setPriority(4 + i)
                     .setAttribute("maxVelocity", 4.0)
                     .setAttribute("maxAcceleration", 5.0)
                     .setAttribute("attractionDistance", 80.0)
@@ -208,12 +270,25 @@ public class DemoScene extends AbstractScene {
     }
 
     @Override
+    public void input(Game g, InputHandler ih) {
+        if (ih.getKey(KeyEvent.VK_ESCAPE)) {
+            g.setExit(false);
+            g.getSceneManager().activate("title");
+        }
+    }
+
+    @Override
     public void draw(Game g, Renderer r) {
 
     }
 
     @Override
     public void dispose(Game g) {
-
+        getEntities().clear();
+        game.getPhysicEngine().reset();
+        game.getRenderer().reset();
+        if (Optional.ofNullable(demoListener).isPresent()) {
+            g.getInputHandler().removeListener(demoListener);
+        }
     }
 }

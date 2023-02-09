@@ -4,6 +4,7 @@ import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.math.World;
+import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.demo101.scenes.DemoScene;
 import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
 
@@ -19,11 +20,13 @@ import java.util.List;
  * @since 0.0.2
  **/
 public class DemoListener implements KeyListener {
+    private final Game game;
     DemoScene scene;
     Configuration config;
     World world;
 
     public DemoListener(Game g, DemoScene scene) {
+        this.game = g;
         this.scene = scene;
         config = g.getConfiguration();
         world = g.getPhysicEngine().getWorld();
@@ -50,6 +53,25 @@ public class DemoListener implements KeyListener {
             }
             case KeyEvent.VK_DELETE -> {
                 removeNbObjectByNameFilter("ball_", 10);
+            }
+            case KeyEvent.VK_B -> {
+                if (scene.getEntities().get("backgroundImage").isActive()) {
+                    scene.getEntities().get("backgroundImage").setActive(false);
+                    scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(true));
+                } else {
+                    scene.getEntities().get("backgroundImage").setActive(true);
+                    scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(false));
+                }
+            }
+            case KeyEvent.VK_G -> {
+                world.setGravity(world.getGravity().negate());
+            }
+            case KeyEvent.VK_R -> {
+                scene.getEntities().get("rain").setActive(!scene.getEntities().get("rain").isActive());
+            }
+
+            case KeyEvent.VK_BACK_SPACE -> {
+                game.getSceneManager().activate("title");
             }
         }
     }
