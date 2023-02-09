@@ -5,7 +5,20 @@
 This is a small Minimalistic Game project , based on a master Game Java class, with some subclasses to let keep the code
 ass short as possible.
 
-## Compile
+## Goals
+
+This Mini'mal project propose an exploration of structure and services required by a 2D platformer. 
+
+**GameObject** & **Scene** with **Behavior**, **Particle System** with effects, Ambient and Spot **Light**,  **Resource** and Manager, **Renderer** with plugin, **PhysicEngine**, **World** and **Material**, all the game ingredients are design in their simplest flavour to let understand the complexity of 2D platform game.
+
+## Coming soon
+
+The future coming evolution woill be Water simulation with Influencer, addon to the PhsyicEngine, Collision detection and resolution, evolution of already defined Behavior.
+
+
+## let's try ?
+
+### Compile
 
 Based on standard Maven tooling, a simple command line will provide a JAR:
 
@@ -13,7 +26,7 @@ Based on standard Maven tooling, a simple command line will provide a JAR:
 $ mvn clean install
 ```
 
-## Run
+### Run
 
 To run the produced artifact, multiple solution :
 
@@ -60,3 +73,4 @@ You can interact with the demo with the following keys :
 
 if you want to contribute to the experiment, just contact me via github 
 
+McG.
