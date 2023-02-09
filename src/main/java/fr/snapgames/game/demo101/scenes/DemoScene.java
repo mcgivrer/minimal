@@ -76,8 +76,10 @@ public class DemoScene extends AbstractScene {
                 .setFont(g.getFont().deriveFont(20.0f))
                 .setPosition(new Vector2D(viewportWidth - 80, 35))
                 .setColor(Color.WHITE)
+                .setBorderColor(Color.DARK_GRAY)
+                .setBorderWidth(1)
                 .setShadowColor(Color.BLACK)
-                .setShadowWidth(3)
+                .setShadowWidth(2)
                 .setLayer(20)
                 .setPriority(3)
                 .stickToCamera(true)
@@ -178,15 +180,7 @@ public class DemoScene extends AbstractScene {
     }
 
     private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
-        ParticlesEntity stars = (ParticlesEntity) new ParticlesEntity(prefixEntityName)
-                .setPhysicType(PhysicType.STATIC)
-                .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(), 0.0))
-                .setSize(new Vector2D(
-                        world.getPlayArea().getWidth(),
-                        world.getPlayArea().getHeight()))
-                .setLayer(5)
-                .setPriority(1)
-                .setActive(active);
+
         for (int i = 0; i < nbStars; i++) {
             GameEntity star = new GameEntity(prefixEntityName + "_" + i)
                     .setType(EntityType.CIRCLE)
@@ -197,9 +191,8 @@ public class DemoScene extends AbstractScene {
                     .setLayer(5)
                     .setPriority(1 + i)
                     .setActive(active);
-            stars.addChild(star);
+            add(star);
         }
-        add(stars);
     }
 
     private void createSpotLights(String prefixEntityName, int nbLights, World world) {
@@ -262,7 +255,7 @@ public class DemoScene extends AbstractScene {
                             Math.random() * world.getPlayArea().getHeight()))
                     .setImage(coinImg)
                     .setMaterial(Material.SUPER_BALL)
-                    .setMass(5.0)
+                    .setMass(25.0)
                     .setLayer(4)
                     .setPriority(4 + i)
                     .setAttribute("maxVelocity", 4.0)
