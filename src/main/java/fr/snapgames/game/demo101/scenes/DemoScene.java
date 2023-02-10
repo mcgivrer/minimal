@@ -13,6 +13,7 @@ import fr.snapgames.game.core.scene.AbstractScene;
 import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
 import fr.snapgames.game.demo101.scenes.behaviors.RainEffectBehavior;
 import fr.snapgames.game.demo101.scenes.behaviors.StormBehavior;
+import fr.snapgames.game.demo101.scenes.behaviors.WindyWeatherBehavior;
 import fr.snapgames.game.demo101.scenes.io.DemoListener;
 
 import java.awt.*;
@@ -87,8 +88,10 @@ public class DemoScene extends AbstractScene {
                     @Override
                     public void update(Game game, TextEntity entity, double dt) {
                         GameEntity p = getEntity("player");
-                        int score = (int) p.getAttribute("score", 0);
-                        entity.setText(String.format("%05d", score));
+                        if (Optional.ofNullable(p).isPresent()) {
+                            int score = (int) p.getAttribute("score", 0);
+                            entity.setText(String.format("%05d", score));
+                        }
                     }
 
                     @Override
@@ -177,6 +180,10 @@ public class DemoScene extends AbstractScene {
                 .setTween(0.1)
                 .setViewport(new Rectangle2D.Double(0, 0, vpWidth, vpHeight));
         renderer.setCurrentCamera(cam);
+
+
+        // add randomly wind.
+        add(new WindyWeatherBehavior(20.0, 0.0, 0.3, 5.0));
     }
 
     private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
@@ -222,7 +229,7 @@ public class DemoScene extends AbstractScene {
                         world.getPlayArea().getHeight()))
                 .setLayer(1)
                 .setPriority(1)
-                .addBehavior(new RainEffectBehavior(world, Color.CYAN,world.getWind()));
+                .addBehavior(new RainEffectBehavior(world, Color.CYAN));
         for (int i = 0; i < nbParticles; i++) {
             GameEntity p = new GameEntity(pes.name + "_" + i)
                     .setType(EntityType.CIRCLE)
@@ -235,7 +242,7 @@ public class DemoScene extends AbstractScene {
                     .setColor(Color.CYAN)
                     .setLayer(1)
                     .setPriority(i)
-                    .setMass(0.1)
+                    .setMass(1.0)
                     .setMaterial(Material.AIR);
             pes.getChild().add(p);
         }
