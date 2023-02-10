@@ -138,10 +138,9 @@ public class Renderer {
                     return;
                 }
                 Graphics2D g2 = (Graphics2D) frame.getBufferStrategy().getDrawGraphics();
-                int titleBar = frame.getInsets().top - frame.getInsets().bottom;
                 g2.scale(scale, scale);
                 g2.drawImage(buffer,
-                        0, titleBar, frame.getWidth(), frame.getHeight(),
+                        0, 0, frame.getWidth(), frame.getHeight(),
                         0, 0, buffer.getWidth(), buffer.getHeight(),
                         null);
                 g2.scale(1.0 / scale, 1.0 / scale);

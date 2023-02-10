@@ -7,6 +7,7 @@ import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.math.World;
 
 import java.awt.*;
+import java.util.Optional;
 
 /**
  * Rain Effect behavior to simulate falling rain
@@ -27,14 +28,12 @@ public class RainEffectBehavior implements Behavior {
     @Override
     public void update(Game game, Object entity, double dt) {
         ParticlesEntity pe = (ParticlesEntity) entity;
+
         pe.getChild().forEach(p -> {
-            p.forces.add(
-                    new Vector2D(
-                            (Math.random() - 0.5) * 0.1,
-                            (Math.random() * 25.0)));
-            p.forces.add(new Vector2D(
-                    Math.random() * 10.0, 0.0));
-            p.forces.add(world.getGravity());
+            if (Optional.ofNullable(world.getWind()).isPresent()) {
+                p.forces.add(world.getWind());
+            }
+            p.forces.add(world.getGravity().negate());
 
             if (p.position.y - p.size.y > pe.size.y ||
                     p.position.x > pe.size.x ||
