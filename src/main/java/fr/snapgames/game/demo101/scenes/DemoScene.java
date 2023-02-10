@@ -230,6 +230,7 @@ public class DemoScene extends AbstractScene {
                 .setLayer(1)
                 .setPriority(1)
                 .addBehavior(new RainEffectBehavior(world, Color.CYAN));
+
         for (int i = 0; i < nbParticles; i++) {
             GameEntity p = new GameEntity(pes.name + "_" + i)
                     .setType(EntityType.CIRCLE)
