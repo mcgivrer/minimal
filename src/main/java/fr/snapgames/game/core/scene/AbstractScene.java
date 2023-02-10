@@ -1,9 +1,12 @@
 package fr.snapgames.game.core.scene;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Renderer;
@@ -21,9 +24,11 @@ public abstract class AbstractScene implements Scene {
     protected InputHandler inputHandler;
     protected Renderer renderer;
 
+    protected List<Behavior<Scene>> behaviors = new ArrayList<>();
+
     @Override
     public String getName() {
-        return "default";
+        return name;
     }
 
     @Override
@@ -41,7 +46,7 @@ public abstract class AbstractScene implements Scene {
 
     protected AbstractScene(Game g, String name) {
         this.game = g;
-        this.name = name;
+        setName(name);
     }
 
     public void add(GameEntity ge) {
@@ -49,6 +54,17 @@ public abstract class AbstractScene implements Scene {
         game.getPhysicEngine().addEntity(ge);
         this.entities.put(ge.name, ge);
         ge.getChild().forEach(c -> this.entities.put(c.name, c));
+    }
+
+    /**
+     * Add a behavior to the scene.
+     *
+     * @param b
+     * @return
+     */
+    public Scene add(Behavior<Scene> b) {
+        this.behaviors.add(b);
+        return this;
     }
 
     public GameEntity getEntity(String name) {
@@ -66,6 +82,8 @@ public abstract class AbstractScene implements Scene {
 
     @Override
     public void update(Game g, double dt) {
-
+        behaviors.stream().forEach(b -> {
+            b.update(game, this, dt);
+        });
     }
 }
