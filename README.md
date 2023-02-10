@@ -13,7 +13,7 @@ This Mini'mal project propose an exploration of structure and services required 
 
 ## Coming soon
 
-The future coming evolution woill be Water simulation with Influencer, addon to the PhsyicEngine, Collision detection and resolution, evolution of already defined Behavior.
+The future coming evolution will be Water simulation with Influencer, addon to the PhsyicEngine, Collision detection and resolution, evolution of already defined Behavior.
 
 
 ## let's try ?
