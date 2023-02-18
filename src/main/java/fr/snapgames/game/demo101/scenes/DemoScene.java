@@ -87,8 +87,10 @@ public class DemoScene extends AbstractScene {
                     @Override
                     public void update(Game game, TextEntity entity, double dt) {
                         GameEntity p = getEntity("player");
-                        int score = (int) p.getAttribute("score", 0);
-                        entity.setText(String.format("%05d", score));
+                        if (Optional.ofNullable(p).isPresent()) {
+                            int score = (int) p.getAttribute("score", 0);
+                            entity.setText(String.format("%05d", score));
+                        }
                     }
 
                     @Override
@@ -220,9 +222,9 @@ public class DemoScene extends AbstractScene {
                 .setSize(new Vector2D(
                         world.getPlayArea().getWidth(),
                         world.getPlayArea().getHeight()))
-                .setLayer(1)
+                .setLayer(11)
                 .setPriority(1)
-                .addBehavior(new RainEffectBehavior(world, Color.CYAN,world.getWind()));
+                .addBehavior(new RainEffectBehavior(world, Color.CYAN, world.getWind()));
         for (int i = 0; i < nbParticles; i++) {
             GameEntity p = new GameEntity(pes.name + "_" + i)
                     .setType(EntityType.CIRCLE)
@@ -233,7 +235,7 @@ public class DemoScene extends AbstractScene {
                                     world.getPlayArea().getWidth() * Math.random(),
                                     world.getPlayArea().getHeight() * Math.random()))
                     .setColor(Color.CYAN)
-                    .setLayer(1)
+                    .setLayer(11)
                     .setPriority(i)
                     .setMass(0.1)
                     .setMaterial(Material.AIR);
