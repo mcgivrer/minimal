@@ -23,7 +23,8 @@ public class LightRenderer implements RendererPlugin<Light> {
                         l.color,
                         new Color(0.0f, 0.0f, 0.0f, 0.0f)};
                 final RadialGradientPaint rgp = new RadialGradientPaint(
-                        new Point((int) l.position.x, (int) l.position.y), (int) l.size.x,
+                        new Point((int) l.position.x, (int) l.position.y),
+                        (float) l.size.x,
                         l.dist, l.colors);
                 g.setPaint(rgp);
                 g.fill(new Ellipse2D.Double(l.position.x - l.size.x, l.position.y - l.size.x, l.size.x * 2,
