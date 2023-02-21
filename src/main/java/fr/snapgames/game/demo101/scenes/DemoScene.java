@@ -63,6 +63,7 @@ public class DemoScene extends AbstractScene {
         //Add Background Image
         GameEntity backgroundImage = new GameEntity("backgroundImage")
                 .setImage(backgroundImg)
+                .setPhysicType(PhysicType.STATIC)
                 .setLayer(0)
                 .setPriority(1);
         add(backgroundImage);
@@ -174,6 +175,20 @@ public class DemoScene extends AbstractScene {
         // define Camera to track player.
         int vpWidth = config.getInteger("game.camera.viewport.width", 320);
         int vpHeight = config.getInteger("game.camera.viewport.height", 200);
+
+
+        Influencer water = (Influencer) new Influencer("water")
+                .setType(EntityType.RECTANGLE)
+                .setPosition(new Vector2D(0, worldHeight * 0.85))
+                .setSize(new Vector2D(worldWidth, worldHeight * 0.15))
+                .setColor(new Color(0.0f, 0.3f, 0.8f, 0.7f))
+                .setBorderColor(Color.CYAN)
+                .setBorderWidth(1)
+                .setMaterial(Material.WATER)
+                .addForce(world.getGravity().multiply(0.98))
+                .setLayer(15)
+                .setPriority(1);
+        add(water);
 
         Camera cam = new Camera("camera")
                 .setTarget(player)

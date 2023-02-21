@@ -4,12 +4,15 @@ import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.entity.Influencer;
 
 import java.awt.*;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * {@link PhysicEngine} compute acceleration, velocity and position for all {@link GameEntity}
@@ -58,7 +61,7 @@ public class PhysicEngine {
 
     public void update(double elapsed) {
         entities.values().stream()
-                .filter(e -> e.isActive())
+                .filter(e -> e.isActive() && !(e instanceof Influencer))
                 .forEach(entity -> {
                     updateEntity(entity, elapsed);
                     if (Optional.ofNullable(world).isPresent()) {
@@ -69,27 +72,19 @@ public class PhysicEngine {
 
     public void updateEntity(GameEntity entity, double elapsed) {
 
-        for (Behavior b : entity.behaviors) {
-            b.update(game, entity, elapsed);
-        }
         if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
             // apply gravity
             entity.forces.add(world.getGravity().negate());
-
+            // Apply influencer Effects (Material and force impacted)
+            Material material = appliedInfluencerToEntity(entity, world);
             // compute acceleration
-            double density = entity.material != null ? entity.material.density : world.getMaterial().density;
-            entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(density);
+            entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(material.density);
             entity.acceleration = entity.acceleration.multiply((double) entity.mass);
-
             entity.acceleration.maximize((double) entity.getAttribute("maxAcceleration", maxAcceleration));
 
             // compute velocity
-            entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed));
-            if (entity.contact == 0) {
-                entity.speed = entity.speed.multiply(world.getMaterial().roughness);
-            } else {
-                entity.speed = entity.speed.multiply(entity.material.roughness * world.getMaterial().roughness);
-            }
+            double roughness = entity.contact == 0 ? world.getMaterial().roughness : world.getMaterial().roughness * material.roughness;
+            entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed)).multiply(roughness);
             entity.speed.maximize((double) entity.getAttribute("maxVelocity", maxVelocity));
 
             // compute position
@@ -97,8 +92,23 @@ public class PhysicEngine {
             entity.getChild().forEach(c -> updateEntity(c, elapsed));
             entity.forces.clear();
             entity.updateBox();
-
         }
+        for (Behavior b : entity.behaviors) {
+            b.update(game, entity, elapsed);
+        }
+    }
+
+    private Material appliedInfluencerToEntity(GameEntity e, World world) {
+        Material material = e.material.copy();
+        List<GameEntity> il = entities.values().stream()
+                .filter(i -> i instanceof Influencer)
+                .filter(i -> i.box.intersects(e.box.getBounds2D()))
+                .collect(Collectors.toList());
+        for (GameEntity ge : il) {
+            material = ge.material;
+            e.addForces(ge.forces);
+        }
+        return material;
     }
 
     /**

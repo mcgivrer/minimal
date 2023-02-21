@@ -100,6 +100,7 @@ public class GameEntity {
 
     public GameEntity setSize(Vector2D s) {
         this.size = s;
+        updateBox();
         return this;
     }
 
@@ -244,5 +245,19 @@ public class GameEntity {
 
     public void updateBox() {
         this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
+    }
+
+    public GameEntity addForce(Vector2D force) {
+        this.forces.add(force);
+        return this;
+    }
+
+    public GameEntity addForces(List<Vector2D> forces) {
+        this.forces.addAll(forces);
+        return this;
+    }
+
+    public String toString() {
+        return this.getClass().getSimpleName() + ":" + this.name;
     }
 }

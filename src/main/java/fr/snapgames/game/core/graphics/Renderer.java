@@ -48,6 +48,7 @@ public class Renderer {
         addPlugin(new TextEntityRenderer());
         addPlugin(new ParticlesEntityRenderer());
         addPlugin(new LightRenderer());
+        addPlugin(new InfluencerRenderer());
     }
 
     public void addEntities(Collection<GameEntity> entities) {
@@ -161,7 +162,7 @@ public class Renderer {
     }
 
     private String prepareStatsString(Map<String, Object> stats) {
-        return "[" + stats.entrySet().stream().map(entry ->
+        return "[" + stats.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(entry ->
                         entry.getKey() + ":" + entry.getValue())
                 .collect(Collectors.joining("|")) + "]";
     }

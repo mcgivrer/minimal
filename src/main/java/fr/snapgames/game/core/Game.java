@@ -55,7 +55,8 @@ public class Game extends JPanel {
     private SceneManager scm;
 
     /**
-     * Create Game by loading configuration from the default game.properties file, with no test mode activated.
+     * Create Game by loading configuration from the default game.properties file,
+     * with no test mode activated.
      *
      * @see Game#Game(String, boolean)
      */
@@ -64,12 +65,15 @@ public class Game extends JPanel {
     }
 
     /**
-     * This the entry point of our {@link Game}, providing a path to a configuration file to take in account to configure all the Game engine,
+     * This the entry point of our {@link Game}, providing a path to a configuration
+     * file to take in account to configure all the Game engine,
      * and set a flag to activate or not a specific test mode.
      *
      * @param configFilePath the path to the *.properties configuration file.
-     * @param mode           if true, set the Game in test mode and the GameLoop will not occur:
-     *                       only ONE loop in the game loop will be achieved, to let the unit test manage
+     * @param mode           if true, set the Game in test mode and the GameLoop
+     *                       will not occur:
+     *                       only ONE loop in the game loop will be achieved, to let
+     *                       the unit test manage
      *                       the looping strategy for test purpose.
      * @see Configuration
      */
@@ -91,14 +95,15 @@ public class Game extends JPanel {
 
     /**
      * Create the Window where the magic happen !
-     * It gathers the required window size parameters from the translation file and configuration file with 4 main keys:
+     * It gathers the required window size parameters from the translation file and
+     * configuration file with 4 main keys:
      *
      * <ul>
-     *     <li><code>game.title</code> from the I18n file, the title of the window</li>
-     *     <li><code>game.camera.viewport.width</code></li>
-     *     <li><code>game.camera.viewport.height</code></li>
-     *     <li><code>game.screen.scale</code></li>
-     *     <li><code>game.buffer.strategy</code></li>
+     * <li><code>game.title</code> from the I18n file, the title of the window</li>
+     * <li><code>game.camera.viewport.width</code></li>
+     * <li><code>game.camera.viewport.height</code></li>
+     * <li><code>game.screen.scale</code></li>
+     * <li><code>game.buffer.strategy</code></li>
      * </ul>
      *
      * @see Configuration
@@ -169,13 +174,9 @@ public class Game extends JPanel {
     /**
      * Draw all things on screen.
      *
-     * @param realFPS displayed Frame Per Seconds.
-     * @param realUPS
+     * @param stats a list of stats in a {@link Map} to be displayed in the debug bar.
      */
-    private void draw(long realFPS, long realUPS) {
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("fps", realFPS);
-        stats.put("ups", realUPS);
+    private void draw(Map<String, Object> stats) {
         renderer.draw(stats);
     }
 
@@ -229,8 +230,11 @@ public class Game extends JPanel {
         long ups = 0;
         long realUPS = 0;
         long timeFrame = 0;
+        long loopCounter = 0;
+        Map<String, Object> loopData = new HashMap<>();
         while (!exit && !testMode) {
             start = System.nanoTime() / 1000000.0;
+            loopCounter++;
             input();
             if (!pause) {
                 update(dt * .04);
@@ -246,8 +250,11 @@ public class Game extends JPanel {
                 ups = 0;
                 timeFrame = 0;
             }
+            loopData.put("cnt", loopCounter);
+            loopData.put("fps", realFPS);
+            loopData.put("ups", realUPS);
 
-            draw(realFPS, realUPS);
+            draw(loopData);
             waitUntilStepEnd(dt);
 
             end = System.nanoTime() / 1000000.0;
@@ -311,7 +318,6 @@ public class Game extends JPanel {
     public InputHandler getInputHandler() {
         return inputHandler;
     }
-
 
     public PhysicEngine getPhysicEngine() {
         return physicEngine;
