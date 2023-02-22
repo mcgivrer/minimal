@@ -55,11 +55,12 @@ public class DemoListener implements KeyListener {
                 removeNbObjectByNameFilter("ball_", 10);
             }
             case KeyEvent.VK_B -> {
-                if (scene.getEntities().get("backgroundImage").isActive()) {
-                    scene.getEntities().get("backgroundImage").setActive(false);
+                GameEntity backGndImd = scene.getEntities().get("backgroundImage");
+                if (backGndImd.isActive()) {
+                    backGndImd.setActive(false);
                     scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(true));
                 } else {
-                    scene.getEntities().get("backgroundImage").setActive(true);
+                    backGndImd.setActive(true);
                     scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(false));
                 }
             }

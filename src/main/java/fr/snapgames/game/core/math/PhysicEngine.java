@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
  **/
 public class PhysicEngine {
 
+    private static final double TIME_FACTOR = 0.45;
     private final Game game;
     private Configuration config;
     private World world;
@@ -60,10 +61,11 @@ public class PhysicEngine {
     }
 
     public void update(double elapsed) {
+        double time = elapsed * TIME_FACTOR;
         entities.values().stream()
                 .filter(e -> e.isActive() && !(e instanceof Influencer))
                 .forEach(entity -> {
-                    updateEntity(entity, elapsed);
+                    updateEntity(entity, time);
                     if (Optional.ofNullable(world).isPresent()) {
                         constrainEntityToWorld(world, entity);
                     }
@@ -100,12 +102,12 @@ public class PhysicEngine {
 
     private Material appliedInfluencerToEntity(GameEntity e, World world) {
         Material material = e.material.copy();
-        List<GameEntity> il = entities.values().stream()
+        List<GameEntity> influencerList = entities.values().stream()
                 .filter(i -> i instanceof Influencer)
                 .filter(i -> i.box.intersects(e.box.getBounds2D()))
-                .collect(Collectors.toList());
-        for (GameEntity ge : il) {
-            material = ge.material;
+                .toList();
+        for (GameEntity ge : influencerList) {
+            material = material.merge(ge.material);
             e.addForces(ge.forces);
         }
         return material;

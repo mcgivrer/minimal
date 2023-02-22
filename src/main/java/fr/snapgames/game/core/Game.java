@@ -15,6 +15,7 @@ import fr.snapgames.game.core.scene.SceneManager;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.util.*;
 
 import javax.swing.JFrame;
@@ -125,7 +126,7 @@ public class Game extends JPanel {
         // define Window content and size.
         frame.setLayout(new GridLayout());
 
-        frame.setContentPane(this);
+        //frame.setContentPane();
 
         frame.setSize(dim);
         frame.setPreferredSize(dim);
@@ -145,6 +146,7 @@ public class Game extends JPanel {
         frame.setContentPane(this);
         frame.getContentPane().setPreferredSize(dim);
 
+
         frame.addKeyListener(inputHandler);
         frame.pack();
 
@@ -163,7 +165,6 @@ public class Game extends JPanel {
         config.parseArguments(args);
         scm.activateDefaultScene();
         create((Graphics2D) frame.getGraphics());
-
     }
 
     private void create(Graphics2D g) {
@@ -286,9 +287,6 @@ public class Game extends JPanel {
     }
 
     public void keyTyped(KeyEvent e) {
-        if (e.getKeyChar() == 'p') {
-            this.pause = !this.pause;
-        }
     }
 
     public int getDebug() {
@@ -342,4 +340,7 @@ public class Game extends JPanel {
         this.debug = debug;
     }
 
+    public void requestPause(boolean pause) {
+        this.pause = pause;
+    }
 }
