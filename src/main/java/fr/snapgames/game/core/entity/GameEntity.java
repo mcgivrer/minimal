@@ -43,6 +43,9 @@ public class GameEntity {
     public List<Behavior> behaviors = new ArrayList<>();
     public Rectangle2D box;
 
+    /**
+     * Child entities for this one. Mainly used by {@link ParticlesEntity}.
+     */
     private List<GameEntity> child = new ArrayList<>();
 
     public BufferedImage image;
@@ -64,7 +67,7 @@ public class GameEntity {
     private int priority;
 
     /**
-     * Create a new GameEntity with a name.
+     * Create a new {@link GameEntity} with a name, and set all characteristics to default values.
      *
      * @param name Name of the new entity.
      */
@@ -109,6 +112,12 @@ public class GameEntity {
         return this;
     }
 
+    /**
+     * Set the image attribute. if the image is not null, use the image dimension to set {@link GameEntity#size}.
+     *
+     * @param i the {@link BufferedImage} ti set as {@link GameEntity} image.
+     * @return the updated {@link GameEntity}.
+     */
     public GameEntity setImage(BufferedImage i) {
         if (Optional.ofNullable(i).isPresent()) {
             this.image = i;
@@ -134,18 +143,20 @@ public class GameEntity {
         return this;
     }
 
+    /**
+     * Add internal debug information used by
+     * {@link fr.snapgames.game.core.graphics.Renderer#drawEntitesDebug(Graphics2D)}
+     * to display realtime information.
+     *
+     * @return the corresponding {@link Collection} of {@link String} containing the debug information to be displayed.
+     */
     public Collection<String> getDebugInfo() {
         List<String> ls = new ArrayList<>();
         ls.add(String.format("name:%s", name));
         ls.add(String.format("pos: %04.2f,%04.2f", this.position.x, this.position.y));
         ls.add(String.format("spd: %04.2f,%04.2f", this.speed.x, this.speed.y));
         ls.add(String.format("acc: %04.2f,%04.2f", this.acceleration.x, this.acceleration.y));
-        ls.add(String.format("mat: %s[%04.2f,%04.2f,%04.2f]",
-                this.material.name,
-                this.material.density,
-                this.material.elasticity,
-                this.material.roughness));
-
+        ls.add(String.format("mat: %s", this.material));
         return ls;
     }
 
@@ -238,25 +249,49 @@ public class GameEntity {
         return priority;
     }
 
+    /**
+     * Set the {@link PhysicType} for this GameENtity.
+     *
+     * @param pt the {@link PhysicType#STATIC} or {@link PhysicType#DYNAMIC}.
+     * @return the updated {@link GameEntity}.
+     */
     public GameEntity setPhysicType(PhysicType pt) {
         this.physicType = pt;
         return this;
     }
 
+    /**
+     * Compute the box for this GameEntity according to its position and size.
+     *
+     * @see Rectangle2D
+     */
     public void updateBox() {
         this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
     }
 
+    /**
+     * Add a force to the {@link GameEntity}.
+     *
+     * @param force a {@link Vector2D} force.
+     * @return the updated {@link GameEntity}.
+     */
     public GameEntity addForce(Vector2D force) {
         this.forces.add(force);
         return this;
     }
 
+    /**
+     * Add a list of forces to the {@link GameEntity}.
+     *
+     * @param forces a {@link List} {@link Vector2D} force.
+     * @return the updated {@link GameEntity}.
+     */
     public GameEntity addForces(List<Vector2D> forces) {
         this.forces.addAll(forces);
         return this;
     }
 
+    @Override
     public String toString() {
         return this.getClass().getSimpleName() + ":" + this.name;
     }

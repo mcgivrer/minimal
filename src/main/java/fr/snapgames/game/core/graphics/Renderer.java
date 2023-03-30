@@ -56,12 +56,11 @@ public class Renderer {
 
         this.entities.put(e.name, e);
         pipeline.add(e);
-        pipeline.sort((e1, e2) -> {
-            return e1.getLayer() > e2.getLayer() ? 1
-                    : e1.getPriority() == e2.getPriority() ? 0
-                    : e1.getPriority() > e2.getPriority() ? 1
-                    : -1;
-        });
+        pipeline.sort(Renderer::compare);
+    }
+
+    private static int compare(GameEntity e1, GameEntity e2) {
+        return e1.getLayer() == e2.getLayer() ? (Integer.compare(e1.getPriority(), e2.getPriority())) : e1.getLayer() > e2.getLayer() ? 1 : -1;
     }
 
     public void addPlugin(RendererPlugin<?> rendererPlugin) {
@@ -95,14 +94,14 @@ public class Renderer {
                             currentCamera.postDraw(g);
                         }
                     });
-            if (game.getDebug() > 1) {
+            if (game.getDebug() > 0) {
                 drawDebugGrid(g, 32);
                 if (Optional.ofNullable(currentCamera).isPresent()) {
                     drawCameraDebug(g, currentCamera);
                 }
-            }
-            if (game.isUpdatePause()) {
-                drawPauseMode(g);
+                if (game.getDebug() > 2) {
+                    drawEntitesDebug(g);
+                }
             }
             g.dispose();
             stats.put("pause", game.isUpdatePause() ? "On" : "Off");
@@ -167,9 +166,6 @@ public class Renderer {
         if (Optional.ofNullable(currentCamera).isPresent()) {
             currentCamera.postDraw(g);
         }
-        if (game.getDebug() > 2) {
-            drawEntitesDebug(g);
-        }
         g.setColor(Color.ORANGE);
         g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
@@ -177,9 +173,7 @@ public class Renderer {
     private void drawEntitesDebug(Graphics2D g) {
         entities.values().stream()
                 .filter(e -> e.isActive() && inCameraViewport(currentCamera, e))
-                .sorted((e1, e2) -> {
-                    return e1.getLayer() > e2.getLayer() ? 1 : e1.getPriority() > e2.getPriority() ? 1 : -1;
-                })
+                .sorted(Renderer::compare)
                 .forEach(v -> {
                     if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
                         currentCamera.preDraw(g);

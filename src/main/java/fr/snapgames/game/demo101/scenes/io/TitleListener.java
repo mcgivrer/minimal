@@ -6,9 +6,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 /**
- * @author : M313104
- * @mailto : buy@mail.com
- * @created : 06/02/2023
+ * The {@link fr.snapgames.game.demo101.scenes.TitleScene} input handler to manage keys on the title page.
+ *
+ * @author Frédéric Delorme
+ * @since 0.0.2
  **/
 public class TitleListener implements KeyListener {
     Game game;

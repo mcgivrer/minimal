@@ -6,6 +6,7 @@ import java.util.List;
  * Internal Class to manipulate simple Vector2D.
  *
  * @author Frédéric Delorme
+ * @since 0.0.3
  */
 public class Vector2D {
     public double x, y;

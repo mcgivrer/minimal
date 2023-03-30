@@ -232,9 +232,6 @@ public class Game extends JPanel {
     }
 
     public void keyTyped(KeyEvent e) {
-        if (e.getKeyChar() == 'p') {
-            this.pause = !this.pause;
-        }
     }
 
     public int getDebug() {
@@ -286,5 +283,8 @@ public class Game extends JPanel {
 
     public boolean isDebugGreaterThan(int minDebug) {
         return debug > minDebug;
+    }
+    public void requestPause(boolean pause) {
+        this.pause = pause;
     }
 }
