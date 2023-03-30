@@ -1,23 +1,21 @@
 package fr.snapgames.game.core;
 
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Renderer;
+import fr.snapgames.game.core.graphics.Window;
 import fr.snapgames.game.core.io.GameKeyListener;
 import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
-import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
 import java.util.*;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
@@ -45,12 +43,13 @@ public class Game extends JPanel {
     private boolean testMode;
 
     // Internal components
-    private Configuration config;
-    private JFrame frame;
+    private OldConfiguration config;
 
+    fr.snapgames.game.core.graphics.Window window;
     // all the services.
     private InputHandler inputHandler;
     private Renderer renderer;
+
     private PhysicEngine physicEngine;
     private SceneManager scm;
 
@@ -75,83 +74,30 @@ public class Game extends JPanel {
      *                       only ONE loop in the game loop will be achieved, to let
      *                       the unit test manage
      *                       the looping strategy for test purpose.
-     * @see Configuration
+     * @see OldConfiguration
      */
     public Game(String configFilePath, boolean mode) {
         this.testMode = testMode;
-        config = new Configuration(configFilePath);
+        config = new OldConfiguration(configFilePath);
         debug = config.getInteger("game.debug", 0);
         FPS = config.getDouble("game.screen.fps", 60.0);
         fpsDelay = 1000000.0 / FPS;
 
-        createFrame();
+        // retrieve some Window parameters
+        String title = I18n.get("game.window.title");
+        Dimension dim = config.getDimension("game.window.size", new Dimension(640, 400));
+        // set input handlers
+        inputHandler = new InputHandler(this);
+        inputHandler.addListener(new GameKeyListener(this));
+        // Create the output window.
+        window = new Window(this, title, dim);
+        window.add(inputHandler);
 
         // create services
-        renderer = new Renderer(this);
+        renderer = new Renderer(this, config.getDimension("game.viewport.size", new Dimension(320, 200)));
         physicEngine = new PhysicEngine(this);
         scm = new SceneManager(this);
         scm.initialize(this);
-    }
-
-    /**
-     * Create the Window where the magic happen !
-     * It gathers the required window size parameters from the translation file and
-     * configuration file with 4 main keys:
-     *
-     * <ul>
-     * <li><code>game.title</code> from the I18n file, the title of the window</li>
-     * <li><code>game.camera.viewport.width</code></li>
-     * <li><code>game.camera.viewport.height</code></li>
-     * <li><code>game.screen.scale</code></li>
-     * <li><code>game.buffer.strategy</code></li>
-     * </ul>
-     *
-     * @see Configuration
-     * @see I18n
-     */
-    private void createFrame() {
-        inputHandler = new InputHandler(this);
-        inputHandler.addListener(new GameKeyListener(this));
-
-        String title = I18n.get("game.window.title");
-        frame = new JFrame(title);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        double scale = config.getDouble("game.screen.scale", 2.0);
-        int width = (int) (scale * config.getInteger("game.camera.viewport.width", 320));
-        int height = (int) (scale * config.getInteger("game.camera.viewport.height", 200));
-        Dimension dim = new Dimension(width, height);
-
-        // define Window content and size.
-        frame.setLayout(new GridLayout());
-
-        frame.setContentPane(this);
-
-        frame.setSize(dim);
-        frame.setPreferredSize(dim);
-        frame.setMinimumSize(dim);
-        frame.setMaximumSize(dim);
-        frame.setIconImage(ResourceManager.loadImage("/images/sg-logo-image.png"));
-
-        setBackground(Color.BLACK);
-        frame.setIgnoreRepaint(true);
-        frame.enableInputMethods(true);
-        frame.setFocusTraversalKeysEnabled(false);
-        frame.setLocationByPlatform(false);
-        // define Window content and size.
-        frame.setLayout(new GridLayout());
-        getLayout().layoutContainer(frame);
-
-        frame.setContentPane(this);
-        frame.getContentPane().setPreferredSize(dim);
-
-        frame.addKeyListener(inputHandler);
-        frame.pack();
-
-        frame.setVisible(true);
-        if (frame.getBufferStrategy() == null) {
-            frame.createBufferStrategy(config.getInteger("game.buffer.strategy", 2));
-        }
     }
 
     /**
@@ -162,7 +108,7 @@ public class Game extends JPanel {
     private void initialize(String[] args) {
         config.parseArguments(args);
         scm.activateDefaultScene();
-        create((Graphics2D) frame.getGraphics());
+        create(window.getGraphics());
 
     }
 
@@ -178,6 +124,7 @@ public class Game extends JPanel {
      */
     private void draw(Map<String, Object> stats) {
         renderer.draw(stats);
+        window.drawFrom(renderer, stats, scale);
     }
 
     /**
@@ -210,8 +157,7 @@ public class Game extends JPanel {
      * Request to close this Window frame.
      */
     public void dispose() {
-        dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-        frame.dispose();
+        window.close();
         config.save();
     }
 
@@ -303,11 +249,7 @@ public class Game extends JPanel {
         exit = true;
     }
 
-    public JFrame getFrame() {
-        return frame;
-    }
-
-    public Configuration getConfiguration() {
+    public OldConfiguration getConfiguration() {
         return config;
     }
 
@@ -342,4 +284,7 @@ public class Game extends JPanel {
         this.debug = debug;
     }
 
+    public boolean isDebugGreaterThan(int minDebug) {
+        return debug > minDebug;
+    }
 }
