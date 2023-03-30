@@ -27,7 +27,7 @@ import javax.swing.JPanel;
  * @author Frédéric Delorme
  * @since 2022
  */
-public class Game extends JPanel {
+public class Game {
 
     // Frames to be rendered
     double FPS = 60.0;
@@ -134,16 +134,13 @@ public class Game extends JPanel {
         frame.setMaximumSize(dim);
         frame.setIconImage(ResourceManager.loadImage("/images/sg-logo-image.png"));
 
-        setBackground(Color.BLACK);
         frame.setIgnoreRepaint(true);
         frame.enableInputMethods(true);
         frame.setFocusTraversalKeysEnabled(false);
         frame.setLocationByPlatform(false);
         // define Window content and size.
         frame.setLayout(new GridLayout());
-        getLayout().layoutContainer(frame);
 
-        frame.setContentPane(this);
         frame.getContentPane().setPreferredSize(dim);
 
 
@@ -170,6 +167,7 @@ public class Game extends JPanel {
     private void create(Graphics2D g) {
         Scene s = scm.getActiveScene();
         s.loadResources(this);
+        s.create(this);
     }
 
     /**
@@ -211,7 +209,7 @@ public class Game extends JPanel {
      * Request to close this Window frame.
      */
     public void dispose() {
-        dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+        frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
         frame.dispose();
         config.save();
     }
@@ -266,11 +264,11 @@ public class Game extends JPanel {
 
     private void waitUntilStepEnd(double dt) {
         if (dt < fpsDelay) {
+            long wait = (long) (fpsDelay - dt) / 1000;
             try {
-                Thread.sleep((long) (fpsDelay - dt) / 1000);
+                Thread.sleep(wait);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.err.printf("Unable to wait for %d ms%n", wait);
             }
         }
     }

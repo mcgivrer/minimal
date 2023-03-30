@@ -15,7 +15,7 @@ public class Material {
     public static final Material WOOD = new Material("wood", 0.20, 0.65, 0.50);
     public static final Material STEEL = new Material("steel", 0.10, 1.2, 0.12);
     public static final Material AIR = new Material("air", 0.0, 0.05, 0.99);
-    public static final Material WATER = new Material("water", 0.0, 0.90, 0.80);
+    public static final Material WATER = new Material("water", 0.1, 0.95, 0.40);
 
     public String name;
     public double elasticity;

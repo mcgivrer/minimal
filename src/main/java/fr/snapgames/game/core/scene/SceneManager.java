@@ -128,7 +128,7 @@ public class SceneManager {
      * @see AbstractScene
      */
     public void activate(String name) {
-        if (!scenes.containsKey(name) && availableScenes.containsKey(name)) {
+        if (availableScenes.containsKey(name)) {
             Class<? extends Scene> sceneClass = availableScenes.get(name);
             if (Optional.ofNullable(activeScene).isPresent()) {
                 activeScene.dispose(game);

@@ -138,13 +138,11 @@ public class PhysicEngine {
                 ge.position.y = world.getPlayArea().height - ge.size.y;
                 ge.speed.y = ge.speed.y * -ge.material.elasticity;
                 ge.contact += 4;
-
             }
             if (ge.position.y < 0) {
                 ge.position.y = 0;
                 ge.speed.y = ge.speed.y * -ge.material.elasticity;
                 ge.contact += 8;
-
             }
         }
     }

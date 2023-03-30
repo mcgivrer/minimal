@@ -57,6 +57,7 @@ public class DemoScene extends AbstractScene {
         int worldWidth = config.getInteger("game.world.width", 1008);
         int worldHeight = config.getInteger("game.world.height", 640);
         World world = pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
+        world.setMaterial(Material.AIR);
 
         demoListener = new DemoListener(g, this);
         g.getInputHandler().addListener(demoListener);
@@ -77,7 +78,7 @@ public class DemoScene extends AbstractScene {
         int vpHeight = config.getInteger("game.camera.viewport.height", 200);
         TextEntity score = (TextEntity) new TextEntity("score")
                 .setText("")
-                .setFont(g.getFont().deriveFont(20.0f))
+                .setFont(g.getFrame().getFont().deriveFont(20.0f))
                 .setPosition(new Vector2D(vpWidth - 80, 35))
                 .setColor(Color.WHITE)
                 .setBorderColor(Color.DARK_GRAY)
@@ -96,22 +97,12 @@ public class DemoScene extends AbstractScene {
                             entity.setText(String.format("%05d", score));
                         }
                     }
-
-                    @Override
-                    public void input(Game game, TextEntity entity) {
-
-                    }
-
-                    @Override
-                    public void draw(Game game, Graphics2D g, TextEntity entity) {
-
-                    }
                 });
         add(score);
 
         TextEntity pauseText = (TextEntity) new TextEntity("pause")
                 .setText(I18n.get("game.state.pause.message"))
-                .setFont(g.getFont().deriveFont(20.0f))
+                .setFont(g.getFrame().getFont().deriveFont(20.0f))
                 .setPhysicType(PhysicType.STATIC)
                 .setPosition(new Vector2D(vpWidth * 0.5, vpHeight * 0.5))
                 .setColor(Color.WHITE)
@@ -139,18 +130,13 @@ public class DemoScene extends AbstractScene {
                 .setPriority(1)
                 .addBehavior(new Behavior<GameEntity>() {
                     @Override
-                    public void update(Game game, GameEntity entity, double dt) {
-
-                    }
-
-                    @Override
                     public void input(Game game, GameEntity entity) {
-                        double accel = (Double) entity.getAttribute("speedStep", 0.02);
+                        double accel = (Double) entity.getAttribute("speedStep", 0.04);
                         accel = inputHandler.isShiftPressed() ? accel * 2.0 : accel;
                         accel = inputHandler.isCtrlPressed() ? accel * 1.5 : accel;
 
                         if (inputHandler.getKey(KeyEvent.VK_UP)) {
-                            entity.forces.add(new Vector2D(0, -accel * 3.0));
+                            entity.forces.add(new Vector2D(0, -accel * 10.0));
                         }
                         if (inputHandler.getKey(KeyEvent.VK_DOWN)) {
                             entity.forces.add(new Vector2D(0, accel));
@@ -164,11 +150,6 @@ public class DemoScene extends AbstractScene {
                             entity.forces.add(new Vector2D(-accel, 0));
                         }
                     }
-
-                    @Override
-                    public void draw(Game game, Graphics2D g, GameEntity entity) {
-
-                    }
                 });
         add(player);
 
@@ -179,7 +160,7 @@ public class DemoScene extends AbstractScene {
         createRain("rain", 200, world);
 
         // add an ambient light
-        Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
+        Light ambiantLight = (Light) new Light("ambient", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
                 .setLayer(2)
                 .setPriority(1)
@@ -199,7 +180,7 @@ public class DemoScene extends AbstractScene {
                 .setBorderColor(Color.CYAN)
                 .setBorderWidth(1)
                 .setMaterial(Material.WATER)
-                .addForce(world.getGravity().multiply(0.98))
+                .addForce(world.getGravity().multiply(0.7))
                 .setLayer(11)
                 .setPriority(2);
         add(water);
@@ -305,19 +286,6 @@ public class DemoScene extends AbstractScene {
 
             add(e);
         }
-    }
-
-    @Override
-    public void input(Game g, InputHandler ih) {
-        if (ih.getKey(KeyEvent.VK_ESCAPE)) {
-            g.setExit(false);
-            g.getSceneManager().activate("title");
-        }
-    }
-
-    @Override
-    public void draw(Game g, Renderer r) {
-
     }
 
     @Override

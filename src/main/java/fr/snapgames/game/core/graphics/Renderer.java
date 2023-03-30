@@ -231,7 +231,7 @@ public class Renderer {
     private void drawCameraDebug(Graphics2D g, Camera camera) {
         g.drawRect(10, 10, (int) camera.viewport.getWidth() - 20, (int) camera.viewport.getHeight() - 20);
         g.drawString(String.format("cam: %s", camera.name), 20, 20);
-        g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
+        g.drawString(String.format("pos: %s", camera.position.toShortString()), 20, 32);
         g.drawString(String.format("targ: %s", camera.target.name), 20, 44);
     }
 

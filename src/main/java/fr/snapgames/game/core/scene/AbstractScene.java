@@ -86,4 +86,9 @@ public abstract class AbstractScene implements Scene {
             b.update(game, this, dt);
         });
     }
+
+    @Override
+    public void draw(Game g, Renderer r) {
+
+    }
 }

@@ -85,6 +85,11 @@ public class Vector2D {
         return String.format("{x:%04.2f,y:%04.2f}", x, y);
     }
 
+
+    public String toShortString() {
+        return String.format("%.0f,%.0f", x, y);
+    }
+
     public Vector2D maximize(double maxAccel) {
         if (Math.abs(x) > maxAccel) {
             x = Math.signum(x) * maxAccel;
