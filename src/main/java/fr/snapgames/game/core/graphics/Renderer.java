@@ -2,7 +2,7 @@ package fr.snapgames.game.core.graphics;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.plugins.*;
@@ -26,9 +26,8 @@ import java.util.stream.Collectors;
  **/
 public class Renderer {
     BufferedImage buffer;
-    Configuration config;
+    OldConfiguration config;
     private Game game;
-    private JFrame frame;
     private Color clearColor = Color.BLACK;
     private double scale;
     private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
@@ -37,12 +36,10 @@ public class Renderer {
     private Camera currentCamera;
     private Map<Class<?>, RendererPlugin<?>> plugins = new HashMap<>();
 
-    public Renderer(Game g) {
+    public Renderer(Game g, Dimension bufferSize) {
         this.game = g;
         this.config = game.getConfiguration();
-        this.scale = config.getDouble("game.screen.scale", 2.0);
-        this.frame = game.getFrame();
-        this.buffer = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        this.buffer = new BufferedImage(bufferSize.width, bufferSize.height, BufferedImage.TYPE_INT_ARGB);
         // Add required renderer plugins
         addPlugin(new GameEntityRenderer());
         addPlugin(new TextEntityRenderer());
@@ -111,8 +108,6 @@ public class Renderer {
             stats.put("obj", game.getSceneManager().getActiveScene().getEntities().size());
             stats.put("scn", game.getSceneManager().getActiveScene().getName());
             stats.put("dbg", game.getDebug());
-            // draw image to screen.
-            drawToScreen(stats);
         }
         // remove inactive object.
         entities.values().stream()
@@ -121,40 +116,16 @@ public class Renderer {
                 .forEach(ed -> entities.remove(ed.name));
     }
 
-    private void drawToScreen(Map<String, Object> stats) {
-        if (Optional.ofNullable(frame).isPresent()) {
-            if (frame.getBufferStrategy() != null) {
-                if (frame.getBufferStrategy().getDrawGraphics() == null) {
-                    return;
-                }
-                Graphics2D g2 = (Graphics2D) frame.getBufferStrategy().getDrawGraphics();
-                g2.scale(scale, scale);
-                g2.drawImage(buffer,
-                        0, 0, frame.getWidth(), frame.getHeight(),
-                        0, 0, buffer.getWidth(), buffer.getHeight(),
-                        null);
-                g2.scale(1.0 / scale, 1.0 / scale);
-                if (game.getDebug() > 0) {
-                    g2.setColor(new Color(0.3f, 0.0f, 0.0f, 0.8f));
-                    g2.fillRect(0, frame.getHeight() - 32, frame.getWidth(), 32);
-                    g2.setColor(Color.ORANGE);
-                    String displayLine = prepareStatsString(stats);
-                    g2.setFont(g2.getFont().deriveFont(15.0f));
-                    g2.drawString(displayLine, 16, frame.getHeight() - 16);
-                }
-                g2.dispose();
-                if (frame.getBufferStrategy() != null) {
-                    frame.getBufferStrategy().show();
-                }
-            }
-        }
+    private void drawPauseMode(Graphics2D g) {
+        g.setColor(new Color(0.3f, 0.6f, 0.4f, 0.9f));
+        g.fillRect(0, ((int) currentCamera.viewport.getHeight() - 24) / 2, (int) currentCamera.viewport.getWidth(), 24);
+        g.setColor(Color.WHITE);
+        g.setFont(g.getFont().deriveFont(Font.ITALIC, 14.0f).deriveFont(Font.BOLD));
+        String pauseTxt = I18n.get("game.state.pause.message");
+        int lng = g.getFontMetrics().stringWidth(pauseTxt);
+        g.drawString(pauseTxt, ((int) currentCamera.viewport.getWidth() - lng) / 2, ((int) currentCamera.viewport.getHeight() + 12) / 2);
     }
 
-    private String prepareStatsString(Map<String, Object> stats) {
-        return "[" + stats.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(entry ->
-                        entry.getKey() + ":" + entry.getValue())
-                .collect(Collectors.joining("|")) + "]";
-    }
 
     public void drawEntity(Graphics2D g, GameEntity entity) {
         entity.setDrawnBy(null);

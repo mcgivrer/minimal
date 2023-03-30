@@ -2,7 +2,7 @@ package fr.snapgames.game.core.math;
 
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.entity.Influencer;
 
@@ -25,7 +25,7 @@ public class PhysicEngine {
 
     private static final double TIME_FACTOR = 0.45;
     private final Game game;
-    private Configuration config;
+    private OldConfiguration config;
     private World world;
 
     private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
@@ -74,7 +74,7 @@ public class PhysicEngine {
 
     public void updateEntity(GameEntity entity, double elapsed) {
 
-        if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
+       if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
             // apply gravity
             entity.forces.add(world.getGravity().negate());
             // Apply influencer Effects (Material and force impacted)

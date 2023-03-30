@@ -78,7 +78,7 @@ public class DemoScene extends AbstractScene {
         int vpHeight = config.getInteger("game.camera.viewport.height", 200);
         TextEntity score = (TextEntity) new TextEntity("score")
                 .setText("")
-                .setFont(g.getFrame().getFont().deriveFont(20.0f))
+                .setFont(game.getWindow().getFrame().getFont().deriveFont(20.0f))
                 .setPosition(new Vector2D(vpWidth - 80, 35))
                 .setColor(Color.WHITE)
                 .setBorderColor(Color.DARK_GRAY)
@@ -102,7 +102,7 @@ public class DemoScene extends AbstractScene {
 
         TextEntity pauseText = (TextEntity) new TextEntity("pause")
                 .setText(I18n.get("game.state.pause.message"))
-                .setFont(g.getFrame().getFont().deriveFont(20.0f))
+                .setFont(game.getWindow().getFrame().getFont().deriveFont(20.0f))
                 .setPhysicType(PhysicType.STATIC)
                 .setPosition(new Vector2D(vpWidth * 0.5, vpHeight * 0.5))
                 .setColor(Color.WHITE)

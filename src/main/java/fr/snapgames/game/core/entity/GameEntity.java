@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * Entity manipulated by Game.
+ * Entity managed by Game.
  *
  * @author Frédéric Delorme
  * @since 0.0.1

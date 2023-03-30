@@ -1,10 +1,9 @@
 package fr.snapgames.game.demo101.scenes.io;
 
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.math.World;
-import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.demo101.scenes.DemoScene;
 import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
 
@@ -22,7 +21,7 @@ import java.util.List;
 public class DemoListener implements KeyListener {
     private final Game game;
     DemoScene scene;
-    Configuration config;
+    OldConfiguration config;
     World world;
 
     public DemoListener(Game g, DemoScene scene) {

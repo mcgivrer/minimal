@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.io.InputHandler;
@@ -19,7 +19,7 @@ public abstract class AbstractScene implements Scene {
     protected Game game;
     protected String name;
 
-    protected Configuration config;
+    protected OldConfiguration config;
     protected PhysicEngine pe;
     protected InputHandler inputHandler;
     protected Renderer renderer;
