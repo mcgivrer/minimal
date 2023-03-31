@@ -3,6 +3,7 @@ package fr.snapgames.game.core.graphics;
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.plugins.*;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  **/
 public class Renderer {
     BufferedImage buffer;
-    OldConfiguration config;
+    Configuration config;
     private Game game;
     private Color clearColor = Color.BLACK;
     private double scale;

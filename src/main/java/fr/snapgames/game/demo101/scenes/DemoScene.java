@@ -3,6 +3,7 @@ package fr.snapgames.game.demo101.scenes;
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.entity.*;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
@@ -54,9 +55,8 @@ public class DemoScene extends AbstractScene {
     @Override
     public void create(Game g) {
         // define world play area with constrains
-        int worldWidth = config.getInteger("game.world.width", 1008);
-        int worldHeight = config.getInteger("game.world.height", 640);
-        World world = pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
+        Dimension playArea = (Dimension) config.get(ConfigAttribute.PLAY_AREA_SIZE);
+        World world = pe.getWorld().setPlayArea(playArea);
 
         demoListener = new DemoListener(g, this);
         g.getInputHandler().addListener(demoListener);
@@ -73,12 +73,11 @@ public class DemoScene extends AbstractScene {
         createStars("star", 500, world, false);
 
         // Add a score display
-        int vpWidth = config.getInteger("game.camera.viewport.width", 320);
-        int vpHeight = config.getInteger("game.camera.viewport.height", 200);
+        Dimension viewport = (Dimension) config.get(ConfigAttribute.VIEWPORT_SIZE);
         TextEntity score = (TextEntity) new TextEntity("score")
                 .setText("")
                 .setFont(g.getFont().deriveFont(20.0f))
-                .setPosition(new Vector2D(vpWidth - 80, 35))
+                .setPosition(new Vector2D(viewport.width - 80, 35))
                 .setColor(Color.WHITE)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
@@ -113,7 +112,7 @@ public class DemoScene extends AbstractScene {
                 .setText(I18n.get("game.state.pause.message"))
                 .setFont(g.getFont().deriveFont(20.0f))
                 .setPhysicType(PhysicType.STATIC)
-                .setPosition(new Vector2D(vpWidth * 0.5, vpHeight * 0.5))
+                .setPosition(new Vector2D(viewport.width * 0.5, viewport.height * 0.5))
                 .setColor(Color.WHITE)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
@@ -127,7 +126,7 @@ public class DemoScene extends AbstractScene {
 
         // Create a player
         GameEntity player = new GameEntity("player")
-                .setPosition(new Vector2D(worldWidth / 2.0, worldHeight / 2.0))
+                .setPosition(new Vector2D(playArea.width / 2.0, playArea.height / 2.0))
                 .setImage(playerImg)
                 .setColor(Color.BLUE)
                 .setMaterial(Material.RUBBER)
@@ -179,7 +178,8 @@ public class DemoScene extends AbstractScene {
         createRain("rain", 200, world);
 
         // add an ambient light
-        Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
+        Light ambiantLight = (Light) new Light("ambiant",
+                new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
                 .setLayer(2)
                 .setPriority(1)
@@ -193,8 +193,8 @@ public class DemoScene extends AbstractScene {
         // define Camera to track player.
         Influencer water = (Influencer) new Influencer("water")
                 .setType(EntityType.RECTANGLE)
-                .setPosition(new Vector2D(0, worldHeight * 0.85))
-                .setSize(new Vector2D(worldWidth, worldHeight * 0.15))
+                .setPosition(new Vector2D(0, playArea.height * 0.85))
+                .setSize(new Vector2D(playArea.width, playArea.height * 0.15))
                 .setColor(new Color(0.0f, 0.3f, 0.8f, 0.7f))
                 .setBorderColor(Color.CYAN)
                 .setBorderWidth(1)
@@ -207,7 +207,7 @@ public class DemoScene extends AbstractScene {
         Camera cam = new Camera("camera")
                 .setTarget(player)
                 .setTween(0.1)
-                .setViewport(new Rectangle2D.Double(0, 0, vpWidth, vpHeight));
+                .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height));
         renderer.setCurrentCamera(cam);
 
 

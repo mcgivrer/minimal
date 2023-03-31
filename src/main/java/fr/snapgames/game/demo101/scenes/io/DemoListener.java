@@ -2,6 +2,7 @@ package fr.snapgames.game.demo101.scenes.io;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.demo101.scenes.DemoScene;
@@ -21,7 +22,7 @@ import java.util.List;
 public class DemoListener implements KeyListener {
     private final Game game;
     DemoScene scene;
-    OldConfiguration config;
+    Configuration config;
     World world;
 
     public DemoListener(Game g, DemoScene scene) {

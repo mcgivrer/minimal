@@ -2,6 +2,8 @@ package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.entity.TextEntity;
 import fr.snapgames.game.core.graphics.Renderer;
@@ -41,10 +43,8 @@ public class TitleScene extends AbstractScene {
 
     @Override
     public void create(Game g) {
-        OldConfiguration config = g.getConfiguration();
-        double width = config.getInteger("game.camera.viewport.width", 320);
-        double height = config.getInteger("game.camera.viewport.height", 200);
-
+        Configuration config = g.getConfiguration();
+        Dimension viewport = (Dimension) config.get(ConfigAttribute.VIEWPORT_SIZE);
 
         GameEntity bckImage = new GameEntity("background")
                 .setImage(backgroundImg);
@@ -66,7 +66,7 @@ public class TitleScene extends AbstractScene {
                 .setShadowWidth(4)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
-                .setPosition(new Vector2D(((width - titleTextWidth) * 0.5), height * 0.4));
+                .setPosition(new Vector2D(((viewport.width - titleTextWidth) * 0.5), viewport.height * 0.4));
         add(titleTxt);
 
         String msgString = I18n.get("game.title.message");
@@ -80,7 +80,7 @@ public class TitleScene extends AbstractScene {
                 .setShadowWidth(2)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
-                .setPosition(new Vector2D(((width - msgTextWidth) * 0.5), height * 0.80));
+                .setPosition(new Vector2D(((viewport.width - msgTextWidth) * 0.5), viewport.height * 0.80));
         add(msgTxt);
 
         g.getInputHandler().addListener(titleListener);

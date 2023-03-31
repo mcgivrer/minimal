@@ -2,7 +2,9 @@ package fr.snapgames.game.core.configuration;
 
 import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.Vector2D;
+import fr.snapgames.game.core.utils.StringUtils;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -22,16 +24,16 @@ public enum ConfigAttribute implements IConfigAttribute {
      */
     APP_TITLE(
             "appTitle",
-            "app.main.title",
+            "game.main.title",
             "Set the name of the application to be displayed in log and UI",
-            "GDemoApp",
+            "Game",
             v -> v),
     /*
      * debug mode argument.
      */
-    DEBUG_MODE(
+    DEBUG_LEVEL(
             "debugMode",
-            "app.debug.mode",
+            "game.debug.level",
             "Setting the debug mode (0 to 5)",
             0,
             Integer::valueOf),
@@ -40,7 +42,7 @@ public enum ConfigAttribute implements IConfigAttribute {
      */
     EXIT_TEST_COUNT_FRAME(
             "testCounter",
-            "app.test.loop.counter",
+            "game.test.loop.counter",
             "if debug>0, set a number of frame to execute before exit (test mode)",
             -1,
             Integer::valueOf),
@@ -49,36 +51,26 @@ public enum ConfigAttribute implements IConfigAttribute {
      */
     RENDER_FPS(
             "fps",
-            "app.render.fps",
+            "game.render.fps",
             "set the frame per second for the render engine",
             60,
             Integer::valueOf),
     /**
-     * the width of our game's window
+     * scale ratio between Window and rendering buffer.
      */
-    WINDOW_WIDTH(
-            "windowWidth",
-            "app.window.width",
-            "Set the Display Window width",
-            640,
-            Integer::valueOf),
-    /**
-     * the height of our game's window
-     */
-    WINDOW_HEIGHT(
-            "windowHeight",
-            "app.window.height",
-            "Set the Display Window height",
-            400,
-            Integer::valueOf),
+    WINDOW_SCALE(
+            "scale",
+            "game.window.scale",
+            "Set the window scale ration based on game.viewport.size",
+            1.0,
+            Double::valueOf),
     /**
      * flag indicates if game's window is on full screen.
      */
-
     WINDOW_FULL_SCREEN(
             "windowFullscreen",
-            "app.window.fullscreen",
-            "Switch the Window to full screen",
+            "game.window.fullscreen",
+            "Switch the Window to full screen (not implemented yet)",
             false,
             Boolean::valueOf),
     /**
@@ -86,7 +78,7 @@ public enum ConfigAttribute implements IConfigAttribute {
      */
     SCREEN_WIDTH(
             "screenWidth",
-            "app.screen.width",
+            "game.screen.width",
             "set the screen width",
             320,
             Integer::valueOf),
@@ -95,110 +87,120 @@ public enum ConfigAttribute implements IConfigAttribute {
      */
     SCREEN_HEIGHT(
             "screenHeight",
-            "app.screen.height",
+            "game.screen.height",
             "set the screen height",
             200,
             Integer::valueOf),
-    PLAY_AREA_WIDTH(
-            "playAreaWidth",
-            "app.physic.world.play.area.width",
-            "set the width of the play area",
-            320.0,
-            Double::valueOf),
-    PLAY_AREA_HEIGHT(
-            "playAreaHeight",
-            "app.physic.world.play.area.height",
-            "set the height of the play area",
-            200.0,
-            Double::valueOf),
+    PLAY_AREA_SIZE(
+            "playAreaSize",
+            "game.physic.world.playarea.size",
+            "set the size of the play area: [width]x[height]",
+            new Dimension(320, 200),
+            StringUtils::toDimension),
     PHYSIC_UPS(
             "physicUps",
-            "app.physic.ups",
+            "game.physic.ups",
             "set the Update Per Second (UPS) rate",
             60,
             Integer::valueOf
     ),
     PHYSIC_GRAVITY(
             "physicGravity",
-            "app.physic.world.gravity",
+            "game.physic.world.gravity",
             "set the 2D vector for gravity applied by physic engine",
             new Vector2D(0.0, 0.0),
             v -> IConfigAttribute.stringToVector2D(v, new Vector2D(0.0, 0.0))
     ),
     PHYSIC_MATERIAL(
             "worldMaterial",
-            "app.physic.world.material",
+            "game.physic.world.material",
             "Set the default Material for the world context",
             Material.AIR,
             v -> IConfigAttribute.stringToMaterial(v, Material.DEFAULT)
     ),
     PHYSIC_MIN_SPEED(
             "physicSpeedMin",
-            "app.physic.world.speed.min",
+            "game.physic.world.speed.min",
             "set the minimum speed below considered as zero",
             0.01,
             Double::valueOf
     ),
     PHYSIC_MAX_SPEED_X(
             "physicSpeedXMax",
-            "app.physic.world.speed.x.max",
+            "game.physic.world.speed.x.max",
             "set the maximum speed on X axis",
-            0.01,
+            4.0,
             Double::valueOf
     ),
     PHYSIC_MAX_SPEED_Y(
             "physicSpeedYMax",
-            "app.physic.world.speed.y.max",
+            "game.physic.world.speed.y.max",
             "set the maximum speed on Y axis",
             0.01,
             Double::valueOf
     ),
     PHYSIC_MIN_ACCELERATION(
             "physicMinAcceleration",
-            "app.physic.world.acceleration.min",
+            "game.physic.world.acceleration.min",
             "Set the minimum acceleration below considered as zero",
             0.00001,
             Double::valueOf),
     PHYSIC_MAX_ACCELERATION_X(
             "physicMaxAccelerationX",
-            "app.physic.world.acceleration.x.max",
+            "game.physic.world.acceleration.x.max",
             "Set the maximum acceleration on X axis",
-            0.2,
+            4.0,
             Double::valueOf),
     PHYSIC_MAX_ACCELERATION_Y(
             "physicMaxAccelerationY",
-            "app.physic.world.acceleration.y.max",
+            "game.physic.world.acceleration.y.max",
             "Set the maximum acceleration on Y axis",
             0.2,
             Double::valueOf),
     DEBUG_WHILE_LIST("debugWhiteList",
-            "app.debug.filter.white.list",
+            "game.debug.filter.white.list",
             "List of entity to display debug information for",
             "",
             v -> v),
 
     DEBUG_BLACK_LIST("debugBlackList",
-            "app.debug.filter.black.list",
+            "game.debug.filter.black.list",
             "List of entity to NOT display debug information for",
             "",
             v -> v),
     SCENE_LIST("sceneList",
-            "app.scene.list",
+            "game.scene.list",
             "List of available scene implementations for that application",
             new String[0],
             v -> Arrays.stream(v.split(",")).toList()
     ),
     SCENE_DEFAULT("sceneDefault",
-            "app.scene.default",
+            "game.scene.default",
             "define the default scene to be activated at start",
             "",
             v -> v),
     GAME_RESHUFFLE_FORCE("reshuffleForce",
-            "app.physic.ingame.balls.reshuffle.force",
-            "Force used to reshuffle balls' acceleration and move",
+            "game.physic.ingame.balls.reshuffle.force",
+            "Force used to reshuffle balls' acceleration and move: [width]x[height]",
             200.00,
-            Double::valueOf);
-
+            Double::valueOf),
+    WINDOW_SIZE("wsize",
+            "game.window.size",
+            "Define Window size",
+            new Dimension(640, 400),
+            StringUtils::toDimension),
+    VIEWPORT_SIZE(
+            "viewport",
+            "game.viewport.size",
+            "Define viewport rendering buffer size: [width]x[height]",
+            new Dimension(320, 200),
+            StringUtils::toDimension),
+    WINDOW_BUFFER_NUMBER(
+            "buffer",
+            "game.buffer.strategy",
+            "Define the number of display buffer"
+            , 1,
+            Integer::valueOf);
     private final String attrName;
     private final String attrDescription;
     private final Object attrDefaultValue;
