@@ -76,8 +76,10 @@ public class DemoScene extends AbstractScene {
                 .setFont(g.getFont().deriveFont(20.0f))
                 .setPosition(new Vector2D(viewportWidth - 80, 25))
                 .setColor(Color.WHITE)
+                .setBorderColor(Color.DARK_GRAY)
+                .setBorderWidth(1)
                 .setShadowColor(Color.BLACK)
-                .setShadowWidth(3)
+                .setShadowWidth(2)
                 .setLayer(20)
                 .setPriority(3)
                 .stickToCamera(true)
@@ -151,9 +153,6 @@ public class DemoScene extends AbstractScene {
         // Create enemies Entity.
         createCoins("coin_", 20, world, new CoinBehavior());
 
-        // create Rain effect with a ParticleEntity.
-        createRain("rain", 500, world);
-
         // add an ambient light
         Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
@@ -178,15 +177,7 @@ public class DemoScene extends AbstractScene {
     }
 
     private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
-        ParticlesEntity stars = (ParticlesEntity) new ParticlesEntity(prefixEntityName)
-                .setPhysicType(PhysicType.STATIC)
-                .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(), 0.0))
-                .setSize(new Vector2D(
-                        world.getPlayArea().getWidth(),
-                        world.getPlayArea().getHeight()))
-                .setLayer(5)
-                .setPriority(1)
-                .setActive(active);
+
         for (int i = 0; i < nbStars; i++) {
             GameEntity star = new GameEntity(prefixEntityName + "_" + i)
                     .setType(EntityType.CIRCLE)
@@ -197,9 +188,8 @@ public class DemoScene extends AbstractScene {
                     .setLayer(5)
                     .setPriority(1 + i)
                     .setActive(active);
-            stars.addChild(star);
+            add(star);
         }
-        add(stars);
     }
 
     private void createSpotLights(String prefixEntityName, int nbLights, World world) {
@@ -221,34 +211,6 @@ public class DemoScene extends AbstractScene {
         }
     }
 
-    private void createRain(String entityName, int nbParticles, World world) {
-        ParticlesEntity pes = (ParticlesEntity) new ParticlesEntity(entityName)
-                .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(), 0.0))
-                .setSize(new Vector2D(
-                        world.getPlayArea().getWidth(),
-                        world.getPlayArea().getHeight()))
-                .setLayer(1)
-                .setPriority(1)
-                .addBehavior(new RainEffectBehavior(world, Color.CYAN));
-        for (int i = 0; i < nbParticles; i++) {
-            GameEntity p = new GameEntity(pes.name + "_" + i)
-                    .setType(EntityType.CIRCLE)
-                    .setPhysicType(PhysicType.DYNAMIC)
-                    .setSize(new Vector2D(1.0, 1.0))
-                    .setPosition(
-                            new Vector2D(
-                                    world.getPlayArea().getWidth() * Math.random(),
-                                    world.getPlayArea().getHeight() * Math.random()))
-                    .setColor(Color.CYAN)
-                    .setLayer(1)
-                    .setPriority(i)
-                    .setMass(0.1)
-                    .setMaterial(Material.AIR);
-            pes.getChild().add(p);
-        }
-        add(pes);
-    }
-
     /**
      * Create nb enemies in the world area delimited by worldWidth x worldHeight.
      *
@@ -262,7 +224,7 @@ public class DemoScene extends AbstractScene {
                             Math.random() * world.getPlayArea().getHeight()))
                     .setImage(coinImg)
                     .setMaterial(Material.SUPER_BALL)
-                    .setMass(5.0)
+                    .setMass(25.0)
                     .setLayer(4)
                     .setPriority(4 + i)
                     .setAttribute("maxVelocity", 4.0)

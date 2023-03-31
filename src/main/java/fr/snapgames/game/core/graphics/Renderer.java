@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class Renderer {
     private JFrame frame;
     private Color clearColor = Color.BLACK;
     private double scale;
-    private Map<String, GameEntity> entities = new HashMap<>();
+    private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
     private List<GameEntity> pipeline = new CopyOnWriteArrayList<>();
 
     private Camera currentCamera;
@@ -235,7 +236,11 @@ public class Renderer {
     }
 
     private boolean inCameraViewport(Camera currentCamera, GameEntity e) {
-        return currentCamera.viewport.contains(e.box);
+        if (Optional.ofNullable(currentCamera).isPresent()) {
+            return currentCamera.viewport.contains(e.box);
+        } else {
+            return false;
+        }
     }
 
     private void drawCameraDebug(Graphics2D g, Camera camera) {

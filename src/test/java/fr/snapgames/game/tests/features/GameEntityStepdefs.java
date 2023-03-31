@@ -17,6 +17,7 @@ public class GameEntityStepdefs implements En {
         Given("a Game is instantiated", () -> {
             TestContext.clear();
             game = (Game) TestContext.get("game", new Game("/test.properties", true));
+            game.getSceneManager().activateDefaultScene();
         });
         And("the entities map is empty", () -> {
             assertTrue(game.getSceneManager().getActiveScene().getEntities().isEmpty());
