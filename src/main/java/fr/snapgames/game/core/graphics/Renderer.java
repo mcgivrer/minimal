@@ -80,7 +80,8 @@ public class Renderer {
 
             // draw all entities according to Camera
             pipeline.stream()
-                    .filter(e -> e.isActive())
+                    .filter(e -> e.isActive() && isInViewPort(currentCamera,e))
+                    .sorted((e1, e2) -> e1.getPriority() > e2.getPriority() ? 1 : -1)
                     .forEach(entity -> {
                         // draw Scene
                         if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
@@ -114,6 +115,13 @@ public class Renderer {
                 .filter(e -> !e.isActive())
                 .collect(Collectors.toList())
                 .forEach(ed -> entities.remove(ed.name));
+    }
+
+    private boolean isInViewPort(Camera currentCamera, GameEntity e) {
+        if(currentCamera!=null){
+
+        }
+        return false;
     }
 
     private void drawPauseMode(Graphics2D g) {
