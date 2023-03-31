@@ -8,10 +8,10 @@ import java.awt.*;
  * The World class to define environment characteristics
  */
 public class World {
-    private Dimension playArea;
-    private Vector2D gravity;
-    private Vector2D wind = new Vector2D();
-    private Material material = Material.AIR;
+    Dimension playArea;
+    Vector2D gravity;
+    Vector2D wind = new Vector2D();
+    Material material = Material.AIR;
 
     public World(Dimension area, Vector2D gravity) {
         this.playArea = area;

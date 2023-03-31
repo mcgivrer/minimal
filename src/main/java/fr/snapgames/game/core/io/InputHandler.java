@@ -32,7 +32,9 @@ public class InputHandler implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
         if (Optional.ofNullable(game).isPresent()) {
+            checkMetaKeys(e);
             game.keyTyped(e);
+            listeners.forEach(kl -> kl.keyPressed(e));
         }
     }
 

@@ -3,11 +3,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.snapgames.game</groupId>
-    <artifactId>game</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
-    <name>minimal</name>
-    <description>A demonstration project on how to create sustainable project.</description>
+    <artifactId>minimal</artifactId>
+    <version>0.0.5-SNAPSHOT</version>
+    <name>Minimal</name>
+    <description>A project demonstrating how to create sustainable project in a Game dev context</description>
     <inceptionYear>2023</inceptionYear>
+
+    <contributors>
+        <contributor>
+            <name>Frédéric Delorme</name>
+            <organization>SnapGames</organization>
+            <email>fredericDOTdelormeATgmailDOTcom</email>
+            <timezone>Europe/Paris</timezone>
+        </contributor>
+    </contributors>
+
 
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
@@ -25,21 +35,21 @@
         <url>https://snapgames.github.io/${project.name}</url>
     </organization>
     <scm>
-        <url>https://github.com/SnapGames/${project.name}</url>
-        <connection>scm:git:git@github.com:SnapGames/${project.name}.git</connection>
-        <developerConnection>scm:git:https://github.com/SnapGames/${project.name}.git</developerConnection>
+        <url>https://github.com/${organization.name}/${project.name}</url>
+        <connection>scm:git:git@github.com:${organization.name}/${project.name}.git</connection>
+        <developerConnection>scm:git:https://github.com/${organization.name}/${project.name}.git</developerConnection>
         <tag>v${project.version}</tag>
     </scm>
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/SnapGames/${project.name}/issues</url>
+        <url>https://github.com/${organization.name}/${project.name}/issues</url>
     </issueManagement>
 
     <!--distributionManagement>
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/SnapGames/${project.name}</url>
+            <url>https://maven.pkg.github.com/${organization.name}/${project.name}</url>
         </repository>
     </distributionManagement-->
 
@@ -223,7 +233,7 @@
                     <nohelp>true</nohelp>
                     <overview>${project.basedir}/README.md</overview>
                     <bottom>
-                        <![CDATA[<em>Copyright © \\${project.inceptionYear} - SnapGames.</em>]]>
+                        <![CDATA[<em>Copyright © \\${project.inceptionYear} - ${organization.name}</em>]]>
                     </bottom>
                     <!-- more links than can (or not) be added -->
                     <!--links>

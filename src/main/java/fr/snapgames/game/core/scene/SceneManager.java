@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
 
 /**
  * <p>The {@link SceneManager} intends to activate one of multiple {@link Scene} instances according
@@ -26,9 +26,9 @@ public class SceneManager {
      */
     private final Map<String, Class<? extends Scene>> availableScenes = new HashMap<>();
     /**
-     * The parent {@link Game}'s {@link Configuration} instance.
+     * The parent {@link Game}'s {@link OldConfiguration} instance.
      */
-    private Configuration config;
+    private OldConfiguration config;
 
     private Scene activeScene;
 
@@ -42,7 +42,7 @@ public class SceneManager {
     }
 
     /**
-     * <p>Initialize the service, taking configuration value from the {@link Configuration} class.
+     * <p>Initialize the service, taking configuration value from the {@link OldConfiguration} class.
      * Load all {@link Scene}'s implementation listed in to the <code>game.scene.list</code> configuration key.</p>
      * <p>After loaded and store all class implementation into the internal scene available list,
      * activates the default {@link Scene}, defined in to the configuration key <code>game.scene.default</code>.</p>

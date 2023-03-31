@@ -7,13 +7,11 @@ import fr.snapgames.game.core.entity.*;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
 import fr.snapgames.game.core.io.InputHandler;
+import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.*;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
-import fr.snapgames.game.demo101.scenes.behaviors.RainEffectBehavior;
-import fr.snapgames.game.demo101.scenes.behaviors.StormBehavior;
-import fr.snapgames.game.demo101.scenes.behaviors.WindyWeatherBehavior;
+import fr.snapgames.game.demo101.scenes.behaviors.*;
 import fr.snapgames.game.demo101.scenes.io.DemoListener;
 
 import java.awt.*;
@@ -23,7 +21,10 @@ import java.awt.image.BufferedImage;
 import java.util.Optional;
 
 /**
+ * The {@link DemoScene} implements in a demonstration purpose all the features available in the Mini'mal framework.
+ *
  * @author Frédéric Delorme
+ * @since 0.0.1
  **/
 public class DemoScene extends AbstractScene {
 
@@ -63,6 +64,7 @@ public class DemoScene extends AbstractScene {
         //Add Background Image
         GameEntity backgroundImage = new GameEntity("backgroundImage")
                 .setImage(backgroundImg)
+                .setPhysicType(PhysicType.STATIC)
                 .setLayer(0)
                 .setPriority(1);
         add(backgroundImage);
@@ -71,18 +73,19 @@ public class DemoScene extends AbstractScene {
         createStars("star", 500, world, false);
 
         // Add a score display
-        int viewportWidth = config.getInteger("game.camera.viewport.width", 320);
+        int vpWidth = config.getInteger("game.camera.viewport.width", 320);
+        int vpHeight = config.getInteger("game.camera.viewport.height", 200);
         TextEntity score = (TextEntity) new TextEntity("score")
                 .setText("")
                 .setFont(g.getFont().deriveFont(20.0f))
-                .setPosition(new Vector2D(viewportWidth - 80, 35))
+                .setPosition(new Vector2D(vpWidth - 80, 35))
                 .setColor(Color.WHITE)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
                 .setShadowColor(Color.BLACK)
                 .setShadowWidth(2)
                 .setLayer(20)
-                .setPriority(3)
+                .setPriority(1)
                 .stickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
                     @Override
@@ -106,6 +109,22 @@ public class DemoScene extends AbstractScene {
                 });
         add(score);
 
+        TextEntity pauseText = (TextEntity) new TextEntity("pause")
+                .setText(I18n.get("game.state.pause.message"))
+                .setFont(g.getFont().deriveFont(20.0f))
+                .setPhysicType(PhysicType.STATIC)
+                .setPosition(new Vector2D(vpWidth * 0.5, vpHeight * 0.5))
+                .setColor(Color.WHITE)
+                .setBorderColor(Color.DARK_GRAY)
+                .setBorderWidth(1)
+                .setShadowColor(Color.BLACK)
+                .setShadowWidth(2)
+                .setLayer(20)
+                .setPriority(1)
+                .stickToCamera(true)
+                .setActive(false);
+        add(pauseText);
+
         // Create a player
         GameEntity player = new GameEntity("player")
                 .setPosition(new Vector2D(worldWidth / 2.0, worldHeight / 2.0))
@@ -126,9 +145,9 @@ public class DemoScene extends AbstractScene {
 
                     @Override
                     public void input(Game game, GameEntity entity) {
-                        double accel = (Double) entity.getAttribute("speedStep", 1.0);
-                        accel = inputHandler.isShiftPressed() ? accel * 4.0 : accel;
-                        accel = inputHandler.isCtrlPressed() ? accel * 2.0 : accel;
+                        double accel = (Double) entity.getAttribute("speedStep", 0.02);
+                        accel = inputHandler.isShiftPressed() ? accel * 2.0 : accel;
+                        accel = inputHandler.isCtrlPressed() ? accel * 1.5 : accel;
 
                         if (inputHandler.getKey(KeyEvent.VK_UP)) {
                             entity.forces.add(new Vector2D(0, -accel * 3.0));
@@ -172,8 +191,18 @@ public class DemoScene extends AbstractScene {
         createSpotLights("spot", 10, world);
 
         // define Camera to track player.
-        int vpWidth = config.getInteger("game.camera.viewport.width", 320);
-        int vpHeight = config.getInteger("game.camera.viewport.height", 200);
+        Influencer water = (Influencer) new Influencer("water")
+                .setType(EntityType.RECTANGLE)
+                .setPosition(new Vector2D(0, worldHeight * 0.85))
+                .setSize(new Vector2D(worldWidth, worldHeight * 0.15))
+                .setColor(new Color(0.0f, 0.3f, 0.8f, 0.7f))
+                .setBorderColor(Color.CYAN)
+                .setBorderWidth(1)
+                .setMaterial(Material.WATER)
+                .addForce(world.getGravity().multiply(0.98))
+                .setLayer(11)
+                .setPriority(2);
+        add(water);
 
         Camera cam = new Camera("camera")
                 .setTarget(player)
@@ -184,15 +213,16 @@ public class DemoScene extends AbstractScene {
 
         // add randomly wind.
         add(new WindyWeatherBehavior(20.0, 0.0, 0.3, 5.0));
+        add(new PauseBehavior(pauseText));
     }
 
     private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
-
+        Dimension starArea = new Dimension(world.getPlayArea().width, (int) (world.getPlayArea().height * 0.85));
         for (int i = 0; i < nbStars; i++) {
             GameEntity star = new GameEntity(prefixEntityName + "_" + i)
                     .setType(EntityType.CIRCLE)
                     .setPhysicType(PhysicType.STATIC)
-                    .setPosition(RandomUtils.ramdomVector(world.getPlayArea()))
+                    .setPosition(RandomUtils.ramdomVector(starArea))
                     .setSize(new Vector2D(1.0, 1.0))
                     .setColor(Color.WHITE)
                     .setLayer(5)

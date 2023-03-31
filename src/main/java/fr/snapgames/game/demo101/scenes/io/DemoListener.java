@@ -1,10 +1,9 @@
 package fr.snapgames.game.demo101.scenes.io;
 
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.math.World;
-import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.demo101.scenes.DemoScene;
 import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
 
@@ -22,7 +21,7 @@ import java.util.List;
 public class DemoListener implements KeyListener {
     private final Game game;
     DemoScene scene;
-    Configuration config;
+    OldConfiguration config;
     World world;
 
     public DemoListener(Game g, DemoScene scene) {
@@ -55,11 +54,12 @@ public class DemoListener implements KeyListener {
                 removeNbObjectByNameFilter("ball_", 10);
             }
             case KeyEvent.VK_B -> {
-                if (scene.getEntities().get("backgroundImage").isActive()) {
-                    scene.getEntities().get("backgroundImage").setActive(false);
+                GameEntity backGndImd = scene.getEntities().get("backgroundImage");
+                if (backGndImd.isActive()) {
+                    backGndImd.setActive(false);
                     scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(true));
                 } else {
-                    scene.getEntities().get("backgroundImage").setActive(true);
+                    backGndImd.setActive(true);
                     scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(false));
                 }
             }

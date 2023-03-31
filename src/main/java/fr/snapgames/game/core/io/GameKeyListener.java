@@ -35,9 +35,17 @@ public class GameKeyListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_D) {
-            int debug = game.getDebug() + 1 < 5 ? game.getDebug() + 1 : 0;
-            game.setDebug(debug);
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_P, KeyEvent.VK_PAUSE -> {
+                game.requestPause(!game.isUpdatePause());
+            }
+            case KeyEvent.VK_D -> {
+                int debug = game.getDebug() + 1 < 5 ? game.getDebug() + 1 : 0;
+                game.setDebug(debug);
+            }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_P || e.getKeyCode() == KeyEvent.VK_PAUSE) {
         }
     }
 }

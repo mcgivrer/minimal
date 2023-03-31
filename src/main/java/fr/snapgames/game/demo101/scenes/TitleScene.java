@@ -1,7 +1,7 @@
 package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.entity.TextEntity;
 import fr.snapgames.game.core.graphics.Renderer;
@@ -41,7 +41,7 @@ public class TitleScene extends AbstractScene {
 
     @Override
     public void create(Game g) {
-        Configuration config = g.getConfiguration();
+        OldConfiguration config = g.getConfiguration();
         double width = config.getInteger("game.camera.viewport.width", 320);
         double height = config.getInteger("game.camera.viewport.height", 200);
 

@@ -45,14 +45,14 @@ public class RainEffectBehavior implements Behavior {
 
             p.forces.add(world.getGravity().negate());
 
-            if (p.position.y - p.size.y > pe.size.y ||
+            if (p.position.y - p.size.y > pe.size.y*.85 ||
                     p.position.x > pe.size.x ||
                     p.position.x < 0.0 ||
                     p.position.y < 0.0) {
                 p.setColor(color);
                 p.setPosition(new Vector2D(
                         Math.random() * world.getPlayArea().width,
-                        Math.random() * world.getPlayArea().height));
+                        Math.random() * world.getPlayArea().height*0.85));
             }
         });
     }

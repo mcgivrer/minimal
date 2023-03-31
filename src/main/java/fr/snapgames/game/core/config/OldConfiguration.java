@@ -7,11 +7,10 @@ import java.awt.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.util.Properties;
 
 /**
- * {@link Configuration} loads a properties file and
+ * {@link OldConfiguration} loads a properties file and
  * let user gather converted value to
  * <ul>
  *     <li>Integer,</li>
@@ -22,35 +21,38 @@ import java.util.Properties;
  *     <li>{@link fr.snapgames.game.core.math.Material} the physic engine required material definition to make math processing.</li>
  * </ul>
  * from these properties.
- * The user can also {@link Configuration#save()} values after changes.
+ * The user can also {@link OldConfiguration#save()} values after changes.
  *
  * @author Frédéric Delorme
  * @since 0.0.1
+ * @deprecated preferred use of {@link fr.snapgames.game.core.configuration.Configuration},
+ * {@link fr.snapgames.game.core.configuration.IConfigAttribute} and
+ * {@link fr.snapgames.game.core.configuration.ConfigAttribute}
  */
-public class Configuration {
+public class OldConfiguration {
     private final Properties parameters = new Properties();
     String filePath;
 
     /**
-     * Initialize the {@link Configuration} with a file properties.
+     * Initialize the {@link OldConfiguration} with a file properties.
      *
-     * @param file the path to the properties file to load into Configuration.
+     * @param file the path to the properties file to load into OldConfiguration.
      */
-    public Configuration(String file) {
+    public OldConfiguration(String file) {
         this.filePath = file;
         try {
             parameters.load(Game.class.getResourceAsStream(filePath));
-            System.out.printf("Configuration:The configuration file %s has been loaded%n", file);
+            System.out.printf("OldConfiguration:The configuration file %s has been loaded%n", file);
         } catch (IOException e) {
-            System.err.printf("Configuration:The configuration file %s can not been loaded: %s%n", file, e.getMessage());
+            System.err.printf("OldConfiguration:The configuration file %s can not been loaded: %s%n", file, e.getMessage());
         }
     }
 
     /**
-     * Retrieve a value as Integer from {@link Configuration}.
+     * Retrieve a value as Integer from {@link OldConfiguration}.
      *
      * @param key          name of the configuration key to be loaded
-     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @param defaultValue if no value exists in {@link OldConfiguration}, instead use the defaultValue.
      * @return the corresponding int value
      */
     public int getInteger(String key, int defaultValue) {
@@ -61,10 +63,10 @@ public class Configuration {
     }
 
     /**
-     * Retrieve a value as Double from {@link Configuration}.
+     * Retrieve a value as Double from {@link OldConfiguration}.
      *
      * @param key          name of the configuration key to be loaded
-     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @param defaultValue if no value exists in {@link OldConfiguration}, instead use the defaultValue.
      * @return the corresponding double value
      */
     public double getDouble(String key, double defaultValue) {
@@ -75,10 +77,10 @@ public class Configuration {
     }
 
     /**
-     * Retrieve a value as Boolean from {@link Configuration}.
+     * Retrieve a value as Boolean from {@link OldConfiguration}.
      *
      * @param key          name of the configuration key to be loaded
-     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @param defaultValue if no value exists in {@link OldConfiguration}, instead use the defaultValue.
      * @return the corresponding boolean value
      */
     public boolean getBoolean(String key, boolean defaultValue) {
@@ -89,10 +91,10 @@ public class Configuration {
     }
 
     /**
-     * Retrieve a value as String from {@link Configuration}.
+     * Retrieve a value as String from {@link OldConfiguration}.
      *
      * @param key          name of the configuration key to be loaded
-     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @param defaultValue if no value exists in {@link OldConfiguration}, instead use the defaultValue.
      * @return the corresponding String value
      */
     public String getString(String key, String defaultValue) {
@@ -104,10 +106,10 @@ public class Configuration {
 
 
     /**
-     * Retrieve a value as Dimension from {@link Configuration} from a string format "dim([width],[height])".
+     * Retrieve a value as Dimension from {@link OldConfiguration} from a string format "dim([width],[height])".
      *
      * @param key          name of the configuration key to be loaded
-     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @param defaultValue if no value exists in {@link OldConfiguration}, instead use the defaultValue.
      * @return the corresponding Dimension value
      */
     public Dimension getDimension(String key, Dimension defaultValue) {
@@ -118,16 +120,16 @@ public class Configuration {
             int height = Integer.valueOf(k[0]);
             return new Dimension(width, height);
         } else {
-            System.err.printf("Configuration: Dimension value not found for %s, use %s as default value.%n", key, defaultValue);
+            System.err.printf("OldConfiguration: Dimension value not found for %s, use %s as default value.%n", key, defaultValue);
             return defaultValue;
         }
     }
 
     /**
-     * Retrieve a value as Vector2D from {@link Configuration} from a string format "dim([width],[height])".
+     * Retrieve a value as Vector2D from {@link OldConfiguration} from a string format "dim([width],[height])".
      *
      * @param key          name of the configuration key to be loaded
-     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @param defaultValue if no value exists in {@link OldConfiguration}, instead use the defaultValue.
      * @return the corresponding Vector2D value
      */
     public Vector2D getVector2D(String key, Vector2D defaultValue) {
@@ -138,7 +140,7 @@ public class Configuration {
             double y = Double.valueOf(k[1]);
             return new Vector2D(x, y);
         } else {
-            System.err.printf("Configuration: Dimension value not found for %s, use %s as default value.%n", key, defaultValue);
+            System.err.printf("OldConfiguration: Dimension value not found for %s, use %s as default value.%n", key, defaultValue);
             return defaultValue;
         }
     }
@@ -167,10 +169,10 @@ public class Configuration {
             String rootPath = this.getClass().getResource("/").getPath();
             OutputStream output = new FileOutputStream(rootPath + filePath);
             parameters.store(output, "updated From CommandLine");
-            System.out.printf("Configuration:Configuration saved into the properties file: %s%n", filePath);
-            System.out.printf("Configuration:Content: %s%n", parameters);
+            System.out.printf("OldConfiguration:OldConfiguration saved into the properties file: %s%n", filePath);
+            System.out.printf("OldConfiguration:Content: %s%n", parameters);
         } catch (IOException e) {
-            System.err.printf("Configuration:Unable to save configuration into properties file: %s%n", e.getMessage());
+            System.err.printf("OldConfiguration:Unable to save configuration into properties file: %s%n", e.getMessage());
         }
     }
 
