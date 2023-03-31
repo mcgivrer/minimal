@@ -12,8 +12,8 @@ import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.*;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.scenes.behaviors.*;
-import fr.snapgames.game.demo101.scenes.io.DemoListener;
+import fr.snapgames.game.demo101.behaviors.*;
+import fr.snapgames.game.demo101.io.DemoListener;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;

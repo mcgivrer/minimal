@@ -50,7 +50,7 @@ public class Renderer {
     }
 
     public void addEntities(Collection<GameEntity> entities) {
-        entities.stream().forEach(e -> addEntity(e));
+        entities.forEach(this::addEntity);
     }
 
     public void addEntity(GameEntity e) {
@@ -82,7 +82,7 @@ public class Renderer {
             // draw all entities according to Camera
             pipeline.stream()
                     .filter(e -> e.isActive() && isInViewPort(currentCamera,e))
-                    .sorted((e1, e2) -> e1.getPriority() > e2.getPriority() ? 1 : -1)
+                    //.sorted((e1, e2) -> e1.getPriority() > e2.getPriority() ? 1 : -1)
                     .forEach(entity -> {
                         // draw Scene
                         if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
@@ -106,23 +106,20 @@ public class Renderer {
                 }
             }
             g.dispose();
-            stats.put("pause", game.isUpdatePause() ? "On" : "Off");
-            stats.put("obj", game.getSceneManager().getActiveScene().getEntities().size());
-            stats.put("scn", game.getSceneManager().getActiveScene().getName());
-            stats.put("dbg", game.getDebug());
         }
         // remove inactive object.
         entities.values().stream()
                 .filter(e -> !e.isActive())
-                .collect(Collectors.toList())
+                .toList()
                 .forEach(ed -> entities.remove(ed.name));
     }
 
     private boolean isInViewPort(Camera currentCamera, GameEntity e) {
         if(currentCamera!=null){
-
+            //TODO exclude objects larger than the Camera
+            return currentCamera.viewport.contains(e.getBoundingBox());
         }
-        return false;
+        return true;
     }
 
     private void drawPauseMode(Graphics2D g) {
@@ -139,7 +136,7 @@ public class Renderer {
     public void drawEntity(Graphics2D g, GameEntity entity) {
         entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
-            RendererPlugin rp = ((RendererPlugin) plugins.get(entity.getClass()));
+            RendererPlugin rp = plugins.get(entity.getClass());
             rp.draw(this, g, entity);
             entity.setDrawnBy(rp.getClass());
         } else {

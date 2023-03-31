@@ -197,7 +197,7 @@ public enum ConfigAttribute implements IConfigAttribute {
             StringUtils::toDimension),
     WINDOW_BUFFER_NUMBER(
             "buffer",
-            "game.buffer.strategy",
+            "game.window.strategy",
             "Define the number of display buffer"
             , 1,
             Integer::valueOf);

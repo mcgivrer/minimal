@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.scenes.io;
+package fr.snapgames.game.demo101.io;
 
 import fr.snapgames.game.core.Game;
 

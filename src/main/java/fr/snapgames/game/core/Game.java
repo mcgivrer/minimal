@@ -76,7 +76,7 @@ public class Game extends JPanel {
      *                       only ONE loop in the game loop will be achieved, to let
      *                       the unit test manage
      *                       the looping strategy for test purpose.
-     * @see OldConfiguration
+     * @see Configuration
      */
     public Game(String configFilePath, boolean mode) {
         this.testMode = testMode;
@@ -99,9 +99,13 @@ public class Game extends JPanel {
         // retrieve some Window parameters
         String title = I18n.get("game.window.title");
         Dimension dim = (Dimension) config.get(ConfigAttribute.WINDOW_SIZE);
+
         // set input handlers
         inputHandler = new InputHandler(this);
         inputHandler.addListener(new GameKeyListener(this));
+
+        scale = (double) config.get(ConfigAttribute.WINDOW_SCALE);
+
         // Create the output window.
         window = new Window(this, title, dim);
         window.add(inputHandler);
@@ -207,6 +211,11 @@ public class Game extends JPanel {
             loopData.put("cnt", loopCounter);
             loopData.put("fps", realFPS);
             loopData.put("ups", realUPS);
+
+            loopData.put("pause", isUpdatePause() ? "ON" : "OFF");
+            loopData.put("obj", getSceneManager().getActiveScene().getEntities().size());
+            loopData.put("scn", getSceneManager().getActiveScene().getName());
+            loopData.put("dbg", getDebug());
 
             draw(loopData);
             waitUntilStepEnd(dt);

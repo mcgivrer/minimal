@@ -295,4 +295,8 @@ public class GameEntity {
     public String toString() {
         return this.getClass().getSimpleName() + ":" + this.name;
     }
+
+    public Rectangle2D getBoundingBox() {
+        return box;
+    }
 }

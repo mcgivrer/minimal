@@ -1,7 +1,6 @@
 package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
@@ -12,7 +11,7 @@ import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.scenes.io.TitleListener;
+import fr.snapgames.game.demo101.io.TitleListener;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
