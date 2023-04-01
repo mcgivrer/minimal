@@ -1,5 +1,6 @@
 package fr.snapgames.game.core;
 
+import fr.snapgames.game.core.audio.SoundSystem;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
@@ -52,6 +53,7 @@ public class Game extends JPanel {
     private InputHandler inputHandler;
     private Renderer renderer;
     private PhysicEngine physicEngine;
+    private final SoundSystem soundSystem;
     private SceneManager scm;
 
     /**
@@ -85,6 +87,7 @@ public class Game extends JPanel {
         // create services
         renderer = new Renderer(this);
         physicEngine = new PhysicEngine(this);
+        soundSystem = new SoundSystem(this);
         scm = new SceneManager(this);
         scm.initialize(this);
     }
@@ -126,7 +129,7 @@ public class Game extends JPanel {
         frame.setPreferredSize(dim);
         frame.setMinimumSize(dim);
         frame.setMaximumSize(dim);
-        frame.setIconImage(ResourceManager.loadImage("/images/sg-logo-image.png"));
+        frame.setIconImage(ResourceManager.getImage("/images/sg-logo-image.png"));
 
         setBackground(Color.BLACK);
         frame.setIgnoreRepaint(true);
@@ -336,4 +339,7 @@ public class Game extends JPanel {
         this.debug = debug;
     }
 
+    public SoundSystem getSoundSystem() {
+        return soundSystem;
+    }
 }

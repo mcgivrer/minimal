@@ -89,6 +89,20 @@ public class Configuration {
     }
 
     /**
+     * Retrieve a value as float from {@link Configuration}.
+     *
+     * @param key          name of the configuration key to be loaded
+     * @param defaultValue if no value exists in {@link Configuration}, instead use the defaultValue.
+     * @return the corresponding float value
+     */
+    public float getFloat(String key, float defaultValue) {
+        if (parameters.containsKey(key)) {
+            return Float.parseFloat(parameters.getProperty(key));
+        }
+        return defaultValue;
+    }
+
+    /**
      * Retrieve a value as String from {@link Configuration}.
      *
      * @param key          name of the configuration key to be loaded
