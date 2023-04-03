@@ -1,6 +1,7 @@
 package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.audio.SoundClip;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
@@ -29,6 +30,7 @@ import java.awt.image.BufferedImage;
 public class TitleScene extends AbstractScene {
     private final TitleListener titleListener;
     private BufferedImage backgroundImg;
+    private SoundClip mainTheme;
 
     public TitleScene(Game g, String name) {
         super(g, name);
@@ -37,7 +39,10 @@ public class TitleScene extends AbstractScene {
 
     @Override
     public void loadResources(Game g) {
-        backgroundImg = ResourceManager.loadImage("/images/backgrounds/ruins.png");
+
+        backgroundImg = ResourceManager.getImage("/images/backgrounds/ruins.png");
+        g.getSoundSystem().load("mainTheme", "/audio/musics/once-around-the-kingdom.mp3");
+
     }
 
     @Override
@@ -87,6 +92,7 @@ public class TitleScene extends AbstractScene {
         add(msgTxt);
 
         g.getInputHandler().addListener(titleListener);
+        g.getSoundSystem().play("mainTheme", 0.6f);
     }
 
     @Override
@@ -103,5 +109,6 @@ public class TitleScene extends AbstractScene {
         game.getPhysicEngine().reset();
         game.getRenderer().reset();
         g.getInputHandler().removeListener(titleListener);
+        g.getSoundSystem().stopAll();
     }
 }

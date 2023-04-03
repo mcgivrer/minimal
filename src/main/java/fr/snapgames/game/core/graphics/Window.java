@@ -38,7 +38,7 @@ public class Window {
         frame.setPreferredSize(dim);
         frame.setMinimumSize(dim);
         frame.setMaximumSize(dim);
-        frame.setIconImage(ResourceManager.loadImage("/images/sg-logo-image.png"));
+        frame.setIconImage(ResourceManager.getImage("/images/sg-logo-image.png"));
 
         game.setBackground(Color.BLACK);
         frame.setIgnoreRepaint(true);

@@ -1,5 +1,6 @@
 package fr.snapgames.game.core;
 
+import fr.snapgames.game.core.audio.SoundSystem;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
@@ -53,6 +54,7 @@ public class Game extends JPanel {
     private Renderer renderer;
 
     private PhysicEngine physicEngine;
+    private final SoundSystem soundSystem;
     private SceneManager scm;
     private Animations animations;
 
@@ -84,6 +86,7 @@ public class Game extends JPanel {
         config = new Configuration(ConfigAttribute.values())
                 .setConfigurationFile("/game.properties")
                 .parseConfigFile();
+        soundSystem = new SoundSystem(this);
     }
 
     /**
@@ -307,5 +310,8 @@ public class Game extends JPanel {
 
     public void requestPause(boolean pause) {
         this.pause = pause;
+    }
+    public SoundSystem getSoundSystem() {
+        return soundSystem;
     }
 }

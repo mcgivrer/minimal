@@ -1,15 +1,18 @@
 package fr.snapgames.game.demo101.behaviors;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.audio.SoundClip;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.math.Vector2D;
+import fr.snapgames.game.core.resources.ResourceManager;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.util.Optional;
 
 public class CoinBehavior implements Behavior<GameEntity> {
+
     @Override
     public void input(Game g, GameEntity e) {
 
@@ -64,6 +67,7 @@ public class CoinBehavior implements Behavior<GameEntity> {
                 int score = (int) p.getAttribute("score", 0);
                 score += (int) p.getAttribute("value", 20);
                 p.setAttribute("score", score);
+                game.getSoundSystem().play("collectCoin",1.0f);
             }
         }
     }
