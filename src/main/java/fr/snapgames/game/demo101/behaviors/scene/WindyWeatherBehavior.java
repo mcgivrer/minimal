@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.behaviors;
+package fr.snapgames.game.demo101.behaviors.scene;
 
 import java.awt.Graphics2D;
 
@@ -42,15 +42,5 @@ public class WindyWeatherBehavior implements Behavior<Scene> {
                     * Math.random() * maxWindSpeed, 0.0);
         }
         w.setWind(windForceTarget);
-    }
-
-    @Override
-    public void input(Game game, Scene scene) {
-
-    }
-
-    @Override
-    public void draw(Game game, Graphics2D g, Scene scene) {
-
     }
 }

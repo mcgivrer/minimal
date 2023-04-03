@@ -70,7 +70,7 @@ public class PhysicEngine {
     public void update(double elapsed) {
         double time = elapsed * TIME_FACTOR;
         entities.values().stream()
-                .filter(e -> e.isActive() && !(e instanceof Influencer))
+                .filter(e -> !(e instanceof Influencer))
                 .forEach(entity -> {
                     updateEntity(entity, time);
                     if (Optional.ofNullable(world).isPresent()) {

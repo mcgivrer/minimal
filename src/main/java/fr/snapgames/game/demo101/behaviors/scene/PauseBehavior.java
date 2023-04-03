@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.behaviors;
+package fr.snapgames.game.demo101.behaviors.scene;
 
 import java.awt.Graphics2D;
 
@@ -21,15 +21,5 @@ public class PauseBehavior implements Behavior<Scene> {
         } else {
             this.entity.setActive(false);
         }
-    }
-
-    @Override
-    public void input(Game game, Scene entity) {
-
-    }
-
-    @Override
-    public void draw(Game game, Graphics2D g, Scene entity) {
-
     }
 }

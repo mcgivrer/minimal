@@ -5,14 +5,16 @@ import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.entity.*;
-import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
-import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.*;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.behaviors.*;
+import fr.snapgames.game.demo101.behaviors.entity.CoinBehavior;
+import fr.snapgames.game.demo101.behaviors.entity.RainEffectBehavior;
+import fr.snapgames.game.demo101.behaviors.entity.StormBehavior;
+import fr.snapgames.game.demo101.behaviors.scene.PauseBehavior;
+import fr.snapgames.game.demo101.behaviors.scene.WindyWeatherBehavior;
 import fr.snapgames.game.demo101.io.DemoListener;
 
 import java.awt.*;
@@ -159,14 +161,24 @@ public class DemoScene extends AbstractScene {
         createRain("rain", 200, world);
 
         // add an ambient light
-        Light ambiantLight = (Light) new Light("ambiant",
+        Light ambientLight = (Light) new Light("ambient",
                 new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
-                .setLayer(2)
+                .setLayer(12)
                 .setPriority(1)
                 .addBehavior(new LightBehavior())
                 .addBehavior(new StormBehavior(500, 4, 50));
-        add(ambiantLight);
+        add(ambientLight);
+
+        Light thunderLight = (Light) new Light("thunderLight",
+                new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.9f)
+                .setColor(Color.WHITE)
+                .setLayer(12)
+                .setPriority(1)
+                .addBehavior(new LightBehavior())
+                .addBehavior(new StormBehavior(500, 4, 50))
+                .setActive(false);
+        add(thunderLight);
 
         // add some spotlights
         createSpotLights("spot", 10, world);
@@ -237,9 +249,9 @@ public class DemoScene extends AbstractScene {
                 .setSize(new Vector2D(
                         world.getPlayArea().getWidth(),
                         world.getPlayArea().getHeight()))
-                .setLayer(1)
-                .setPriority(1)
-                .addBehavior(new RainEffectBehavior(world, Color.CYAN,world.getWind()));
+                .setLayer(12)
+                .setPriority(0)
+                .addBehavior(new RainEffectBehavior(world, Color.CYAN, world.getWind()));
         for (int i = 0; i < nbParticles; i++) {
             GameEntity p = new GameEntity(pes.name + "_" + i)
                     .setType(EntityType.CIRCLE)

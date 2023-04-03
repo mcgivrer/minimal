@@ -136,11 +136,11 @@ public class Renderer {
 
         if (currentCamera != null) {
             if (e.isStickToCamera()
-                    || (e.box.getWidth() > currentCamera.viewport.getWidth()
-                    && e.box.getHeight() > currentCamera.viewport.getHeight())) {
+                    || (e.box.getBounds2D().getWidth() > currentCamera.viewport.getWidth()
+                    && e.box.getBounds2D().getHeight() > currentCamera.viewport.getHeight())) {
                 return true;
             } else {
-                return currentCamera.viewport.intersects(e.box);
+                return currentCamera.viewport.intersects(e.box.getBounds2D());
             }
         }
         return true;
@@ -200,7 +200,7 @@ public class Renderer {
         g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
-    private void drawEntitesDebug(Graphics2D g) {
+    public void drawEntitesDebug(Graphics2D g) {
         entities.values().stream()
                 .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
                 .sorted(Renderer::compare)

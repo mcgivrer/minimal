@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.behaviors;
+package fr.snapgames.game.demo101.behaviors.entity;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
@@ -15,7 +15,7 @@ import java.util.Optional;
  * @author Frédéric Delorme
  * @since 0.0.3
  */
-public class RainEffectBehavior implements Behavior {
+public class RainEffectBehavior implements Behavior<ParticlesEntity> {
 
     private World world;
     private Color color;
@@ -35,8 +35,7 @@ public class RainEffectBehavior implements Behavior {
     }
 
     @Override
-    public void update(Game game, Object entity, double dt) {
-        ParticlesEntity pe = (ParticlesEntity) entity;
+    public void update(Game game, ParticlesEntity pe, double dt) {
 
         pe.getChild().forEach(p -> {
             if (Optional.ofNullable(world.getWind()).isPresent()) {
@@ -45,25 +44,15 @@ public class RainEffectBehavior implements Behavior {
 
             p.forces.add(world.getGravity().negate());
 
-            if (p.position.y - p.size.y > pe.size.y*.85 ||
+            if (p.position.y - p.size.y > pe.size.y * .85 ||
                     p.position.x > pe.size.x ||
                     p.position.x < 0.0 ||
                     p.position.y < 0.0) {
                 p.setColor(color);
                 p.setPosition(new Vector2D(
                         Math.random() * world.getPlayArea().width,
-                        Math.random() * world.getPlayArea().height*0.85));
+                        Math.random() * world.getPlayArea().height * 0.85));
             }
         });
-    }
-
-    @Override
-    public void input(Game game, Object entity) {
-
-    }
-
-    @Override
-    public void draw(Game game, Graphics2D g, Object entity) {
-
     }
 }
