@@ -1,5 +1,6 @@
 package fr.snapgames.game.core.graphics.plugins;
 
+import fr.snapgames.game.core.entity.EntityType;
 import fr.snapgames.game.core.entity.Light;
 import fr.snapgames.game.core.graphics.Renderer;
 
@@ -27,8 +28,8 @@ public class LightRenderer implements RendererPlugin<Light> {
                         (float) l.size.x,
                         l.dist, l.colors);
                 g.setPaint(rgp);
-                g.fill(new Ellipse2D.Double(l.position.x - l.size.x, l.position.y - l.size.x, l.size.x * 2,
-                        l.size.x * 2));
+                g.fill(new Ellipse2D.Double(l.position.x - l.size.x, l.position.y - l.size.y, l.size.x * 2,
+                        l.size.y * 2));
             }
             case CONE -> {
                 // TODO implement the CONE light type
@@ -43,6 +44,15 @@ public class LightRenderer implements RendererPlugin<Light> {
 
     @Override
     public void drawDebug(Renderer r, Graphics2D g, Light e) {
-
+        g.setColor(Color.ORANGE);
+        if (e.getType() == EntityType.CIRCLE) {
+            g.translate(-e.box.getBounds2D().getCenterX(), -e.box.getBounds2D().getCenterY());
+        }
+        g.draw(e.box);
+        if (e.getType() == EntityType.CIRCLE) {
+            g.translate(e.box.getBounds2D().getCenterX(), e.box.getBounds2D().getCenterY());
+        }
     }
 }
+
+

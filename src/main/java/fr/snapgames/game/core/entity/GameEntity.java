@@ -1,7 +1,7 @@
 package fr.snapgames.game.core.entity;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class GameEntity {
 
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior<?>> behaviors = new ArrayList<>();
-    public Rectangle2D box;
+    public Shape box;
 
     /**
      * Child entities for this one. Mainly used by {@link ParticlesEntity}.
@@ -152,7 +152,7 @@ public class GameEntity {
      * to display realtime information.
      *
      * @return the corresponding {@link Collection} of {@link String} containing the
-     *         debug information to be displayed.
+     * debug information to be displayed.
      */
     public Collection<String> getDebugInfo() {
         List<String> ls = new ArrayList<>();
@@ -270,7 +270,16 @@ public class GameEntity {
      * @see Rectangle2D
      */
     public void updateBox() {
-        this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
+        switch (type) {
+            case CIRCLE -> {
+                this.box = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
+
+            }
+            default -> {
+                this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
+
+            }
+        }
     }
 
     /**
@@ -301,6 +310,10 @@ public class GameEntity {
     }
 
     public Rectangle2D getBoundingBox() {
-        return box;
+        return box.getBounds2D();
+    }
+
+    public EntityType getType() {
+        return type;
     }
 }

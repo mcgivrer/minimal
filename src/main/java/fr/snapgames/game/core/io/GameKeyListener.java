@@ -37,7 +37,9 @@ public class GameKeyListener implements ActionListener {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_P, KeyEvent.VK_PAUSE -> {
-                game.requestPause(!game.isUpdatePause());
+                if(game.isPauseAuthorized()){
+                    game.requestPause(!game.isUpdatePause());
+                }
             }
             case KeyEvent.VK_D -> {
                 int debug = game.getDebug() + 1 < 5 ? game.getDebug() + 1 : 0;

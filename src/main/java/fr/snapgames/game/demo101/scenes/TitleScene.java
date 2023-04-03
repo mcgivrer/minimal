@@ -42,6 +42,7 @@ public class TitleScene extends AbstractScene {
 
     @Override
     public void create(Game g) {
+        g.setPauseAutorized(false);
         Configuration config = g.getConfiguration();
         Dimension viewport = (Dimension) config.get(ConfigAttribute.VIEWPORT_SIZE);
 
@@ -103,5 +104,6 @@ public class TitleScene extends AbstractScene {
         game.getPhysicEngine().reset();
         game.getRenderer().reset();
         g.getInputHandler().removeListener(titleListener);
+        g.setPauseAutorized(true);
     }
 }

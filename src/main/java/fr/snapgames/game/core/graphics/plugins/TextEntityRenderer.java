@@ -20,40 +20,75 @@ public class TextEntityRenderer implements RendererPlugin<TextEntity> {
     }
 
     @Override
-    public void draw(Renderer r, Graphics2D g, TextEntity e) {
-        g.setFont(e.font);
-        e.size.x = g.getFontMetrics().stringWidth(e.text);
-        e.size.y = g.getFontMetrics().getHeight();
-        if (Optional.ofNullable(e.shadowColor).isPresent()) {
-            g.setColor(e.shadowColor);
-            for (int d = 0; d <= e.shadowWidth; d++) {
-                g.drawString(e.text, (int) e.position.x + d, (int) e.position.y + d);
+    public void draw(Renderer r, Graphics2D g, TextEntity te) {
+        g.setFont(te.getFont());
+        te.size.x = g.getFontMetrics().stringWidth(te.getText());
+        te.size.y = g.getFontMetrics().getHeight();
+        double offX = 0;
+        switch (te.getTexAlign()) {
+            case RIGHT -> {
+                offX = -te.size.x;
+            }
+            case LEFT -> {
+                offX = 0;
+            }
+            case CENTER -> {
+                offX = te.size.x * 0.5;
             }
         }
-        if (Optional.ofNullable(e.borderColor).isPresent()) {
-            g.setColor(e.borderColor);
-            for (int c = -e.borderWidth; c <= e.borderWidth; c++) {
-                for (int d = -e.borderWidth; d <= e.borderWidth; d++) {
-                    g.drawString(e.text, (int) e.position.x + d, (int) e.position.y + c);
+        drawTextShadow(g, te, offX);
+        drawTextOutLine(g, te, offX);
+        drawText(g, te, offX);
+    }
+
+    private void drawText(Graphics2D g, TextEntity te, double offX) {
+        // draw text
+        g.setColor(te.color);
+        g.drawString(te.getText(), (int) (te.position.x + offX), (int) te.position.y);
+    }
+
+    private void drawTextOutLine(Graphics2D g, TextEntity te, double offX) {
+        if (Optional.ofNullable(te.borderColor).isPresent()) {
+            g.setColor(te.borderColor);
+            for (int c = -te.borderWidth; c <= te.borderWidth; c++) {
+                for (int d = -te.borderWidth; d <= te.borderWidth; d++) {
+                    g.drawString(te.getText(), (int) (te.position.x + offX + d), (int) te.position.y + c);
                 }
             }
         }
+    }
 
-        g.setColor(e.color);
-        g.drawString(e.text, (int) e.position.x, (int) e.position.y);
+    private void drawTextShadow(Graphics2D g, TextEntity te, double offX) {
+        if (Optional.ofNullable(te.shadowColor).isPresent()) {
+            g.setColor(te.shadowColor);
+            for (int d = 0; d <= te.shadowWidth; d++) {
+                g.drawString(te.getText(), (int) (te.position.x + offX + d), (int) te.position.y + d);
+            }
+        }
     }
 
     @Override
-    public void drawDebug(Renderer r, Graphics2D g, TextEntity v) {
+    public void drawDebug(Renderer r, Graphics2D g, TextEntity te) {
         g.setColor(Color.ORANGE);
-
+        double offX = 0;
+        switch (te.getTexAlign()) {
+            case RIGHT -> {
+                offX = -te.size.x;
+            }
+            case LEFT -> {
+                offX = 0;
+            }
+            case CENTER -> {
+                offX = te.size.x * 0.5;
+            }
+        }
         g.drawRect(
-                (int) v.position.x,
-                (int) v.position.y - (g.getFontMetrics().getHeight() + g.getFontMetrics().getAscent()),
-                (int) v.size.x, (int) v.size.y);
+                (int) (te.position.x + offX),
+                (int) te.position.y - (g.getFontMetrics().getHeight() + g.getFontMetrics().getAscent()),
+                (int) te.size.x, (int) te.size.y);
         int il = 0;
-        for (String s : v.getDebugInfo()) {
-            g.drawString(s, (int) (v.position.x + v.size.x + 4.0), (int) v.position.y + il);
+        for (String s : te.getDebugInfo()) {
+            g.drawString(s, (int) (te.position.x + te.size.x + offX + 4.0), (int) te.position.y + il);
             il += 10;
         }
 

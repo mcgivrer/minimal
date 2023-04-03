@@ -6,10 +6,9 @@ import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.io.ActionListener;
 import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.demo101.scenes.DemoScene;
-import fr.snapgames.game.demo101.behaviors.CoinBehavior;
+import fr.snapgames.game.demo101.behaviors.entity.CoinBehavior;
 
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

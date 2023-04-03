@@ -5,14 +5,18 @@ import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.entity.*;
-import fr.snapgames.game.core.graphics.Renderer;
+import fr.snapgames.game.core.graphics.TextAlign;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
-import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.*;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.behaviors.*;
+import fr.snapgames.game.demo101.behaviors.entity.CoinBehavior;
+import fr.snapgames.game.demo101.behaviors.entity.PlayerInputBehavior;
+import fr.snapgames.game.demo101.behaviors.entity.RainEffectBehavior;
+import fr.snapgames.game.demo101.behaviors.entity.StormBehavior;
+import fr.snapgames.game.demo101.behaviors.scene.PauseBehavior;
+import fr.snapgames.game.demo101.behaviors.scene.WindyWeatherBehavior;
 import fr.snapgames.game.demo101.io.DemoListener;
 
 import java.awt.*;
@@ -84,7 +88,7 @@ public class DemoScene extends AbstractScene {
                 .setBorderWidth(1)
                 .setShadowColor(Color.BLACK)
                 .setShadowWidth(2)
-                .setLayer(2)
+                .setLayer(12)
                 .setPriority(20)
                 .setStickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
@@ -99,11 +103,18 @@ public class DemoScene extends AbstractScene {
                 });
         add(score);
 
+        Font pauseFont = g.getFont().deriveFont(14.0f);
+        String pauseStr = I18n.get("game.state.pause.message");
+        int textWidth = g.getFontMetrics(pauseFont).stringWidth(pauseStr);
+        int textHeight = g.getFontMetrics(pauseFont).getHeight();
         TextEntity pauseText = (TextEntity) new TextEntity("pause")
-                .setText(I18n.get("game.state.pause.message"))
-                .setFont(g.getFont().deriveFont(20.0f))
+                .setText(pauseStr)
+                .setFont(pauseFont)
+                .setTextAlign(TextAlign.CENTER)
                 .setPhysicType(PhysicType.STATIC)
-                .setPosition(new Vector2D(viewport.width * 0.5, viewport.height * 0.5))
+                .setPosition(new Vector2D((viewport.width - textWidth) * 0.5, (viewport.height - textHeight) * 0.5))
+                .setSize(new Vector2D(viewport.width, textHeight + 4))
+
                 .setColor(Color.WHITE)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
@@ -127,46 +138,34 @@ public class DemoScene extends AbstractScene {
                 .setMass(8.0)
                 .setLayer(10)
                 .setPriority(1)
-                .addBehavior(new Behavior<GameEntity>() {
-                    @Override
-                    public void input(Game game, GameEntity entity) {
-                        double accel = (Double) entity.getAttribute("speedStep", 0.02);
-                        accel = inputHandler.isShiftPressed() ? accel * 2.0 : accel;
-                        accel = inputHandler.isCtrlPressed() ? accel * 1.5 : accel;
-
-                        if (inputHandler.getKey(KeyEvent.VK_UP)) {
-                            entity.forces.add(new Vector2D(0, -accel * 3.0));
-                        }
-                        if (inputHandler.getKey(KeyEvent.VK_DOWN)) {
-                            entity.forces.add(new Vector2D(0, accel));
-                        }
-                        if (inputHandler.getKey(KeyEvent.VK_RIGHT)) {
-                            entity.setDirection(1);
-                            entity.forces.add(new Vector2D(accel, 0));
-                        }
-                        if (inputHandler.getKey(KeyEvent.VK_LEFT)) {
-                            entity.setDirection(-1);
-                            entity.forces.add(new Vector2D(-accel, 0));
-                        }
-                    }
-                });
+                .addBehavior(new PlayerInputBehavior());
         add(player);
 
         // Create enemies Entity.
         createCoins("coin_", 20, world, new CoinBehavior());
 
         // create Rain effect with a ParticleEntity.
-        createRain("rain", 200, world);
+        createRainParticlesEntity("rain", 200, world);
 
         // add an ambient light
-        Light ambiantLight = (Light) new Light("ambiant",
+        Light ambientLight = (Light) new Light("ambient",
                 new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
-                .setLayer(2)
+                .setLayer(12)
                 .setPriority(1)
                 .addBehavior(new LightBehavior())
                 .addBehavior(new StormBehavior(500, 4, 50));
-        add(ambiantLight);
+        add(ambientLight);
+
+        Light thunderLight = (Light) new Light("thunderLight",
+                new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.9f)
+                .setColor(Color.WHITE)
+                .setLayer(12)
+                .setPriority(1)
+                .addBehavior(new LightBehavior())
+                .addBehavior(new StormBehavior(500, 4, 50))
+                .setActive(false);
+        add(thunderLight);
 
         // add some spotlights
         createSpotLights("spot", 10, world);
@@ -181,7 +180,7 @@ public class DemoScene extends AbstractScene {
                 .setBorderWidth(1)
                 .setMaterial(Material.WATER)
                 .addForce(world.getGravity().multiply(0.98))
-                .setLayer(11)
+                .setLayer(10)
                 .setPriority(2);
         add(water);
 
@@ -231,31 +230,15 @@ public class DemoScene extends AbstractScene {
         }
     }
 
-    private void createRain(String entityName, int nbParticles, World world) {
+    private void createRainParticlesEntity(String entityName, int nbParticles, World world) {
         ParticlesEntity pes = (ParticlesEntity) new ParticlesEntity(entityName)
                 .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(), 0.0))
                 .setSize(new Vector2D(
                         world.getPlayArea().getWidth(),
                         world.getPlayArea().getHeight()))
-                .setLayer(1)
-                .setPriority(1)
-                .addBehavior(new RainEffectBehavior(world, Color.CYAN,world.getWind()));
-        for (int i = 0; i < nbParticles; i++) {
-            GameEntity p = new GameEntity(pes.name + "_" + i)
-                    .setType(EntityType.CIRCLE)
-                    .setPhysicType(PhysicType.DYNAMIC)
-                    .setSize(new Vector2D(1.0, 1.0))
-                    .setPosition(
-                            new Vector2D(
-                                    world.getPlayArea().getWidth() * Math.random(),
-                                    world.getPlayArea().getHeight() * Math.random()))
-                    .setColor(Color.CYAN)
-                    .setLayer(1)
-                    .setPriority(i)
-                    .setMass(0.1)
-                    .setMaterial(Material.AIR);
-            pes.getChild().add(p);
-        }
+                .setLayer(12)
+                .setPriority(0)
+                .addBehavior(new RainEffectBehavior(world, Color.CYAN, nbParticles));
         add(pes);
     }
 

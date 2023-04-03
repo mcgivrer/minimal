@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.behaviors;
+package fr.snapgames.game.demo101.behaviors.entity;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
@@ -31,25 +31,15 @@ public class StormBehavior implements Behavior<Light> {
             delay = Math.random() * 10000 + 2000;
             lightning = Math.random() * maxNbLightning;
         } else {
-            delay -= dt;
+            delay -= dt * 100;
         }
         if (lightning >= 0 && lightningInterval > maxDelayLightning) {
+            entity.setActive(true);
             lightning -= 1;
             lightningInterval = 0;
-            entity.setDeltaIntensity((float) Math.random());
         } else {
-            entity.setDeltaIntensity(1.0f);
-            lightningInterval += dt;
+            entity.setActive(false);
+            lightningInterval += dt*100;
         }
-    }
-
-    @Override
-    public void input(Game game, Light entity) {
-
-    }
-
-    @Override
-    public void draw(Game game, Graphics2D g, Light entity) {
-
     }
 }

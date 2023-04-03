@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.behaviors;
+package fr.snapgames.game.demo101.behaviors.entity;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
@@ -10,10 +10,6 @@ import java.awt.geom.Ellipse2D;
 import java.util.Optional;
 
 public class CoinBehavior implements Behavior<GameEntity> {
-    @Override
-    public void input(Game g, GameEntity e) {
-
-    }
 
     @Override
     public void draw(Game game, Graphics2D g, GameEntity e) {
