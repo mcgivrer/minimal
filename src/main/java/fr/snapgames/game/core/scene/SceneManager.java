@@ -81,9 +81,9 @@ public class SceneManager {
             try {
                 Class<? extends Scene> sceneToAdd = (Class<? extends Scene>) Class.forName(kv[1]);
                 availableScenes.put(kv[0], sceneToAdd);
-                System.out.printf("SceneManager:Add scene %s:%s%n", kv[0], kv[1]);
+                System.out.printf("INFO: SceneManager:Add scene %s:%s%n", kv[0], kv[1]);
             } catch (ClassNotFoundException e) {
-                System.err.printf("SceneManager:Unable to load class %s%n", kv[1]);
+                System.err.printf("ERROR: SceneManager:Unable to load class %s%n", kv[1]);
             }
         });
 
@@ -122,29 +122,37 @@ public class SceneManager {
      * @see AbstractScene
      */
     public void activate(String name) {
-        if (!scenes.containsKey(name) && availableScenes.containsKey(name)) {
+        if (availableScenes.containsKey(name)) {
             Class<? extends Scene> sceneClass = availableScenes.get(name);
             if (Optional.ofNullable(activeScene).isPresent()) {
                 activeScene.dispose(game);
+                System.out.printf("INFO: SceneManager: the Scene %s has been disposed.%n", activeScene.getName());
             }
             try {
-                Scene s = sceneClass.getConstructor(Game.class, String.class).newInstance(game, name);
-                add(s);
-                s.initialize(game);
-                s.loadResources(game);
-                s.create(game);
-                this.activeScene = s;
-                System.out.printf("SceneManager:Scene %s instance has been activated%n", sceneClass.getName());
+                if (!scenes.containsKey(name)) {
+                    Scene s = sceneClass.getConstructor(Game.class, String.class).newInstance(game, name);
+                    add(s);
+                    this.activeScene = s;
+
+                    System.out.printf("INFO: SceneManager: Scene %s instance has been instantiated.%n", sceneClass.getName());
+                } else {
+                    activeScene = scenes.get(name);
+                    System.out.printf("INFO: SceneManager: the Scene %s has been pop from scene cache.%n", activeScene.getName());
+                }
+                activeScene.initialize(game);
+                activeScene.loadResources(game);
+                activeScene.create(game);
+
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                      NoSuchMethodException e) {
-                System.err.printf("SceneManager:Unable to create Scene %s instance:%s%n", sceneClass.getName(), e.getMessage());
+                System.err.printf("ERROR: SceneManager:Unable to create Scene %s instance:%s%n", sceneClass.getName(), e.getMessage());
             }
         } else {
             System.err.printf(
-                    "SceneManager:The Scene %s does not exists in configuration file for key '%s'.%n",
+                    "ERROR: SceneManager:The Scene %s does not exists in configuration file for key '%s'.%n",
                     name, name);
             System.err.printf(
-                    "SceneManager:Known scenes are '%s'.%n", scenes.entrySet().toString());
+                    "ERROR: SceneManager:Known scenes are '%s'.%n", scenes.entrySet().toString());
         }
 
     }

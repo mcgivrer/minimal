@@ -67,7 +67,7 @@ public class DemoScene extends AbstractScene {
                 .setImage(backgroundImg)
                 .setPhysicType(PhysicType.STATIC)
                 .setLayer(0)
-                .setPriority(1);
+                .setPriority(0);
         add(backgroundImage);
 
         // create Stars
@@ -84,8 +84,8 @@ public class DemoScene extends AbstractScene {
                 .setBorderWidth(1)
                 .setShadowColor(Color.BLACK)
                 .setShadowWidth(2)
-                .setLayer(20)
-                .setPriority(1)
+                .setLayer(2)
+                .setPriority(20)
                 .setStickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
                     @Override
@@ -285,19 +285,6 @@ public class DemoScene extends AbstractScene {
 
             add(e);
         }
-    }
-
-    @Override
-    public void input(Game g, InputHandler ih) {
-        if (ih.getKey(KeyEvent.VK_ESCAPE)) {
-            g.setExit(false);
-            g.getSceneManager().activate("title");
-        }
-    }
-
-    @Override
-    public void draw(Game g, Renderer r) {
-
     }
 
     @Override

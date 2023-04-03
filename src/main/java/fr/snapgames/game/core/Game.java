@@ -1,15 +1,6 @@
 package fr.snapgames.game.core;
 
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.swing.JPanel;
-
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
@@ -22,6 +13,12 @@ import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Main Game Java2D test.
