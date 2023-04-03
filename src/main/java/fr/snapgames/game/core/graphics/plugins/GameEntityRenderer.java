@@ -28,6 +28,7 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
                     if (direction) {
                         g.drawImage(e.image,
                                 (int) e.position.x, (int) e.position.y,
+                                (int) e.size.x, (int) e.size.y,
                                 null);
                     } else {
                         g.drawImage(e.image,

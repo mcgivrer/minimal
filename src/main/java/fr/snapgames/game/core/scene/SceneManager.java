@@ -4,7 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.configuration.Configuration;
 
 /**
  * <p>The {@link SceneManager} intends to activate one of multiple {@link Scene} instances according
@@ -42,7 +44,7 @@ public class SceneManager {
     }
 
     /**
-     * <p>Initialize the service, taking configuration value from the {@link Configuration} class.
+     * <p>Initialize the service, taking configuration value from the {@link OldConfiguration} class.
      * Load all {@link Scene}'s implementation listed in to the <code>game.scene.list</code> configuration key.</p>
      * <p>After loaded and store all class implementation into the internal scene available list,
      * activates the default {@link Scene}, defined in to the configuration key <code>game.scene.default</code>.</p>
@@ -72,27 +74,19 @@ public class SceneManager {
     public void initialize(Game g) {
         this.game = g;
         config = g.getConfiguration();
-        String listOfScene = config.getString("game.scene.list", "");
-        List<String> scenesList;
-        if (listOfScene.contains(",")) {
-            scenesList = Arrays.asList(config.getString("game.scene.list", "").split(","));
-        } else {
-            scenesList = new ArrayList<>();
-            scenesList.add(listOfScene);
-        }
+        List<String> scenesList = (List<String>) config.get(ConfigAttribute.SCENE_LIST);
 
-        if (!scenesList.isEmpty()) {
-            scenesList.forEach(s -> {
-                String[] kv = s.split(":");
-                try {
-                    Class<? extends Scene> sceneToAdd = (Class<? extends Scene>) Class.forName(kv[1]);
-                    availableScenes.put(kv[0], sceneToAdd);
-                    System.out.printf("SceneManager:Add scene %s:%s%n", kv[0], kv[1]);
-                } catch (ClassNotFoundException e) {
-                    System.err.printf("SceneManager:Unable to load class %s%n", kv[1]);
-                }
-            });
-        }
+        scenesList.forEach(s -> {
+            String[] kv = s.split(":");
+            try {
+                Class<? extends Scene> sceneToAdd = (Class<? extends Scene>) Class.forName(kv[1]);
+                availableScenes.put(kv[0], sceneToAdd);
+                System.out.printf("INFO: SceneManager:Add scene %s:%s%n", kv[0], kv[1]);
+            } catch (ClassNotFoundException e) {
+                System.err.printf("ERROR: SceneManager:Unable to load class %s%n", kv[1]);
+            }
+        });
+
     }
 
     /**
@@ -108,7 +102,7 @@ public class SceneManager {
      * Default Scene activation according to the
      */
     public void activateDefaultScene() {
-        String defaultSceneName = config.getString("game.scene.default", "demo");
+        String defaultSceneName = (String) config.get(ConfigAttribute.SCENE_DEFAULT);
         activate(defaultSceneName);
     }
 
@@ -128,29 +122,37 @@ public class SceneManager {
      * @see AbstractScene
      */
     public void activate(String name) {
-        if (!scenes.containsKey(name) && availableScenes.containsKey(name)) {
+        if (availableScenes.containsKey(name)) {
             Class<? extends Scene> sceneClass = availableScenes.get(name);
             if (Optional.ofNullable(activeScene).isPresent()) {
                 activeScene.dispose(game);
+                System.out.printf("INFO: SceneManager: the Scene %s has been disposed.%n", activeScene.getName());
             }
             try {
-                Scene s = sceneClass.getConstructor(Game.class, String.class).newInstance(game, name);
-                add(s);
-                s.initialize(game);
-                s.loadResources(game);
-                s.create(game);
-                this.activeScene = s;
-                System.out.printf("SceneManager:Scene %s instance has been activated%n", sceneClass.getName());
+                if (!scenes.containsKey(name)) {
+                    Scene s = sceneClass.getConstructor(Game.class, String.class).newInstance(game, name);
+                    add(s);
+                    this.activeScene = s;
+
+                    System.out.printf("INFO: SceneManager: Scene %s instance has been instantiated.%n", sceneClass.getName());
+                } else {
+                    activeScene = scenes.get(name);
+                    System.out.printf("INFO: SceneManager: the Scene %s has been pop from scene cache.%n", activeScene.getName());
+                }
+                activeScene.initialize(game);
+                activeScene.loadResources(game);
+                activeScene.create(game);
+
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                      NoSuchMethodException e) {
-                System.err.printf("SceneManager:Unable to create Scene %s instance:%s%n", sceneClass.getName(), e.getMessage());
+                System.err.printf("ERROR: SceneManager:Unable to create Scene %s instance:%s%n", sceneClass.getName(), e.getMessage());
             }
         } else {
             System.err.printf(
-                    "SceneManager:The Scene %s does not exists in configuration file for key '%s'.%n",
+                    "ERROR: SceneManager:The Scene %s does not exists in configuration file for key '%s'.%n",
                     name, name);
             System.err.printf(
-                    "SceneManager:Known scenes are '%s'.%n", scenes.entrySet().toString());
+                    "ERROR: SceneManager:Known scenes are '%s'.%n", scenes.entrySet().toString());
         }
 
     }

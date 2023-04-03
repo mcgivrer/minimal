@@ -1,11 +1,11 @@
 package fr.snapgames.game.core.resources;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import javax.imageio.ImageIO;
 
 /**
  * {@link ResourceManager} is a static library providing utility to load and cache resources like images.

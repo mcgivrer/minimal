@@ -1,17 +1,18 @@
-package fr.snapgames.game.demo101.scenes.io;
+package fr.snapgames.game.demo101.io;
 
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.io.ActionListener;
 import fr.snapgames.game.core.math.World;
-import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.demo101.scenes.DemoScene;
-import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
+import fr.snapgames.game.demo101.behaviors.CoinBehavior;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Manage demo operation on entity to add or remove.
@@ -19,7 +20,7 @@ import java.util.List;
  * @author Frédéric Delorme
  * @since 0.0.2
  **/
-public class DemoListener implements KeyListener {
+public class DemoListener implements ActionListener {
     private final Game game;
     DemoScene scene;
     Configuration config;
@@ -30,16 +31,6 @@ public class DemoListener implements KeyListener {
         this.scene = scene;
         config = g.getConfiguration();
         world = g.getPhysicEngine().getWorld();
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
     }
 
     @Override
@@ -55,12 +46,17 @@ public class DemoListener implements KeyListener {
                 removeNbObjectByNameFilter("ball_", 10);
             }
             case KeyEvent.VK_B -> {
-                if (scene.getEntities().get("backgroundImage").isActive()) {
-                    scene.getEntities().get("backgroundImage").setActive(false);
-                    scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(true));
-                } else {
-                    scene.getEntities().get("backgroundImage").setActive(true);
-                    scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(false));
+                GameEntity backGndImd = scene.getEntities().get("backgroundImage");
+                if (Optional.ofNullable(backGndImd).isPresent()) {
+                    if (backGndImd.isActive()) {
+                        backGndImd.setActive(false);
+                        scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_"))
+                                .forEach(e2 -> e2.setActive(true));
+                    } else {
+                        backGndImd.setActive(true);
+                        scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_"))
+                                .forEach(e2 -> e2.setActive(false));
+                    }
                 }
             }
             case KeyEvent.VK_G -> {
@@ -110,7 +106,8 @@ public class DemoListener implements KeyListener {
     /**
      * Remove all {@link GameEntity} based on a filtering name.
      *
-     * @param objectNameFilter the object name filter used to remove corresponding {@link GameEntity}.
+     * @param objectNameFilter the object name filter used to remove corresponding
+     *                         {@link GameEntity}.
      */
     private void removeAllObjectByNameFilter(String objectNameFilter) {
         List<GameEntity> toBeRemoved = new ArrayList<>();

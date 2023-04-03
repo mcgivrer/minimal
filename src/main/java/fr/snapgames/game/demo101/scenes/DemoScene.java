@@ -3,18 +3,17 @@ package fr.snapgames.game.demo101.scenes;
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.entity.*;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
 import fr.snapgames.game.core.io.InputHandler;
+import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.*;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.scenes.behaviors.CoinBehavior;
-import fr.snapgames.game.demo101.scenes.behaviors.RainEffectBehavior;
-import fr.snapgames.game.demo101.scenes.behaviors.StormBehavior;
-import fr.snapgames.game.demo101.scenes.behaviors.WindyWeatherBehavior;
-import fr.snapgames.game.demo101.scenes.io.DemoListener;
+import fr.snapgames.game.demo101.behaviors.*;
+import fr.snapgames.game.demo101.io.DemoListener;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -23,7 +22,11 @@ import java.awt.image.BufferedImage;
 import java.util.Optional;
 
 /**
+ * The {@link DemoScene} implements in a demonstration purpose all the features
+ * available in the Mini'mal framework.
+ *
  * @author Frédéric Delorme
+ * @since 0.0.1
  **/
 public class DemoScene extends AbstractScene {
 
@@ -53,37 +56,37 @@ public class DemoScene extends AbstractScene {
     @Override
     public void create(Game g) {
         // define world play area with constrains
-        int worldWidth = config.getInteger("game.world.width", 1008);
-        int worldHeight = config.getInteger("game.world.height", 640);
-        World world = pe.getWorld().setPlayArea(new Dimension(worldWidth, worldHeight));
+        Dimension playArea = (Dimension) config.get(ConfigAttribute.PLAY_AREA_SIZE);
+        World world = pe.getWorld().setPlayArea(playArea);
 
         demoListener = new DemoListener(g, this);
         g.getInputHandler().addListener(demoListener);
 
-        //Add Background Image
+        // Add Background Image
         GameEntity backgroundImage = new GameEntity("backgroundImage")
                 .setImage(backgroundImg)
+                .setPhysicType(PhysicType.STATIC)
                 .setLayer(0)
-                .setPriority(1);
+                .setPriority(0);
         add(backgroundImage);
 
         // create Stars
         createStars("star", 500, world, false);
 
         // Add a score display
-        int viewportWidth = config.getInteger("game.camera.viewport.width", 320);
+        Dimension viewport = (Dimension) config.get(ConfigAttribute.VIEWPORT_SIZE);
         TextEntity score = (TextEntity) new TextEntity("score")
                 .setText("")
                 .setFont(g.getFont().deriveFont(20.0f))
-                .setPosition(new Vector2D(viewportWidth - 80, 35))
+                .setPosition(new Vector2D(viewport.width - 80, 35))
                 .setColor(Color.WHITE)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
                 .setShadowColor(Color.BLACK)
                 .setShadowWidth(2)
-                .setLayer(20)
-                .setPriority(3)
-                .stickToCamera(true)
+                .setLayer(2)
+                .setPriority(20)
+                .setStickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
                     @Override
                     public void update(Game game, TextEntity entity, double dt) {
@@ -93,22 +96,28 @@ public class DemoScene extends AbstractScene {
                             entity.setText(String.format("%05d", score));
                         }
                     }
-
-                    @Override
-                    public void input(Game game, TextEntity entity) {
-
-                    }
-
-                    @Override
-                    public void draw(Game game, Graphics2D g, TextEntity entity) {
-
-                    }
                 });
         add(score);
 
+        TextEntity pauseText = (TextEntity) new TextEntity("pause")
+                .setText(I18n.get("game.state.pause.message"))
+                .setFont(g.getFont().deriveFont(20.0f))
+                .setPhysicType(PhysicType.STATIC)
+                .setPosition(new Vector2D(viewport.width * 0.5, viewport.height * 0.5))
+                .setColor(Color.WHITE)
+                .setBorderColor(Color.DARK_GRAY)
+                .setBorderWidth(1)
+                .setShadowColor(Color.BLACK)
+                .setShadowWidth(2)
+                .setLayer(20)
+                .setPriority(1)
+                .setStickToCamera(true)
+                .setActive(false);
+        add(pauseText);
+
         // Create a player
         GameEntity player = new GameEntity("player")
-                .setPosition(new Vector2D(worldWidth / 2.0, worldHeight / 2.0))
+                .setPosition(new Vector2D(playArea.width / 2.0, playArea.height / 2.0))
                 .setImage(playerImg)
                 .setColor(Color.BLUE)
                 .setMaterial(Material.RUBBER)
@@ -120,15 +129,10 @@ public class DemoScene extends AbstractScene {
                 .setPriority(1)
                 .addBehavior(new Behavior<GameEntity>() {
                     @Override
-                    public void update(Game game, GameEntity entity, double dt) {
-
-                    }
-
-                    @Override
                     public void input(Game game, GameEntity entity) {
-                        double accel = (Double) entity.getAttribute("speedStep", 1.0);
-                        accel = inputHandler.isShiftPressed() ? accel * 4.0 : accel;
-                        accel = inputHandler.isCtrlPressed() ? accel * 2.0 : accel;
+                        double accel = (Double) entity.getAttribute("speedStep", 0.02);
+                        accel = inputHandler.isShiftPressed() ? accel * 2.0 : accel;
+                        accel = inputHandler.isCtrlPressed() ? accel * 1.5 : accel;
 
                         if (inputHandler.getKey(KeyEvent.VK_UP)) {
                             entity.forces.add(new Vector2D(0, -accel * 3.0));
@@ -145,11 +149,6 @@ public class DemoScene extends AbstractScene {
                             entity.forces.add(new Vector2D(-accel, 0));
                         }
                     }
-
-                    @Override
-                    public void draw(Game game, Graphics2D g, GameEntity entity) {
-
-                    }
                 });
         add(player);
 
@@ -160,7 +159,8 @@ public class DemoScene extends AbstractScene {
         createRain("rain", 200, world);
 
         // add an ambient light
-        Light ambiantLight = (Light) new Light("ambiant", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
+        Light ambiantLight = (Light) new Light("ambiant",
+                new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
                 .setLayer(2)
                 .setPriority(1)
@@ -172,27 +172,37 @@ public class DemoScene extends AbstractScene {
         createSpotLights("spot", 10, world);
 
         // define Camera to track player.
-        int vpWidth = config.getInteger("game.camera.viewport.width", 320);
-        int vpHeight = config.getInteger("game.camera.viewport.height", 200);
+        Influencer water = (Influencer) new Influencer("water")
+                .setType(EntityType.RECTANGLE)
+                .setPosition(new Vector2D(0, playArea.height * 0.85))
+                .setSize(new Vector2D(playArea.width, playArea.height * 0.15))
+                .setColor(new Color(0.0f, 0.3f, 0.8f, 0.7f))
+                .setBorderColor(Color.CYAN)
+                .setBorderWidth(1)
+                .setMaterial(Material.WATER)
+                .addForce(world.getGravity().multiply(0.98))
+                .setLayer(11)
+                .setPriority(2);
+        add(water);
 
         Camera cam = new Camera("camera")
                 .setTarget(player)
                 .setTween(0.1)
-                .setViewport(new Rectangle2D.Double(0, 0, vpWidth, vpHeight));
+                .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height));
         renderer.setCurrentCamera(cam);
-
 
         // add randomly wind.
         add(new WindyWeatherBehavior(20.0, 0.0, 0.3, 5.0));
+        add(new PauseBehavior(pauseText));
     }
 
     private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
-
+        Dimension starArea = new Dimension(world.getPlayArea().width, (int) (world.getPlayArea().height * 0.85));
         for (int i = 0; i < nbStars; i++) {
             GameEntity star = new GameEntity(prefixEntityName + "_" + i)
                     .setType(EntityType.CIRCLE)
                     .setPhysicType(PhysicType.STATIC)
-                    .setPosition(RandomUtils.ramdomVector(world.getPlayArea()))
+                    .setPosition(RandomUtils.ramdomVector(starArea))
                     .setSize(new Vector2D(1.0, 1.0))
                     .setColor(Color.WHITE)
                     .setLayer(5)
@@ -275,19 +285,6 @@ public class DemoScene extends AbstractScene {
 
             add(e);
         }
-    }
-
-    @Override
-    public void input(Game g, InputHandler ih) {
-        if (ih.getKey(KeyEvent.VK_ESCAPE)) {
-            g.setExit(false);
-            g.getSceneManager().activate("title");
-        }
-    }
-
-    @Override
-    public void draw(Game g, Renderer r) {
-
     }
 
     @Override

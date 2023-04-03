@@ -11,9 +11,12 @@ import java.awt.*;
  * @since 0.0.1
  */
 public interface Behavior<T> {
-    void update(Game game, T entity, double dt);
+    default void update(Game game, T entity, double dt) {
+    }
 
-    void input(Game game, T entity);
+    default void input(Game game, T entity) {
+    }
 
-    void draw(Game game, Graphics2D g, T entity);
+    default void draw(Game game, Graphics2D g, T entity) {
+    }
 }

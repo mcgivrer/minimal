@@ -1,14 +1,13 @@
-package fr.snapgames.game.demo101.scenes.behaviors;
+package fr.snapgames.game.demo101.behaviors;
+
+import java.awt.Graphics2D;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.math.PhysicEngine;
-import fr.snapgames.game.core.math.RandomUtils;
 import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.core.scene.Scene;
-
-import java.awt.*;
 
 /**
  * crete a random windy on the current action world object.

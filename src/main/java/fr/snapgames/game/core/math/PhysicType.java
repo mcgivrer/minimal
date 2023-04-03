@@ -1,9 +1,8 @@
 package fr.snapgames.game.core.math;
 
 /**
- * @author : M313104
- * @mailto : buy@mail.com
- * @created : 26/01/2023
+ * @author Frédéric Delorme
+ * @since 0.0.3
  **/
 public enum PhysicType {
     STATIC,
