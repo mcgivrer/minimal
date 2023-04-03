@@ -1,8 +1,18 @@
 package fr.snapgames.game.core;
 
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.swing.JPanel;
+
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.graphics.Animations;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.Window;
 import fr.snapgames.game.core.io.GameKeyListener;
@@ -11,12 +21,6 @@ import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
-
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.util.*;
-
-import javax.swing.JPanel;
 
 /**
  * Main Game Java2D test.
@@ -45,13 +49,14 @@ public class Game extends JPanel {
     // Internal components
     private OldConfiguration config;
 
-    fr.snapgames.game.core.graphics.Window window;
+    private Window window;
     // all the services.
     private InputHandler inputHandler;
     private Renderer renderer;
 
     private PhysicEngine physicEngine;
     private SceneManager scm;
+    private Animations animations;
 
     /**
      * Create Game by loading configuration from the default game.properties file,
@@ -120,7 +125,8 @@ public class Game extends JPanel {
     /**
      * Draw all things on screen.
      *
-     * @param stats a list of stats in a {@link Map} to be displayed in the debug bar.
+     * @param stats a list of stats in a {@link Map} to be displayed in the debug
+     *              bar.
      */
     private void draw(Map<String, Object> stats) {
         renderer.draw(stats);
@@ -214,8 +220,7 @@ public class Game extends JPanel {
             try {
                 Thread.sleep((long) (fpsDelay - dt) / 1000);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                System.err.printf("ERROR: Unable to wait for %d ms: %s%n", fpsDelay - dt, e.getMessage());
             }
         }
     }
@@ -242,8 +247,8 @@ public class Game extends JPanel {
         return pause;
     }
 
-    public void setExit(boolean b) {
-        exit = true;
+    public void setExit(boolean requestExit) {
+        exit = requestExit;
     }
 
     public OldConfiguration getConfiguration() {
@@ -266,6 +271,10 @@ public class Game extends JPanel {
         return scm;
     }
 
+    public Animations getAnimations() {
+        return this.animations;
+    }
+
     /**
      * Entry point for executing game.
      *
@@ -284,6 +293,7 @@ public class Game extends JPanel {
     public boolean isDebugGreaterThan(int minDebug) {
         return debug > minDebug;
     }
+
     public void requestPause(boolean pause) {
         this.pause = pause;
     }
