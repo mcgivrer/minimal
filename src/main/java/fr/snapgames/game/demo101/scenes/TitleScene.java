@@ -56,8 +56,9 @@ public class TitleScene extends AbstractScene {
         Font fontMessage = g2d.getFont().deriveFont(Font.BOLD, 9.0f);
 
         String titleString = I18n.get("game.title.main");
-        int titleTextWidth = g2d.getFontMetrics().stringWidth(titleString);
         g2d.setFont(fontTitle);
+        int titleTextWidth = g2d.getFontMetrics().stringWidth(titleString);
+
         TextEntity titleTxt = (TextEntity) new TextEntity(("titleTxt"))
                 .setText(titleString)
                 .setFont(fontTitle)
