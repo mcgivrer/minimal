@@ -239,8 +239,7 @@ public class DemoScene extends AbstractScene {
                         world.getPlayArea().getHeight()))
                 .setLayer(1)
                 .setPriority(1)
-                .addBehavior(new RainEffectBehavior(world, Color.CYAN));
-
+                .addBehavior(new RainEffectBehavior(world, Color.CYAN,world.getWind()));
         for (int i = 0; i < nbParticles; i++) {
             GameEntity p = new GameEntity(pes.name + "_" + i)
                     .setType(EntityType.CIRCLE)
@@ -253,7 +252,7 @@ public class DemoScene extends AbstractScene {
                     .setColor(Color.CYAN)
                     .setLayer(1)
                     .setPriority(i)
-                    .setMass(1.0)
+                    .setMass(0.1)
                     .setMaterial(Material.AIR);
             pes.getChild().add(p);
         }
