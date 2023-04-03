@@ -1,15 +1,14 @@
 package fr.snapgames.game.core.io;
 
-import fr.snapgames.game.core.Game;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import fr.snapgames.game.core.Game;
 
 /**
  * Internal Input listener.
@@ -33,7 +32,6 @@ public class InputHandler implements KeyListener {
     public void keyTyped(KeyEvent e) {
         if (Optional.ofNullable(game).isPresent()) {
             checkMetaKeys(e);
-            game.keyTyped(e);
             listeners.forEach(kl -> kl.keyPressed(e));
         }
     }

@@ -21,7 +21,8 @@ import java.awt.image.BufferedImage;
 import java.util.Optional;
 
 /**
- * The {@link DemoScene} implements in a demonstration purpose all the features available in the Mini'mal framework.
+ * The {@link DemoScene} implements in a demonstration purpose all the features
+ * available in the Mini'mal framework.
  *
  * @author Frédéric Delorme
  * @since 0.0.1
@@ -61,7 +62,7 @@ public class DemoScene extends AbstractScene {
         demoListener = new DemoListener(g, this);
         g.getInputHandler().addListener(demoListener);
 
-        //Add Background Image
+        // Add Background Image
         GameEntity backgroundImage = new GameEntity("backgroundImage")
                 .setImage(backgroundImg)
                 .setPhysicType(PhysicType.STATIC)
@@ -86,7 +87,7 @@ public class DemoScene extends AbstractScene {
                 .setShadowWidth(2)
                 .setLayer(20)
                 .setPriority(1)
-                .stickToCamera(true)
+                .setStickToCamera(true)
                 .addBehavior(new Behavior<TextEntity>() {
                     @Override
                     public void update(Game game, TextEntity entity, double dt) {
@@ -95,16 +96,6 @@ public class DemoScene extends AbstractScene {
                             int score = (int) p.getAttribute("score", 0);
                             entity.setText(String.format("%05d", score));
                         }
-                    }
-
-                    @Override
-                    public void input(Game game, TextEntity entity) {
-
-                    }
-
-                    @Override
-                    public void draw(Game game, Graphics2D g, TextEntity entity) {
-
                     }
                 });
         add(score);
@@ -121,7 +112,7 @@ public class DemoScene extends AbstractScene {
                 .setShadowWidth(2)
                 .setLayer(20)
                 .setPriority(1)
-                .stickToCamera(true)
+                .setStickToCamera(true)
                 .setActive(false);
         add(pauseText);
 
@@ -138,11 +129,6 @@ public class DemoScene extends AbstractScene {
                 .setLayer(10)
                 .setPriority(1)
                 .addBehavior(new Behavior<GameEntity>() {
-                    @Override
-                    public void update(Game game, GameEntity entity, double dt) {
-
-                    }
-
                     @Override
                     public void input(Game game, GameEntity entity) {
                         double accel = (Double) entity.getAttribute("speedStep", 0.02);
@@ -163,11 +149,6 @@ public class DemoScene extends AbstractScene {
                             entity.setDirection(-1);
                             entity.forces.add(new Vector2D(-accel, 0));
                         }
-                    }
-
-                    @Override
-                    public void draw(Game game, Graphics2D g, GameEntity entity) {
-
                     }
                 });
         add(player);
@@ -209,7 +190,6 @@ public class DemoScene extends AbstractScene {
                 .setTween(0.1)
                 .setViewport(new Rectangle2D.Double(0, 0, vpWidth, vpHeight));
         renderer.setCurrentCamera(cam);
-
 
         // add randomly wind.
         add(new WindyWeatherBehavior(20.0, 0.0, 0.3, 5.0));

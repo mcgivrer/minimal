@@ -1,18 +1,20 @@
 package fr.snapgames.game.core.entity;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
 import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.PhysicType;
 import fr.snapgames.game.core.math.Vector2D;
-
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.*;
-import java.util.List;
 
 /**
  * Entity managed by Game.
@@ -40,7 +42,7 @@ public class GameEntity {
     public int borderWidth;
 
     public Map<String, Object> attributes = new HashMap<>();
-    public List<Behavior> behaviors = new ArrayList<>();
+    public List<Behavior<?>> behaviors = new ArrayList<>();
     public Rectangle2D box;
 
     /**
@@ -67,7 +69,8 @@ public class GameEntity {
     private int priority;
 
     /**
-     * Create a new {@link GameEntity} with a name, and set all characteristics to default values.
+     * Create a new {@link GameEntity} with a name, and set all characteristics to
+     * default values.
      *
      * @param name Name of the new entity.
      */
@@ -92,7 +95,7 @@ public class GameEntity {
         return this;
     }
 
-    public GameEntity stickToCamera(boolean flag) {
+    public GameEntity setStickToCamera(boolean flag) {
         this.stickToCamera = flag;
         return this;
     }
@@ -113,7 +116,8 @@ public class GameEntity {
     }
 
     /**
-     * Set the image attribute. if the image is not null, use the image dimension to set {@link GameEntity#size}.
+     * Set the image attribute. if the image is not null, use the image dimension to
+     * set {@link GameEntity#size}.
      *
      * @param i the {@link BufferedImage} ti set as {@link GameEntity} image.
      * @return the updated {@link GameEntity}.
@@ -126,7 +130,6 @@ public class GameEntity {
         }
         return this;
     }
-
 
     public GameEntity setSpeed(Vector2D speed) {
         this.speed = speed;
@@ -148,7 +151,8 @@ public class GameEntity {
      * {@link fr.snapgames.game.core.graphics.Renderer#drawEntitesDebug(Graphics2D)}
      * to display realtime information.
      *
-     * @return the corresponding {@link Collection} of {@link String} containing the debug information to be displayed.
+     * @return the corresponding {@link Collection} of {@link String} containing the
+     *         debug information to be displayed.
      */
     public Collection<String> getDebugInfo() {
         List<String> ls = new ArrayList<>();
@@ -199,7 +203,7 @@ public class GameEntity {
         return this;
     }
 
-    public GameEntity addBehavior(Behavior b) {
+    public GameEntity addBehavior(Behavior<?> b) {
         this.behaviors.add(b);
         return this;
     }

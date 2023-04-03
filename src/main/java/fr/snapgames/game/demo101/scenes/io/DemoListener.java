@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Manage demo operation on entity to add or remove.
@@ -55,12 +56,16 @@ public class DemoListener implements KeyListener {
             }
             case KeyEvent.VK_B -> {
                 GameEntity backGndImd = scene.getEntities().get("backgroundImage");
-                if (backGndImd.isActive()) {
-                    backGndImd.setActive(false);
-                    scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(true));
-                } else {
-                    backGndImd.setActive(true);
-                    scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_")).forEach(e2 -> e2.setActive(false));
+                if (Optional.ofNullable(backGndImd).isPresent()) {
+                    if (backGndImd.isActive()) {
+                        backGndImd.setActive(false);
+                        scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_"))
+                                .forEach(e2 -> e2.setActive(true));
+                    } else {
+                        backGndImd.setActive(true);
+                        scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_"))
+                                .forEach(e2 -> e2.setActive(false));
+                    }
                 }
             }
             case KeyEvent.VK_G -> {
@@ -110,7 +115,8 @@ public class DemoListener implements KeyListener {
     /**
      * Remove all {@link GameEntity} based on a filtering name.
      *
-     * @param objectNameFilter the object name filter used to remove corresponding {@link GameEntity}.
+     * @param objectNameFilter the object name filter used to remove corresponding
+     *                         {@link GameEntity}.
      */
     private void removeAllObjectByNameFilter(String objectNameFilter) {
         List<GameEntity> toBeRemoved = new ArrayList<>();

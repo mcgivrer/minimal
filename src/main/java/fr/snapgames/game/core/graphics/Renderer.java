@@ -1,22 +1,33 @@
 package fr.snapgames.game.core.graphics;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.graphics.plugins.*;
+import fr.snapgames.game.core.graphics.plugins.GameEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.InfluencerRenderer;
+import fr.snapgames.game.core.graphics.plugins.LightRenderer;
+import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
+import fr.snapgames.game.core.graphics.plugins.TextEntityRenderer;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.World;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 /**
  * Renderer service to draw every GameEntity on screen.
@@ -60,7 +71,8 @@ public class Renderer {
     }
 
     private static int compare(GameEntity e1, GameEntity e2) {
-        return e1.getLayer() == e2.getLayer() ? (Integer.compare(e1.getPriority(), e2.getPriority())) : e1.getLayer() > e2.getLayer() ? 1 : -1;
+        return e1.getLayer() == e2.getLayer() ? (Integer.compare(e1.getPriority(), e2.getPriority()))
+                : e1.getLayer() > e2.getLayer() ? 1 : -1;
     }
 
     public void addPlugin(RendererPlugin<?> rendererPlugin) {
@@ -80,7 +92,7 @@ public class Renderer {
 
             // draw all entities according to Camera
             pipeline.stream()
-                    .filter(e -> e.isActive() && isInViewPort(currentCamera,e))
+                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
                     .sorted((e1, e2) -> e1.getPriority() > e2.getPriority() ? 1 : -1)
                     .forEach(entity -> {
                         // draw Scene
@@ -118,10 +130,15 @@ public class Renderer {
     }
 
     private boolean isInViewPort(Camera currentCamera, GameEntity e) {
-        if(currentCamera!=null){
 
+        if (currentCamera != null) {
+            if (e.box.contains(currentCamera.viewport)) {
+                return true;
+            } else {
+                return currentCamera.viewport.contains(e.box);
+            }
         }
-        return false;
+        return true;
     }
 
     private void drawPauseMode(Graphics2D g) {
@@ -131,9 +148,9 @@ public class Renderer {
         g.setFont(g.getFont().deriveFont(Font.ITALIC, 14.0f).deriveFont(Font.BOLD));
         String pauseTxt = I18n.get("game.state.pause.message");
         int lng = g.getFontMetrics().stringWidth(pauseTxt);
-        g.drawString(pauseTxt, ((int) currentCamera.viewport.getWidth() - lng) / 2, ((int) currentCamera.viewport.getHeight() + 12) / 2);
+        g.drawString(pauseTxt, ((int) currentCamera.viewport.getWidth() - lng) / 2,
+                ((int) currentCamera.viewport.getHeight() + 12) / 2);
     }
-
 
     public void drawEntity(Graphics2D g, GameEntity entity) {
         entity.setDrawnBy(null);
@@ -180,7 +197,7 @@ public class Renderer {
 
     private void drawEntitesDebug(Graphics2D g) {
         entities.values().stream()
-                .filter(e -> e.isActive() && inCameraViewport(currentCamera, e))
+                .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
                 .sorted(Renderer::compare)
                 .forEach(v -> {
                     if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
@@ -190,7 +207,8 @@ public class Renderer {
                         RendererPlugin rp = ((RendererPlugin) plugins.get(v.getClass()));
                         rp.drawDebug(this, g, v);
                     } else {
-                        System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", v.getClass().getName());
+                        System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n",
+                                v.getClass().getName());
                     }
 
                     if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
@@ -213,7 +231,6 @@ public class Renderer {
         g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
         g.drawString(String.format("targ: %s", camera.target.name), 20, 44);
     }
-
 
     public void setCurrentCamera(Camera cam) {
         this.currentCamera = cam;

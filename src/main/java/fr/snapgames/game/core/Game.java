@@ -2,7 +2,6 @@ package fr.snapgames.game.core;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +32,7 @@ public class Game extends JPanel {
     // Frames to be rendered
     double FPS = 60.0;
     double fpsDelay = 1000000.0 / 60.0;
-    double scale = 2.0;
+    double scale = 1.0;
     // debug level
     int debug = 0;
     // some internal flags
@@ -82,10 +81,11 @@ public class Game extends JPanel {
      * @see OldConfiguration
      */
     public Game(String configFilePath, boolean mode) {
-        this.testMode = testMode;
+        this.testMode = mode;
         config = new OldConfiguration(configFilePath);
         debug = config.getInteger("game.debug", 0);
         FPS = config.getDouble("game.screen.fps", 60.0);
+        scale = config.getDouble("game.screen.scale", 1.0);
         fpsDelay = 1000000.0 / FPS;
 
         // retrieve some Window parameters
@@ -220,6 +220,7 @@ public class Game extends JPanel {
             try {
                 Thread.sleep((long) (fpsDelay - dt) / 1000);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 System.err.printf("ERROR: Unable to wait for %d ms: %s%n", fpsDelay - dt, e.getMessage());
             }
         }
@@ -234,9 +235,6 @@ public class Game extends JPanel {
         initialize(args);
         loop();
         dispose();
-    }
-
-    public void keyTyped(KeyEvent e) {
     }
 
     public int getDebug() {

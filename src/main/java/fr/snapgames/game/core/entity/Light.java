@@ -10,12 +10,10 @@ public class Light extends GameEntity {
 
     private float intensity;
 
-    private LightType type;
     private GameEntity target;
     private LightType lightType;
     // parameter to generate intensity fluctuation
     private float dIntensity = 1.0f;
-    private double distance;
     public float[] dist = {0f, 1f};
     public Color[] colors = {new Color(0.0f, 0.0f, 0.0f, 0.0f), new Color(0.0f, 0.0f, 0.0f, 1.0f)};
 

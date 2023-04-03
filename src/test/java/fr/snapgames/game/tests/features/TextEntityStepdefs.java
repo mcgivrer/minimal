@@ -1,14 +1,10 @@
 package fr.snapgames.game.tests.features;
 
-import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.entity.TextEntity;
-import io.cucumber.java8.En;
 import org.junit.jupiter.api.Assertions;
 
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.entity.TextEntity;
+import io.cucumber.java8.En;
 
 /**
  * Test steps for the {@link fr.snapgames.game.core.entity.TextEntity} class.

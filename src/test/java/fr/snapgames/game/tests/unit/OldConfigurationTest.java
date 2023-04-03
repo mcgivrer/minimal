@@ -2,8 +2,6 @@ package fr.snapgames.game.tests.unit;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
  * TODO implements unit test for {@link fr.snapgames.game.core.config.OldConfiguration}
  */

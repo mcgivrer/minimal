@@ -17,7 +17,7 @@ import fr.snapgames.game.core.resources.ResourceManager;
  * @since 1.0.1
  */
 public class Animations {
-    Map<String, Animation> animations = new HashMap<>();
+    Map<String, Animation> animationList = new HashMap<>();
 
     /**
      * Initialize a bunch of animation fom the animationFile properties.
@@ -74,7 +74,7 @@ public class Animations {
                         args[0],
                         args[1].equals("loop"),
                         args[2].substring("{".length(), args[2].length() - "}".length()).split("\\+"));
-                animations.put(animName, anim);
+                animationList.put(animName, anim);
             }
         } catch (IOException e) {
             System.err.printf("ERROR: %s animatin file not found: %s%n", animationFile, e.getMessage());
@@ -98,11 +98,11 @@ public class Animations {
         int i = 0;
         for (String f : framesDef) {
             String[] val = f.split(",");
-            int x = Integer.valueOf(val[0]);
-            int y = Integer.valueOf(val[1]);
-            int w = Integer.valueOf(val[2]);
-            int h = Integer.valueOf(val[3]);
-            int frameTime = Integer.valueOf(val[4]);
+            int x = Integer.parseInt(val[0]);
+            int y = Integer.parseInt(val[1]);
+            int w = Integer.parseInt(val[2]);
+            int h = Integer.parseInt(val[3]);
+            int frameTime = Integer.parseInt(val[4]);
             imgs[i] = imageSource.getSubimage(x, y, w, h);
             frameTimes[i] = frameTime;
             i++;
@@ -118,6 +118,6 @@ public class Animations {
      * @return the corresponding initialized {@link Animation} instance.
      */
     public Animation get(String animKey) {
-        return animations.get(animKey);
+        return animationList.get(animKey);
     }
 }

@@ -22,7 +22,7 @@ public class InfluencerRenderer implements RendererPlugin<Influencer> {
     @Override
     public void draw(Renderer r, Graphics2D g, Influencer e) {
         switch (e.type) {
-            case RECTANGLE:
+            case RECTANGLE -> {
                 if (Optional.ofNullable(e.borderColor).isPresent()) {
                     Stroke b = g.getStroke();
                     g.setColor(e.borderColor);
@@ -37,7 +37,8 @@ public class InfluencerRenderer implements RendererPlugin<Influencer> {
                         (int) e.position.x, (int) e.position.y,
                         (int) e.size.x, (int) e.size.y);
                 break;
-            case CIRCLE:
+            }
+            case CIRCLE -> {
                 Ellipse2D el = new Ellipse2D.Double(
                         e.position.x, e.position.y,
                         e.size.x, e.size.y);
@@ -52,6 +53,10 @@ public class InfluencerRenderer implements RendererPlugin<Influencer> {
                 g.setPaint(e.color);
                 g.fill(el);
                 break;
+            }
+            default -> {
+                System.err.printf("Unkown how to draw this Influcener instance %s%n.", e.name);
+            }
         }
     }
 
