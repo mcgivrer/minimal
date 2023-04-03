@@ -7,7 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.io.InputHandler;
@@ -85,5 +86,11 @@ public abstract class AbstractScene implements Scene {
         behaviors.stream().forEach(b -> {
             b.update(game, this, dt);
         });
+    }
+
+    @Override
+    public void draw(Game g, Renderer r) {
+        // A default empty implementation.
+
     }
 }

@@ -1,30 +1,22 @@
-package fr.snapgames.game.demo101.scenes.io;
+package fr.snapgames.game.demo101.io;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.io.ActionListener;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 /**
- * @author : M313104
- * @mailto : buy@mail.com
- * @created : 06/02/2023
+ * The {@link fr.snapgames.game.demo101.scenes.TitleScene} input handler to manage keys on the title page.
+ *
+ * @author Frédéric Delorme
+ * @since 0.0.2
  **/
-public class TitleListener implements KeyListener {
+public class TitleListener implements ActionListener {
     Game game;
 
     public TitleListener(Game g) {
         this.game = g;
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
     }
 
     @Override

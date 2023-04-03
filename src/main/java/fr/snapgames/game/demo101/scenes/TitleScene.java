@@ -1,8 +1,8 @@
 package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.audio.SoundClip;
-import fr.snapgames.game.core.config.Configuration;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.entity.TextEntity;
 import fr.snapgames.game.core.graphics.Renderer;
@@ -11,7 +11,7 @@ import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.scenes.io.TitleListener;
+import fr.snapgames.game.demo101.io.TitleListener;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -47,12 +47,11 @@ public class TitleScene extends AbstractScene {
     @Override
     public void create(Game g) {
         Configuration config = g.getConfiguration();
-        double width = config.getInteger("game.camera.viewport.width", 320);
-        double height = config.getInteger("game.camera.viewport.height", 200);
-
+        Dimension viewport = (Dimension) config.get(ConfigAttribute.VIEWPORT_SIZE);
 
         GameEntity bckImage = new GameEntity("background")
-                .setImage(backgroundImg);
+                .setImage(backgroundImg)
+                .setPriority(0);
         add(bckImage);
 
 
@@ -61,8 +60,9 @@ public class TitleScene extends AbstractScene {
         Font fontMessage = g2d.getFont().deriveFont(Font.BOLD, 9.0f);
 
         String titleString = I18n.get("game.title.main");
-        int titleTextWidth = g2d.getFontMetrics().stringWidth(titleString);
         g2d.setFont(fontTitle);
+        int titleTextWidth = g2d.getFontMetrics().stringWidth(titleString);
+
         TextEntity titleTxt = (TextEntity) new TextEntity(("titleTxt"))
                 .setText(titleString)
                 .setFont(fontTitle)
@@ -71,7 +71,8 @@ public class TitleScene extends AbstractScene {
                 .setShadowWidth(4)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
-                .setPosition(new Vector2D(((width - titleTextWidth) * 0.5), height * 0.4));
+                .setPriority(2)
+                .setPosition(new Vector2D(((viewport.width - titleTextWidth) * 0.5), viewport.height * 0.4));
         add(titleTxt);
 
         String msgString = I18n.get("game.title.message");
@@ -85,7 +86,8 @@ public class TitleScene extends AbstractScene {
                 .setShadowWidth(2)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
-                .setPosition(new Vector2D(((width - msgTextWidth) * 0.5), height * 0.80));
+                .setPriority(2)
+                .setPosition(new Vector2D(((viewport.width - msgTextWidth) * 0.5), viewport.height * 0.80));
         add(msgTxt);
 
         g.getInputHandler().addListener(titleListener);
@@ -98,11 +100,6 @@ public class TitleScene extends AbstractScene {
                 ih.getKey(KeyEvent.VK_SPACE)) {
 
         }
-    }
-
-    @Override
-    public void draw(Game g, Renderer r) {
-
     }
 
     @Override

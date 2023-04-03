@@ -1,14 +1,12 @@
 package fr.snapgames.game.core.resources;
 
-import fr.snapgames.game.core.audio.SoundClip;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 /**
  * {@link ResourceManager} is a static library providing utility to load and cache resources like images.

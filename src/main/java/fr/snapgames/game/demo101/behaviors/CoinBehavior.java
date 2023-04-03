@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.scenes.behaviors;
+package fr.snapgames.game.demo101.behaviors;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.audio.SoundClip;
@@ -56,11 +56,12 @@ public class CoinBehavior implements Behavior<GameEntity> {
             double attrDist = (double) entity.attributes.get("attractionDistance");
             double attrForce = (double) entity.attributes.get("attractionForce");
 
-            if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
+            if (p.position.add(entity.size).distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
                 Vector2D v = p.position.substract(entity.position);
                 entity.forces.add(v.normalize().multiply(attrForce));
             }
-            if (p.position.add(entity.size.multiply(0.5)).distance(entity.position.add(p.size.multiply(0.25))) < entity.size.add(p.size)
+            if (p.position.add(entity.size.multiply(0.50)).distance(entity.position.add(p.size.multiply(0.50)))
+                    < entity.size.add(p.size)
                     .multiply(0.25).length()) {
                 entity.setActive(false);
                 int score = (int) p.getAttribute("score", 0);
