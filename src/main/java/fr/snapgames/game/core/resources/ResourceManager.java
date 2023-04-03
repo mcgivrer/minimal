@@ -1,7 +1,11 @@
 package fr.snapgames.game.core.resources;
 
+import fr.snapgames.game.core.audio.SoundClip;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +18,7 @@ import javax.imageio.ImageIO;
  * <p>
  * A very simple approach consists in caching the read object, ad pull them from cache when already existing.
  * <ol>
- *     <li>Load Image resource : {@link ResourceManager#loadImage(String)} :
+ *     <li>Load Image resource : {@link ResourceManager#getImage(String)} :
  * <pre>
  *     BufferedImage img = ResourceManager.loadImage("/path/to/my/image.png");
  * </pre>
@@ -35,15 +39,38 @@ public class ResourceManager {
     private static Map<String, Object> resources = new HashMap<>();
 
     /**
-     * Request for an image. If image already exists in cache, pull it fom.
+     * Request for an image. If {@link BufferedImage} already exists in cache, pull it fom.
      *
      * @param filePath the path to the image to be loaded.
      * @return a BufferedImage instance corresponding to the loaded image. If file not found, return null.
      */
-    public static BufferedImage loadImage(String filePath) {
+    public static BufferedImage getImage(String filePath) {
         if (!addResource(filePath)) return null;
         return (BufferedImage) resources.get(filePath);
     }
+
+    /**
+     * Request for an {@link SoundClip}. If {@link SoundClip} already exists in cache, pull it fom.
+     *
+     * @param filePath the path to the image to be loaded.
+     * @return a BufferedImage instance corresponding to the loaded image. If file not found, return null.
+     */
+    public static SoundClip getSoundClip(String filePath) {
+        if (!addResource(filePath)) return null;
+        return (SoundClip) resources.get(filePath);
+    }
+
+    /**
+     * Request for an {@link Font}. If {@link Font} already exists in cache, pull it fom.
+     *
+     * @param filePath the path to the image to be loaded.
+     * @return a BufferedImage instance corresponding to the loaded image. If file not found, return null.
+     */
+    public static Font getFont(String filePath) {
+        if (!addResource(filePath)) return null;
+        return (Font) resources.get(filePath);
+    }
+
 
     /**
      * Add a resource to the internal cache.
@@ -61,12 +88,54 @@ public class ResourceManager {
                         img = ImageIO.read(ResourceManager.class.getResourceAsStream(filePath));
                         resources.put(filePath, img);
                     } catch (IOException e) {
-                        System.err.printf("Game:Unable to read image %s: %s", filePath, e.getMessage());
+                        System.err.printf("ERROR: Unable to read image %s: %s", filePath, e.getMessage());
                         return false;
                     }
                 }
             }
+            case "MP3", "WAV", "OGG" -> {
+                if (!resources.containsKey(filePath)) {
+                    try {
+                        loadSound(filePath, ResourceManager.class.getResourceAsStream(filePath));
+                    } catch (Exception e) {
+                        System.err.printf("ERROR: Unable to read sound clip %s: %s", filePath, e.getMessage());
+                        return false;
+                    }
+                }
+            }
+            case "TTF" -> {
+                if (!resources.containsKey(filePath)) {
+                    try {
+                        loadFont(filePath, ResourceManager.class.getResourceAsStream(filePath));
+                    } catch (Exception e) {
+                        System.err.printf("ERROR: Unable to read font %s: %s", filePath, e.getMessage());
+                        return false;
+                    }
+                }
+            }
+
         }
         return true;
+    }
+
+    private static void loadSound(String path, InputStream stream) {
+        SoundClip sc = new SoundClip(path, stream);
+        if (sc != null) {
+            resources.put(path, sc);
+        }
+        System.out.printf("INFO: '%s' added as an audio resource", path);
+    }
+
+    private static void loadFont(String path, InputStream stream) {
+        // load a Font resource
+        try {
+            Font font = Font.createFont(Font.TRUETYPE_FONT, stream);
+            if (font != null) {
+                resources.put(path, font);
+                System.out.printf("INFO: '%s' added as a font resource", path);
+            }
+        } catch (FontFormatException | IOException e) {
+            System.err.printf("ERROR: Unable to read font from %s%n", path);
+        }
     }
 }

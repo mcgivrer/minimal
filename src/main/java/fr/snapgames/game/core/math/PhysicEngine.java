@@ -1,8 +1,7 @@
 package fr.snapgames.game.core.math;
 
-import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
@@ -14,12 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.OldConfiguration;
-import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.entity.Influencer;
 
 /**
  * {@link PhysicEngine} compute acceleration, velocity and position for all {@link GameEntity}

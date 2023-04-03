@@ -1,6 +1,7 @@
 package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.audio.SoundClip;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
@@ -39,6 +40,8 @@ public class DemoScene extends AbstractScene {
     private BufferedImage coinImg;
     private DemoListener demoListener;
 
+    private SoundClip collectCoinSound;
+
     public DemoScene(Game g, String name) {
         super(g, name);
     }
@@ -51,10 +54,10 @@ public class DemoScene extends AbstractScene {
 
     @Override
     public void loadResources(Game g) {
-        backgroundImg = ResourceManager.loadImage("/images/backgrounds/forest.jpg");
-        playerImg = ResourceManager.loadImage("/images/sprites01.png").getSubimage(0, 0, 32, 32);
-        coinImg = ResourceManager.loadImage("/images/tiles01.png").getSubimage(8 * 16, 6 * 16, 16, 16);
-
+        backgroundImg = ResourceManager.getImage("/images/backgrounds/forest.jpg");
+        playerImg = ResourceManager.getImage("/images/sprites01.png").getSubimage(0, 0, 32, 32);
+        coinImg = ResourceManager.getImage("/images/tiles01.png").getSubimage(8 * 16, 6 * 16, 16, 16);
+        g.getSoundSystem().load("collectCoin", "/audio/sounds/collect-coin.wav");
     }
 
     @Override
@@ -274,6 +277,7 @@ public class DemoScene extends AbstractScene {
         getEntities().clear();
         game.getPhysicEngine().reset();
         game.getRenderer().reset();
+        collectCoinSound.stop();
         if (Optional.ofNullable(demoListener).isPresent()) {
             g.getInputHandler().removeListener(demoListener);
         }

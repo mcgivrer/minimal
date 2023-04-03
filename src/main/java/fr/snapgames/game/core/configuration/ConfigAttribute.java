@@ -1,5 +1,6 @@
 package fr.snapgames.game.core.configuration;
 
+import fr.snapgames.game.core.audio.SoundSystem;
 import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.utils.StringUtils;
@@ -200,7 +201,22 @@ public enum ConfigAttribute implements IConfigAttribute {
             "game.window.strategy",
             "Define the number of display buffer"
             , 1,
-            Integer::valueOf);
+            Integer::valueOf),
+    AUDIO_SOUND_VOLUME("soundVolume",
+            "game.sound.volume",
+            "set Audio Sound volume",
+            1.0f,
+            Float::valueOf),
+    AUDIO_SOUND_NB_MAX_SAMPLE(
+            "soundMaxSample",
+            "game.sound.max.sample",
+            "Set the max number of sample to be cached in memory",
+            SoundSystem.MAX_SOUNDS_IN_STACK,
+            Integer::valueOf),
+    AUDIO_SOUND_MUTE_ON("soundMute",
+            "game.sound.mute",
+            "Set sound mute", false,
+            Boolean::parseBoolean);
     private final String attrName;
     private final String attrDescription;
     private final Object attrDefaultValue;

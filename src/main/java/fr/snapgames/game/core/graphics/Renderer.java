@@ -1,34 +1,20 @@
 package fr.snapgames.game.core.graphics;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
-
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.graphics.plugins.GameEntityRenderer;
-import fr.snapgames.game.core.graphics.plugins.InfluencerRenderer;
-import fr.snapgames.game.core.graphics.plugins.LightRenderer;
-import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
-import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
-import fr.snapgames.game.core.graphics.plugins.TextEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.*;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.World;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Renderer service to draw every GameEntity on screen.
