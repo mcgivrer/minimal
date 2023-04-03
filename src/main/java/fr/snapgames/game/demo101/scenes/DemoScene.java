@@ -53,7 +53,7 @@ public class DemoScene extends AbstractScene {
         backgroundImg = ResourceManager.getImage("/images/backgrounds/forest.jpg");
         playerImg = ResourceManager.getImage("/images/sprites01.png").getSubimage(0, 0, 32, 32);
         coinImg = ResourceManager.getImage("/images/tiles01.png").getSubimage(8 * 16, 6 * 16, 16, 16);
-        g.getSoundSystem().load("collectCoin","/audio/sounds/collect-coin.wav");
+        g.getSoundSystem().load("collectCoin", "/audio/sounds/collect-coin.wav");
     }
 
     @Override
@@ -162,7 +162,11 @@ public class DemoScene extends AbstractScene {
         createRain("rain", 200, world);
 
         // add an ambient light
-        Light ambientLight = (Light) new Light("ambient", new Rectangle2D.Double(0, 0, worldWidth, worldHeight), 0.2f)
+        Light ambientLight = (Light) new Light("ambient",
+                new Rectangle2D.Double(0, 0,
+                        world.getPlayArea().width,
+                        world.getPlayArea().height),
+                0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
                 .setLayer(2)
                 .setPriority(1)

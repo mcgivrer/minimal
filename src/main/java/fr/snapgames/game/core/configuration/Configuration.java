@@ -220,4 +220,5 @@ public class Configuration {
             System.err.printf("OldConfiguration:Unable to save configuration into properties file: %s%n", e.getMessage());
         }
     }
+
 }

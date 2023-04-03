@@ -94,7 +94,7 @@ public class Animations {
     public Animation loadAnimation(String imageSrcPath, boolean loop, String[] framesDef) {
         BufferedImage[] imgs = new BufferedImage[framesDef.length];
         long[] frameTimes = new long[framesDef.length];
-        BufferedImage imageSource = ResourceManager.loadImage(imageSrcPath);
+        BufferedImage imageSource = ResourceManager.getImage(imageSrcPath);
         int i = 0;
         for (String f : framesDef) {
             String[] val = f.split(",");

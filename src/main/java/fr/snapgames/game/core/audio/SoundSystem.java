@@ -1,6 +1,7 @@
 package fr.snapgames.game.core.audio;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.resources.ResourceManager;
 
 import javax.sound.sampled.AudioFileFormat.Type;
@@ -22,7 +23,7 @@ public class SoundSystem {
     /**
      * Max number of SoundClip to be stored in cache.
      */
-    private static final int MAX_SOUNDS_IN_STACK = 40;
+    public static final int MAX_SOUNDS_IN_STACK = 40;
 
     /**
      * Internal play Stack
@@ -120,7 +121,7 @@ public class SoundSystem {
                 SoundClip sc = soundBank.get(code);
                 float soundVolume = ((game != null &&
                         game.getConfiguration() != null) ?
-                        game.getConfiguration().getFloat("game.sound.volume", 1.0f) : 1.0f);
+                        (float) game.getConfiguration().get(ConfigAttribute.AUDIO_SOUND_VOLUME) : 1.0f);
                 sc.play(0.5f, volume * soundVolume);
                 System.out.printf("INFO: Play sound %s with volume %s%n", code, volume);
             } else {
@@ -193,14 +194,14 @@ public class SoundSystem {
 
     public int initialize(Game game) {
         this.game = game;
-        int maxSoundStack = game.getConfiguration().getInteger("game.sound.max.sample", MAX_SOUNDS_IN_STACK);
+        int maxSoundStack = (int) game.getConfiguration().get(ConfigAttribute.AUDIO_SOUND_NB_MAX_SAMPLE);
         soundsStack.setSize(maxSoundStack);
         System.out.printf("INFO: Initialize SoundControl with %s stack places%n", MAX_SOUNDS_IN_STACK);
         Type[] supportedFiletypes = AudioSystem.getAudioFileTypes();
         for (Type t : supportedFiletypes) {
             System.out.printf("INFO: supported file format '%s'%n", t);
         }
-        this.mute = game.getConfiguration().getBoolean("game.sound.mute", false);
+        this.mute = (boolean) game.getConfiguration().get(ConfigAttribute.AUDIO_SOUND_MUTE_ON);
         Mixer.Info[] infos = AudioSystem.getMixerInfo();
         for (Info info : infos) {
             System.out.printf("INFO: Mixer info: %s%n", info);

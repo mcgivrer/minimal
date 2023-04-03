@@ -1,5 +1,8 @@
 package fr.snapgames.game.core.resources;
 
+import fr.snapgames.game.core.audio.SoundClip;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;

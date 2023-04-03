@@ -1,6 +1,7 @@
 package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.audio.SoundClip;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
