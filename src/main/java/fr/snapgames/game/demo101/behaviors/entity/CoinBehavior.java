@@ -18,7 +18,8 @@ public class CoinBehavior implements Behavior<GameEntity> {
             setDashLine(g);
             double attrDist = (double) e.getAttribute("attractionDistance", 0);
             if (attrDist > 0) {
-                g.setColor(Color.YELLOW);
+                Color debugColor = (Color) e.getAttribute("debugAttrColor", Color.YELLOW);
+                g.setColor(debugColor);
 
                 g.draw(e.getCollisionBox());
             }
@@ -54,6 +55,9 @@ public class CoinBehavior implements Behavior<GameEntity> {
             if (entity.getCollisionBox().getBounds2D().intersects(p.getBoundingBox().getBounds2D())) {
                 Vector2D v = p.position.substract(entity.position);
                 entity.forces.add(v.normalize().multiply(attrForce));
+                entity.setAttribute("debugAttrColor", Color.RED);
+            } else {
+                entity.setAttribute("debugAttrColor", Color.YELLOW);
             }
             if (entity.getBoundingBox().intersects(p.getBoundingBox().getBounds2D()) && entity.isActive()) {
                 entity.setActive(false);
