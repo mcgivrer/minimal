@@ -5,6 +5,6 @@ pipeline:
     commands:
       - curl -s "https://get.sdkman.io" | bash 
       - source "$HOME/.sdkman/bin/sdkman-init.sh"
-      - sdk end install
+      - sdk env install
       - mvn clean install
 
