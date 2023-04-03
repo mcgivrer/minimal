@@ -44,6 +44,7 @@ public class GameEntity {
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior<?>> behaviors = new ArrayList<>();
     public Shape box;
+    public Shape collisionBox;
 
     /**
      * Child entities for this one. Mainly used by {@link ParticlesEntity}.
@@ -273,11 +274,9 @@ public class GameEntity {
         switch (type) {
             case CIRCLE -> {
                 this.box = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
-
             }
             default -> {
                 this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
-
             }
         }
     }
@@ -315,5 +314,14 @@ public class GameEntity {
 
     public EntityType getType() {
         return type;
+    }
+
+    public GameEntity setCollisionBox(Shape collisionBox) {
+        this.collisionBox = collisionBox;
+        return this;
+    }
+
+    public Shape getCollisionBox() {
+        return this.collisionBox;
     }
 }

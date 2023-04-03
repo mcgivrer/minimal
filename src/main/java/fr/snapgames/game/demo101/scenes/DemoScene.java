@@ -2,6 +2,7 @@ package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.audio.SoundClip;
+import fr.snapgames.game.core.audio.SoundSystem;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
@@ -277,7 +278,7 @@ public class DemoScene extends AbstractScene {
         getEntities().clear();
         game.getPhysicEngine().reset();
         game.getRenderer().reset();
-        collectCoinSound.stop();
+        game.getSoundSystem().stopAll();
         if (Optional.ofNullable(demoListener).isPresent()) {
             g.getInputHandler().removeListener(demoListener);
         }

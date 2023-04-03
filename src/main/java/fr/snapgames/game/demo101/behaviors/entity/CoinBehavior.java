@@ -19,10 +19,8 @@ public class CoinBehavior implements Behavior<GameEntity> {
             double attrDist = (double) e.getAttribute("attractionDistance", 0);
             if (attrDist > 0) {
                 g.setColor(Color.YELLOW);
-                Ellipse2D el = new Ellipse2D.Double(
-                        e.position.x - (attrDist), e.position.y - (attrDist),
-                        e.size.x + (attrDist * 2.0), e.size.y + (attrDist * 2.0));
-                g.draw(el);
+
+                g.draw(e.getCollisionBox());
             }
             g.setStroke(bckUp);
         }
@@ -48,18 +46,21 @@ public class CoinBehavior implements Behavior<GameEntity> {
         if (Optional.ofNullable(p).isPresent()) {
             double attrDist = (double) entity.attributes.get("attractionDistance");
             double attrForce = (double) entity.attributes.get("attractionForce");
-
-            if (p.position.add(entity.size).distance(entity.position.add(p.size.multiply(0.5))) < attrDist) {
+            entity.setCollisionBox(new Ellipse2D.Double(
+                    entity.position.x - ((attrDist - entity.size.x) * 0.5),
+                    entity.position.y - ((attrDist - entity.size.y) * 0.5),
+                    attrDist,
+                    attrDist));
+            if (entity.getCollisionBox().getBounds2D().intersects(p.getBoundingBox().getBounds2D())) {
                 Vector2D v = p.position.substract(entity.position);
                 entity.forces.add(v.normalize().multiply(attrForce));
             }
-            if (p.position.add(entity.size.multiply(0.50)).distance(entity.position.add(p.size.multiply(0.50)))
-                    < entity.size.add(p.size)
-                    .multiply(0.25).length()) {
+            if (entity.getBoundingBox().intersects(p.getBoundingBox().getBounds2D()) && entity.isActive()) {
                 entity.setActive(false);
                 int score = (int) p.getAttribute("score", 0);
                 score += (int) p.getAttribute("value", 20);
                 p.setAttribute("score", score);
+                game.getSoundSystem().play("collectCoin", 1.0f);
             }
         }
     }
