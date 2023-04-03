@@ -1,0 +1,10 @@
+pipeline:
+  build:
+    image: alpine
+    pull: true
+    commands:
+      - curl -s "https://get.sdkman.io" | bash 
+      - source "$HOME/.sdkman/bin/sdkman-init.sh"
+      - sdk end install
+      - mvn clean install
+
