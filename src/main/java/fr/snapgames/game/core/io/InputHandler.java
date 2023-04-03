@@ -1,24 +1,24 @@
 package fr.snapgames.game.core.io;
 
+import fr.snapgames.game.core.Game;
+
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import fr.snapgames.game.core.Game;
-
 /**
  * Internal Input listener.
  *
  * @author Frédéric Delorme
+ * @since 0.0.2
  */
-public class InputHandler implements KeyListener {
+public class InputHandler implements ActionListener {
     Game game;
     private Map<Integer, KeyEvent> events = new ConcurrentHashMap<>();
-    private List<KeyListener> listeners = new CopyOnWriteArrayList<>();
+    private List<ActionListener> listeners = new CopyOnWriteArrayList<>();
     private boolean ctrlDown;
     private boolean shiftDown;
     private boolean altDown;
@@ -62,11 +62,11 @@ public class InputHandler implements KeyListener {
         return (events.containsKey(code));
     }
 
-    public void addListener(KeyListener keyListener) {
+    public void addListener(ActionListener keyListener) {
         listeners.add(keyListener);
     }
 
-    public void removeListener(KeyListener keyListener) {
+    public void removeListener(ActionListener keyListener) {
         listeners.remove(keyListener);
     }
 

@@ -1,6 +1,7 @@
 package fr.snapgames.game.demo101.io;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.io.ActionListener;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -11,21 +12,11 @@ import java.awt.event.KeyListener;
  * @author Frédéric Delorme
  * @since 0.0.2
  **/
-public class TitleListener implements KeyListener {
+public class TitleListener implements ActionListener {
     Game game;
 
     public TitleListener(Game g) {
         this.game = g;
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
     }
 
     @Override

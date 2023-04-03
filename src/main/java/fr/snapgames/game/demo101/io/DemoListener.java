@@ -3,6 +3,7 @@ package fr.snapgames.game.demo101.io;
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.io.ActionListener;
 import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.demo101.scenes.DemoScene;
 import fr.snapgames.game.demo101.behaviors.CoinBehavior;
@@ -19,7 +20,7 @@ import java.util.Optional;
  * @author Frédéric Delorme
  * @since 0.0.2
  **/
-public class DemoListener implements KeyListener {
+public class DemoListener implements ActionListener {
     private final Game game;
     DemoScene scene;
     Configuration config;
@@ -30,16 +31,6 @@ public class DemoListener implements KeyListener {
         this.scene = scene;
         config = g.getConfiguration();
         world = g.getPhysicEngine().getWorld();
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
     }
 
     @Override

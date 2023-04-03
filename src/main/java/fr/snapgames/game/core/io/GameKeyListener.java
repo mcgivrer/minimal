@@ -15,7 +15,7 @@ import java.awt.event.KeyListener;
  * @author Frédéric Delorme
  * @since 0.0.2
  **/
-public class GameKeyListener implements KeyListener {
+public class GameKeyListener implements ActionListener {
 
     private final Game game;
 
@@ -43,9 +43,9 @@ public class GameKeyListener implements KeyListener {
                 int debug = game.getDebug() + 1 < 5 ? game.getDebug() + 1 : 0;
                 game.setDebug(debug);
             }
-        }
-
-        if (e.getKeyCode() == KeyEvent.VK_P || e.getKeyCode() == KeyEvent.VK_PAUSE) {
+            default -> {
+                // nothing special for other keys.
+            }
         }
     }
 }

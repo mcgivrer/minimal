@@ -94,7 +94,10 @@ public class Renderer {
             // draw all entities according to Camera
             pipeline.stream()
                     .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
-                    .sorted((e1, e2) -> e1.getPriority() > e2.getPriority() ? 1 : -1)
+                    .sorted((e1, e2) -> e1.getLayer() == e2.getLayer()
+                            ? e1.getPriority() == e2.getPriority() ? 0
+                            : Integer.compare(e1.getPriority(), e2.getPriority())
+                            : Integer.compare(e1.getLayer(), e2.getLayer()))
                     .forEach(entity -> {
                         // draw Scene
                         if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
@@ -117,6 +120,9 @@ public class Renderer {
                     drawEntitesDebug(g);
                 }
             }
+            if (game.isUpdatePause()) {
+                drawPauseMode(g);
+            }
             g.dispose();
         }
         // remove inactive object.
@@ -129,10 +135,12 @@ public class Renderer {
     private boolean isInViewPort(Camera currentCamera, GameEntity e) {
 
         if (currentCamera != null) {
-            if (e.box.contains(currentCamera.viewport)) {
+            if (e.isStickToCamera()
+                    || (e.box.getWidth() > currentCamera.viewport.getWidth()
+                    && e.box.getHeight() > currentCamera.viewport.getHeight())) {
                 return true;
             } else {
-                return currentCamera.viewport.contains(e.box);
+                return currentCamera.viewport.intersects(e.box);
             }
         }
         return true;
@@ -212,14 +220,6 @@ public class Renderer {
                         currentCamera.postDraw(g);
                     }
                 });
-    }
-
-    private boolean inCameraViewport(Camera currentCamera, GameEntity e) {
-        if (Optional.ofNullable(currentCamera).isPresent()) {
-            return currentCamera.viewport.contains(e.box);
-        } else {
-            return false;
-        }
     }
 
     private void drawCameraDebug(Graphics2D g, Camera camera) {

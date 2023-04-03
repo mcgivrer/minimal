@@ -46,7 +46,8 @@ public class TitleScene extends AbstractScene {
         Dimension viewport = (Dimension) config.get(ConfigAttribute.VIEWPORT_SIZE);
 
         GameEntity bckImage = new GameEntity("background")
-                .setImage(backgroundImg);
+                .setImage(backgroundImg)
+                .setPriority(0);
         add(bckImage);
 
 
@@ -66,6 +67,7 @@ public class TitleScene extends AbstractScene {
                 .setShadowWidth(4)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
+                .setPriority(2)
                 .setPosition(new Vector2D(((viewport.width - titleTextWidth) * 0.5), viewport.height * 0.4));
         add(titleTxt);
 
@@ -80,6 +82,7 @@ public class TitleScene extends AbstractScene {
                 .setShadowWidth(2)
                 .setBorderColor(Color.DARK_GRAY)
                 .setBorderWidth(1)
+                .setPriority(2)
                 .setPosition(new Vector2D(((viewport.width - msgTextWidth) * 0.5), viewport.height * 0.80));
         add(msgTxt);
 
@@ -92,11 +95,6 @@ public class TitleScene extends AbstractScene {
                 ih.getKey(KeyEvent.VK_SPACE)) {
 
         }
-    }
-
-    @Override
-    public void draw(Game g, Renderer r) {
-
     }
 
     @Override

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.snapgames.game</groupId>
     <artifactId>minimal</artifactId>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>0.0.6-SNAPSHOT</version>
     <name>Minimal</name>
     <description>A project demonstrating how to create sustainable project in a Game dev context</description>
     <inceptionYear>2023</inceptionYear>
