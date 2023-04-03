@@ -120,9 +120,6 @@ public class Renderer {
                     drawEntitesDebug(g);
                 }
             }
-            if (game.isUpdatePause()) {
-                drawPauseMode(g);
-            }
             g.dispose();
         }
         // remove inactive object.
@@ -144,17 +141,6 @@ public class Renderer {
             }
         }
         return true;
-    }
-
-    private void drawPauseMode(Graphics2D g) {
-        g.setColor(new Color(0.3f, 0.6f, 0.4f, 0.9f));
-        g.fillRect(0, ((int) currentCamera.viewport.getHeight() - 24) / 2, (int) currentCamera.viewport.getWidth(), 24);
-        g.setColor(Color.WHITE);
-        g.setFont(g.getFont().deriveFont(Font.ITALIC, 14.0f).deriveFont(Font.BOLD));
-        String pauseTxt = I18n.get("game.state.pause.message");
-        int lng = g.getFontMetrics().stringWidth(pauseTxt);
-        g.drawString(pauseTxt, ((int) currentCamera.viewport.getWidth() - lng) / 2,
-                ((int) currentCamera.viewport.getHeight() + 12) / 2);
     }
 
     public void drawEntity(Graphics2D g, GameEntity entity) {

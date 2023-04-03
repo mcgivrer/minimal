@@ -16,10 +16,6 @@ public class PauseBehavior implements Behavior<Scene> {
 
     @Override
     public void update(Game game, Scene entity, double dt) {
-        if (game.isUpdatePause()) {
-            this.entity.setActive(true);
-        } else {
-            this.entity.setActive(false);
-        }
+        this.entity.setActive(game.isUpdatePause());
     }
 }

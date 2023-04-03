@@ -55,6 +55,7 @@ public class Game extends JPanel {
     private PhysicEngine physicEngine;
     private SceneManager scm;
     private Animations animations;
+    private boolean pauseAuthorized;
 
     /**
      * Create Game by loading configuration from the default game.properties file,
@@ -307,5 +308,13 @@ public class Game extends JPanel {
 
     public void requestPause(boolean pause) {
         this.pause = pause;
+    }
+
+    public boolean isPauseAuthorized() {
+        return this.pauseAuthorized;
+    }
+
+    public void setPauseAutorized(boolean authorized) {
+        this.pauseAuthorized = authorized;
     }
 }
