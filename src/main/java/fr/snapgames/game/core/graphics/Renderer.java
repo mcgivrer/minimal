@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.plugins.GameEntityRenderer;
@@ -37,7 +38,7 @@ import fr.snapgames.game.core.math.World;
  **/
 public class Renderer {
     BufferedImage buffer;
-    OldConfiguration config;
+    Configuration config;
     private Game game;
     private Color clearColor = Color.BLACK;
     private double scale;
@@ -60,7 +61,7 @@ public class Renderer {
     }
 
     public void addEntities(Collection<GameEntity> entities) {
-        entities.stream().forEach(e -> addEntity(e));
+        entities.forEach(this::addEntity);
     }
 
     public void addEntity(GameEntity e) {
@@ -117,15 +118,11 @@ public class Renderer {
                 }
             }
             g.dispose();
-            stats.put("pause", game.isUpdatePause() ? "On" : "Off");
-            stats.put("obj", game.getSceneManager().getActiveScene().getEntities().size());
-            stats.put("scn", game.getSceneManager().getActiveScene().getName());
-            stats.put("dbg", game.getDebug());
         }
         // remove inactive object.
         entities.values().stream()
                 .filter(e -> !e.isActive())
-                .collect(Collectors.toList())
+                .toList()
                 .forEach(ed -> entities.remove(ed.name));
     }
 
@@ -155,7 +152,7 @@ public class Renderer {
     public void drawEntity(Graphics2D g, GameEntity entity) {
         entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
-            RendererPlugin rp = ((RendererPlugin) plugins.get(entity.getClass()));
+            RendererPlugin rp = plugins.get(entity.getClass());
             rp.draw(this, g, entity);
             entity.setDrawnBy(rp.getClass());
         } else {

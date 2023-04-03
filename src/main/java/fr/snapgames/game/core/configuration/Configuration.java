@@ -1,6 +1,8 @@
 package fr.snapgames.game.core.configuration;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +52,7 @@ public class Configuration {
     // Configuration filename.
     private String configFile;
 
-
+    private final Properties parameters = new Properties();
     IConfigAttribute[] attributes;
     private Map<IConfigAttribute, Object> configurationValues = new ConcurrentHashMap<>();
 
@@ -168,19 +170,21 @@ public class Configuration {
      *
      * @return 0 if ok, else -1.
      */
-    public int parseConfigFile() {
+    public Configuration parseConfigFile() {
         int status = 0;
-        Properties props = new Properties();
         if (Optional.ofNullable(configFile).isPresent()) {
             try {
-                props.load(Configuration.class.getResourceAsStream(this.configFile));
-                for (Map.Entry<Object, Object> prop : props.entrySet()) {
+                parameters.load(Configuration.class.getResourceAsStream(this.configFile));
+                for (Map.Entry<Object, Object> prop : parameters.entrySet()) {
                     String[] kv = new String[]{(String) prop.getKey(), (String) prop.getValue()};
                     if (!isArgumentFound(kv)) {
                         logger.log(Level.SEVERE, "file={0} : Unknown property {1} with value {2}", new Object[]{
                                 this.configFile,
                                 prop.getKey(),
                                 prop.getValue()});
+                        if (parameters.containsKey(prop.getKey())) {
+                            parameters.setProperty(prop.getKey().toString(), prop.getValue().toString());
+                        }
                         status = -1;
                     } else {
                         logger.log(Level.INFO, "file={0} : set {1} to {2}", new Object[]{
@@ -198,7 +202,22 @@ public class Configuration {
         } else {
             status = -1;
         }
-        return status;
+        System.out.printf("INFO: File has been parsed.%n");
+        return this;
     }
 
+    /**
+     * Save changes to the previously loaded properties file.
+     */
+    public void save() {
+        try {
+            String rootPath = this.getClass().getResource("/").getPath();
+            OutputStream output = new FileOutputStream(rootPath + configFile);
+            parameters.store(output, "updated From CommandLine");
+            System.out.printf("OldConfiguration:OldConfiguration saved into the properties file: %s%n", configFile);
+            System.out.printf("OldConfiguration:Content: %s%n", parameters);
+        } catch (IOException e) {
+            System.err.printf("OldConfiguration:Unable to save configuration into properties file: %s%n", e.getMessage());
+        }
+    }
 }

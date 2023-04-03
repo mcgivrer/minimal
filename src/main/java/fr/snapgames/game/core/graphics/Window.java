@@ -1,6 +1,8 @@
 package fr.snapgames.game.core.graphics;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.configuration.IConfigAttribute;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.utils.StringUtils;
 
@@ -54,7 +56,7 @@ public class Window {
 
         frame.setVisible(true);
         if (frame.getBufferStrategy() == null) {
-            frame.createBufferStrategy(game.getConfiguration().getInteger("game.buffer.strategy", 2));
+            frame.createBufferStrategy((int) game.getConfiguration().get(ConfigAttribute.WINDOW_BUFFER_NUMBER));
         }
     }
 

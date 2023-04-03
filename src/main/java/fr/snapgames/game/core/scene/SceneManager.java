@@ -5,6 +5,8 @@ import java.util.*;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.configuration.Configuration;
 
 /**
  * <p>The {@link SceneManager} intends to activate one of multiple {@link Scene} instances according
@@ -26,9 +28,9 @@ public class SceneManager {
      */
     private final Map<String, Class<? extends Scene>> availableScenes = new HashMap<>();
     /**
-     * The parent {@link Game}'s {@link OldConfiguration} instance.
+     * The parent {@link Game}'s {@link Configuration} instance.
      */
-    private OldConfiguration config;
+    private Configuration config;
 
     private Scene activeScene;
 
@@ -72,27 +74,19 @@ public class SceneManager {
     public void initialize(Game g) {
         this.game = g;
         config = g.getConfiguration();
-        String listOfScene = config.getString("game.scene.list", "");
-        List<String> scenesList;
-        if (listOfScene.contains(",")) {
-            scenesList = Arrays.asList(config.getString("game.scene.list", "").split(","));
-        } else {
-            scenesList = new ArrayList<>();
-            scenesList.add(listOfScene);
-        }
+        List<String> scenesList = (List<String>) config.get(ConfigAttribute.SCENE_LIST);
 
-        if (!scenesList.isEmpty()) {
-            scenesList.forEach(s -> {
-                String[] kv = s.split(":");
-                try {
-                    Class<? extends Scene> sceneToAdd = (Class<? extends Scene>) Class.forName(kv[1]);
-                    availableScenes.put(kv[0], sceneToAdd);
-                    System.out.printf("SceneManager:Add scene %s:%s%n", kv[0], kv[1]);
-                } catch (ClassNotFoundException e) {
-                    System.err.printf("SceneManager:Unable to load class %s%n", kv[1]);
-                }
-            });
-        }
+        scenesList.forEach(s -> {
+            String[] kv = s.split(":");
+            try {
+                Class<? extends Scene> sceneToAdd = (Class<? extends Scene>) Class.forName(kv[1]);
+                availableScenes.put(kv[0], sceneToAdd);
+                System.out.printf("SceneManager:Add scene %s:%s%n", kv[0], kv[1]);
+            } catch (ClassNotFoundException e) {
+                System.err.printf("SceneManager:Unable to load class %s%n", kv[1]);
+            }
+        });
+
     }
 
     /**
@@ -108,7 +102,7 @@ public class SceneManager {
      * Default Scene activation according to the
      */
     public void activateDefaultScene() {
-        String defaultSceneName = config.getString("game.scene.default", "demo");
+        String defaultSceneName = (String) config.get(ConfigAttribute.SCENE_DEFAULT);
         activate(defaultSceneName);
     }
 

@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Animations;
 import fr.snapgames.game.core.graphics.Renderer;
@@ -46,7 +48,7 @@ public class Game extends JPanel {
     private boolean testMode;
 
     // Internal components
-    private OldConfiguration config;
+    private Configuration config;
 
     private Window window;
     // all the services.
@@ -78,31 +80,13 @@ public class Game extends JPanel {
      *                       only ONE loop in the game loop will be achieved, to let
      *                       the unit test manage
      *                       the looping strategy for test purpose.
-     * @see OldConfiguration
+     * @see Configuration
      */
     public Game(String configFilePath, boolean mode) {
-        this.testMode = mode;
-        config = new OldConfiguration(configFilePath);
-        debug = config.getInteger("game.debug", 0);
-        FPS = config.getDouble("game.screen.fps", 60.0);
-        scale = config.getDouble("game.screen.scale", 1.0);
-        fpsDelay = 1000000.0 / FPS;
-
-        // retrieve some Window parameters
-        String title = I18n.get("game.window.title");
-        Dimension dim = config.getDimension("game.window.size", new Dimension(640, 400));
-        // set input handlers
-        inputHandler = new InputHandler(this);
-        inputHandler.addListener(new GameKeyListener(this));
-        // Create the output window.
-        window = new Window(this, title, dim);
-        window.add(inputHandler);
-
-        // create services
-        renderer = new Renderer(this, config.getDimension("game.viewport.size", new Dimension(320, 200)));
-        physicEngine = new PhysicEngine(this);
-        scm = new SceneManager(this);
-        scm.initialize(this);
+        this.testMode = testMode;
+        config = new Configuration(ConfigAttribute.values())
+                .setConfigurationFile("/game.properties")
+                .parseConfigFile();
     }
 
     /**
@@ -111,7 +95,32 @@ public class Game extends JPanel {
      * @param args Java command line arguments
      */
     private void initialize(String[] args) {
-        config.parseArguments(args);
+        config.parseArgs(args);
+        debug = (int) config.get(ConfigAttribute.DEBUG_LEVEL);
+        FPS = (int) config.get(ConfigAttribute.RENDER_FPS);
+        fpsDelay = 1000000.0 / FPS;
+
+        // retrieve some Window parameters
+        String title = I18n.get("game.window.title");
+        Dimension dim = (Dimension) config.get(ConfigAttribute.WINDOW_SIZE);
+
+        // set input handlers
+        inputHandler = new InputHandler(this);
+        inputHandler.addListener(new GameKeyListener(this));
+
+        scale = (double) config.get(ConfigAttribute.WINDOW_SCALE);
+
+        // Create the output window.
+        window = new Window(this, title, dim);
+        window.add(inputHandler);
+
+        // create services
+        renderer = new Renderer(this, (Dimension) config.get(ConfigAttribute.VIEWPORT_SIZE));
+        physicEngine = new PhysicEngine(this);
+        scm = new SceneManager(this);
+        scm.initialize(this);
+
+
         scm.activateDefaultScene();
         create(window.getGraphics());
 
@@ -183,8 +192,10 @@ public class Game extends JPanel {
         long realUPS = 0;
         long timeFrame = 0;
         long loopCounter = 0;
+        int maxLoopCounter = (int) config.get(ConfigAttribute.EXIT_TEST_COUNT_FRAME);
         Map<String, Object> loopData = new HashMap<>();
-        while (!exit && !testMode) {
+        while (!exit && !testMode
+                && !(maxLoopCounter != -1 && loopCounter > maxLoopCounter)) {
             start = System.nanoTime() / 1000000.0;
             loopCounter++;
             input();
@@ -205,6 +216,11 @@ public class Game extends JPanel {
             loopData.put("cnt", loopCounter);
             loopData.put("fps", realFPS);
             loopData.put("ups", realUPS);
+
+            loopData.put("pause", isUpdatePause() ? "ON" : "OFF");
+            loopData.put("obj", getSceneManager().getActiveScene().getEntities().size());
+            loopData.put("scn", getSceneManager().getActiveScene().getName());
+            loopData.put("dbg", getDebug());
 
             draw(loopData);
             waitUntilStepEnd(dt);
@@ -249,7 +265,7 @@ public class Game extends JPanel {
         exit = requestExit;
     }
 
-    public OldConfiguration getConfiguration() {
+    public Configuration getConfiguration() {
         return config;
     }
 

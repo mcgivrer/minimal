@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.scenes.behaviors;
+package fr.snapgames.game.demo101.behaviors;
 
 import java.awt.Graphics2D;
 

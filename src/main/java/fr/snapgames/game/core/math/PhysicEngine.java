@@ -1,6 +1,14 @@
 package fr.snapgames.game.core.math;
 
-import java.awt.Dimension;
+import fr.snapgames.game.core.behaviors.Behavior;
+import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.config.OldConfiguration;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.configuration.Configuration;
+import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.entity.Influencer;
+
+import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +32,7 @@ public class PhysicEngine {
 
     private static final double TIME_FACTOR = 0.45;
     private final Game game;
-    private OldConfiguration config;
+    private Configuration config;
     private World world;
 
     private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
@@ -35,10 +43,10 @@ public class PhysicEngine {
     public PhysicEngine(Game g) {
         this.game = g;
         config = g.getConfiguration();
-        maxAcceleration = config.getDouble("game.physic.limit.acceleration.max", 4.0);
-        maxVelocity = config.getDouble("game.physic.limit.velocity.max", 4.0);
-        Dimension playArea = config.getDimension("game.physic.world.playarea", new Dimension(320, 200));
-        Vector2D gravity = config.getVector2D("game.physic.world.gravity", new Vector2D(0, 0));
+        maxAcceleration = (double) config.get(ConfigAttribute.PHYSIC_MAX_ACCELERATION_X);
+        maxVelocity = (double) config.get(ConfigAttribute.PHYSIC_MAX_SPEED_X);
+        Dimension playArea = (Dimension) config.get(ConfigAttribute.PLAY_AREA_SIZE);
+        Vector2D gravity = (Vector2D) config.get(ConfigAttribute.PHYSIC_GRAVITY);
         world = new World(playArea, gravity);
     }
 
@@ -73,7 +81,7 @@ public class PhysicEngine {
 
     public void updateEntity(GameEntity entity, double elapsed) {
 
-       if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
+        if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
             // apply gravity
             entity.forces.add(world.getGravity().negate());
             // Apply influencer Effects (Material and force impacted)

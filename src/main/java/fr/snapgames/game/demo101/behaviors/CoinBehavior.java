@@ -1,4 +1,4 @@
-package fr.snapgames.game.demo101.scenes.behaviors;
+package fr.snapgames.game.demo101.behaviors;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;

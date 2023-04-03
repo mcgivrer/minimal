@@ -1,5 +1,6 @@
 package fr.snapgames.game.core.utils;
 
+import java.awt.*;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -29,5 +30,19 @@ public class StringUtils {
         return "[" + stats.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(entry ->
                         entry.getKey() + ":" + entry.getValue())
                 .collect(Collectors.joining("|")) + "]";
+    }
+
+    /**
+     * Convert the String expression [width]x[height] ti a Dimension(width,height) instance
+     *
+     * @param value the String value to be parsed.
+     * @return a new Dimension of object of (width,height)
+     */
+    public static Dimension toDimension(String value) {
+        String[] interpretedValue = value
+                .split("x");
+        return new Dimension(
+                Integer.parseInt(interpretedValue[0]),
+                Integer.parseInt(interpretedValue[1]));
     }
 }
