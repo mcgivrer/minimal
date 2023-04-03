@@ -106,9 +106,6 @@ public class Renderer {
                     drawEntitesDebug(g);
                 }
             }
-            if (game.isUpdatePause()) {
-                drawPauseMode(g);
-            }
             g.dispose();
         }
         // remove inactive object.
@@ -122,25 +119,14 @@ public class Renderer {
 
         if (currentCamera != null) {
             if (e.isStickToCamera()
-                    || (e.box.getWidth() > currentCamera.viewport.getWidth()
-                    && e.box.getHeight() > currentCamera.viewport.getHeight())) {
+                    || (e.box.getBounds2D().getWidth() > currentCamera.viewport.getWidth()
+                    && e.box.getBounds2D().getHeight() > currentCamera.viewport.getHeight())) {
                 return true;
             } else {
-                return currentCamera.viewport.intersects(e.box);
+                return currentCamera.viewport.intersects(e.box.getBounds2D());
             }
         }
         return true;
-    }
-
-    private void drawPauseMode(Graphics2D g) {
-        g.setColor(new Color(0.3f, 0.6f, 0.4f, 0.9f));
-        g.fillRect(0, ((int) currentCamera.viewport.getHeight() - 24) / 2, (int) currentCamera.viewport.getWidth(), 24);
-        g.setColor(Color.WHITE);
-        g.setFont(g.getFont().deriveFont(Font.ITALIC, 14.0f).deriveFont(Font.BOLD));
-        String pauseTxt = I18n.get("game.state.pause.message");
-        int lng = g.getFontMetrics().stringWidth(pauseTxt);
-        g.drawString(pauseTxt, ((int) currentCamera.viewport.getWidth() - lng) / 2,
-                ((int) currentCamera.viewport.getHeight() + 12) / 2);
     }
 
     public void drawEntity(Graphics2D g, GameEntity entity) {
@@ -186,7 +172,7 @@ public class Renderer {
         g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
-    private void drawEntitesDebug(Graphics2D g) {
+    public void drawEntitesDebug(Graphics2D g) {
         entities.values().stream()
                 .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
                 .sorted(Renderer::compare)

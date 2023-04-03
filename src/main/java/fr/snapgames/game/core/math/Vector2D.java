@@ -86,12 +86,16 @@ public class Vector2D {
     }
 
     public Vector2D maximize(double maxAccel) {
-        if (Math.abs(x) > maxAccel) {
-            x = Math.signum(x) * maxAccel;
-        }
-        if (Math.abs(y) > maxAccel) {
-            y = Math.signum(y) * maxAccel;
-        }
+        maximize(maxAccel, maxAccel);
         return this;
+    }
+
+    public void maximize(double maxAccelX, double maxAccelY) {
+        if (Math.abs(x) > maxAccelX) {
+            x = Math.signum(x) * maxAccelX;
+        }
+        if (Math.abs(y) > maxAccelY) {
+            y = Math.signum(y) * maxAccelY;
+        }
     }
 }

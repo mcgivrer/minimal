@@ -63,7 +63,7 @@ public class PhysicEngine {
     public void update(double elapsed) {
         double time = elapsed * TIME_FACTOR;
         entities.values().stream()
-                .filter(e -> e.isActive() && !(e instanceof Influencer))
+                .filter(e -> !(e instanceof Influencer))
                 .forEach(entity -> {
                     updateEntity(entity, time);
                     if (Optional.ofNullable(world).isPresent()) {
@@ -72,6 +72,25 @@ public class PhysicEngine {
                 });
     }
 
+    /**
+     * Compute new acceleration speed and position for the {@link GameEntity} entity, according to the elapsed time.
+     *
+     * <p>The simplified famous <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/newtons-laws-of-motion/"
+     * title="go and visit NASA's web site about Newton's Laws of motion">Newton's physic's laws of motion</a>
+     * are applied to the {@link GameEntity}.</p>
+     *
+     * <p><strong>NOTE</strong> The acceleration and velocity for the {@link GameEntity} are threshold
+     * by a maximum speed define by the configuration attribute {@link ConfigAttribute#PHYSIC_MAX_ACCELERATION_X}
+     * and {@link ConfigAttribute#PHYSIC_MAX_SPEED_X}, BUT those value can be superseded by :
+     * <ul>
+     *     <li>the {@link GameEntity#attributes} entry <code>maxAccelX</code>,<code>maxAccelY</code> for x and y acceleration,</li>
+     *     <li>the {@link GameEntity#attributes} entry <code>maxVelX</code> and <code>maxVelY</code> for x and y velocity.</li>
+     * </ul>
+     * </p>
+     *
+     * @param entity  the {@link GameEntity} to be processed by the {@link PhysicEngine}.
+     * @param elapsed the elapsed time (in millisecond) since previous call.
+     */
     public void updateEntity(GameEntity entity, double elapsed) {
 
         if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
@@ -82,12 +101,16 @@ public class PhysicEngine {
             // compute acceleration
             entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(material.density);
             entity.acceleration = entity.acceleration.multiply((double) entity.mass);
-            entity.acceleration.maximize((double) entity.getAttribute("maxAcceleration", maxAcceleration));
+            entity.acceleration.maximize(
+                    (double) entity.getAttribute("maxAccelX", maxAcceleration),
+                    (double) entity.getAttribute("maxAccelY", maxAcceleration));
 
             // compute velocity
             double roughness = entity.contact == 0 ? world.getMaterial().roughness : world.getMaterial().roughness * material.roughness;
             entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed)).multiply(roughness);
-            entity.speed.maximize((double) entity.getAttribute("maxVelocity", maxVelocity));
+            entity.speed.maximize(
+                    (double) entity.getAttribute("maxVelX", maxVelocity),
+                    (double) entity.getAttribute("maxVelY", maxVelocity));
 
             // compute position
             entity.position = entity.position.add(entity.speed.multiply(elapsed));

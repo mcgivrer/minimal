@@ -40,6 +40,7 @@ public class Light extends GameEntity {
         setSize(new Vector2D(playArea.getWidth(), playArea.getHeight()));
         this.lightType = LightType.AMBIENT;
         this.intensity = intensity;
+        this.type = EntityType.RECTANGLE;
     }
 
     /**
@@ -60,6 +61,7 @@ public class Light extends GameEntity {
         this.intensity = intensity;
         this.lightType = LightType.SPOT;
         this.target = target;
+        this.type = EntityType.CIRCLE;
     }
 
     /**
@@ -80,6 +82,7 @@ public class Light extends GameEntity {
         setSize(new Vector2D(radius, radius));
         this.intensity = intensity;
         this.lightType = LightType.SPOT;
+        this.type = EntityType.CIRCLE;
     }
 
     public LightType getLightType() {
