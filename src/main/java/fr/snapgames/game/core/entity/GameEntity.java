@@ -23,8 +23,9 @@ import fr.snapgames.game.core.math.Vector2D;
  * @since 0.0.1
  */
 public class GameEntity {
-    public static long index = 0;
-    public String name = "noname" + (index++);
+    private static long index = 0;
+    private long id = ++index;
+    private String name = "noname" + (id);
     public Vector2D position = new Vector2D(0, 0);
     public Vector2D speed = new Vector2D(0, 0);
     public Vector2D acceleration = new Vector2D(0, 0);
@@ -68,6 +69,16 @@ public class GameEntity {
 
     private int layer;
     private int priority;
+    /**
+     * set to true if it can collide with other entities.
+     */
+    private boolean colliderFlag = true;
+    /**
+     * Set if this GameEntity ust be deleted.
+     *
+     * @see fr.snapgames.game.core.math.PhysicEngine
+     */
+    private boolean markAsDelete;
 
     /**
      * Create a new {@link GameEntity} with a name, and set all characteristics to
@@ -78,7 +89,6 @@ public class GameEntity {
     public GameEntity(String name) {
         this.name = name;
         this.active = true;
-        this.physicType = PhysicType.DYNAMIC;
         this.material = Material.DEFAULT;
         this.direction = 1;
         this.life = -1;
@@ -86,30 +96,40 @@ public class GameEntity {
         this.layer = 1;
         this.priority = 1;
         this.box = new Rectangle2D.Double();
+        this.collisionBox = new Rectangle2D.Double();
         attributes.put("maxSpeed", 8.0);
         attributes.put("maxAcceleration", 3.0);
 
     }
+
+    public static long getIndex() {
+        return index;
+    }
+
 
     public GameEntity setPosition(Vector2D pos) {
         this.position = pos;
         return this;
     }
 
+
     public GameEntity setStickToCamera(boolean flag) {
         this.stickToCamera = flag;
         return this;
     }
 
+
     public boolean isStickToCamera() {
         return stickToCamera;
     }
+
 
     public GameEntity setSize(Vector2D s) {
         this.size = s;
         updateBox();
         return this;
     }
+
 
     public GameEntity setType(EntityType t) {
         this.type = t;
@@ -123,24 +143,27 @@ public class GameEntity {
      * @param i the {@link BufferedImage} ti set as {@link GameEntity} image.
      * @return the updated {@link GameEntity}.
      */
+
     public GameEntity setImage(BufferedImage i) {
         if (Optional.ofNullable(i).isPresent()) {
             this.image = i;
-            setType(EntityType.IMAGE);
             setSize(new Vector2D(i.getWidth(), i.getHeight()));
         }
         return this;
     }
+
 
     public GameEntity setSpeed(Vector2D speed) {
         this.speed = speed;
         return this;
     }
 
+
     public GameEntity setMaterial(Material m) {
         this.material = m;
         return this;
     }
+
 
     public GameEntity setMass(double m) {
         this.mass = m;
@@ -155,6 +178,7 @@ public class GameEntity {
      * @return the corresponding {@link Collection} of {@link String} containing the
      * debug information to be displayed.
      */
+
     public Collection<String> getDebugInfo() {
         List<String> ls = new ArrayList<>();
         ls.add(String.format("name:%s", name));
@@ -165,15 +189,18 @@ public class GameEntity {
         return ls;
     }
 
+
     public GameEntity setAttribute(String key, Object value) {
         attributes.put(key, value);
         return this;
     }
 
+
     public GameEntity addChild(GameEntity ge) {
         child.add(ge);
         return this;
     }
+
 
     public List<GameEntity> getChild() {
         return child;
@@ -204,51 +231,62 @@ public class GameEntity {
         return this;
     }
 
+
     public GameEntity addBehavior(Behavior<?> b) {
         this.behaviors.add(b);
         return this;
     }
 
+
     public Object getAttribute(String attrName, Object defaultValue) {
         return attributes.getOrDefault(attrName, defaultValue);
     }
 
+
     public boolean isActive() {
         return this.active;
     }
+
 
     public GameEntity setActive(boolean active) {
         this.active = active;
         return this;
     }
 
+
     public Class<?> getRenderedBy() {
         return renderedByPlugin;
     }
+
 
     public GameEntity setDrawnBy(Class<?> rendererPluginClass) {
         this.renderedByPlugin = rendererPluginClass;
         return this;
     }
 
+
     public GameEntity setDirection(int d) {
         this.direction = d;
         return this;
     }
+
 
     public GameEntity setLayer(int l) {
         this.layer = l;
         return this;
     }
 
+
     public GameEntity setPriority(int p) {
         this.priority = p;
         return this;
     }
 
+
     public int getLayer() {
         return layer;
     }
+
 
     public int getPriority() {
         return priority;
@@ -260,6 +298,7 @@ public class GameEntity {
      * @param pt the {@link PhysicType#STATIC} or {@link PhysicType#DYNAMIC}.
      * @return the updated {@link GameEntity}.
      */
+
     public GameEntity setPhysicType(PhysicType pt) {
         this.physicType = pt;
         return this;
@@ -270,13 +309,16 @@ public class GameEntity {
      *
      * @see Rectangle2D
      */
+
     public void updateBox() {
         switch (type) {
             case CIRCLE -> {
                 this.box = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
+                this.collisionBox = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
             }
-            default -> {
+            case RECTANGLE -> {
                 this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
+                this.collisionBox = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
             }
         }
     }
@@ -287,6 +329,7 @@ public class GameEntity {
      * @param force a {@link Vector2D} force.
      * @return the updated {@link GameEntity}.
      */
+
     public GameEntity addForce(Vector2D force) {
         this.forces.add(force);
         return this;
@@ -298,30 +341,71 @@ public class GameEntity {
      * @param forces a {@link List} {@link Vector2D} force.
      * @return the updated {@link GameEntity}.
      */
+
     public GameEntity addForces(List<Vector2D> forces) {
         this.forces.addAll(forces);
         return this;
     }
 
-    @Override
+
     public String toString() {
         return this.getClass().getSimpleName() + ":" + this.name;
     }
 
-    public Rectangle2D getBoundingBox() {
-        return box.getBounds2D();
+
+    public Shape getBoundingBox() {
+        return box;
     }
+
 
     public EntityType getType() {
         return type;
     }
+
 
     public GameEntity setCollisionBox(Shape collisionBox) {
         this.collisionBox = collisionBox;
         return this;
     }
 
+
     public Shape getCollisionBox() {
         return this.collisionBox;
+    }
+
+
+    public PhysicType getPhysicType() {
+        return this.physicType;
+    }
+
+
+    public List<Behavior<?>> getBehaviors() {
+        return this.behaviors;
+    }
+
+    public boolean isCollider() {
+        return colliderFlag;
+    }
+
+    public GameEntity setColliderFlag(boolean cf) {
+        this.colliderFlag = cf;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public boolean isMarkedAsDelete() {
+        return markAsDelete;
+    }
+
+    public GameEntity markedAsDeleted(boolean b) {
+        this.markAsDelete = b;
+        return this;
     }
 }

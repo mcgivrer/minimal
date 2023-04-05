@@ -55,7 +55,7 @@ public class InfluencerRenderer implements RendererPlugin<Influencer> {
                 break;
             }
             default -> {
-                System.err.printf("Unkown how to draw this Influcener instance %s%n.", e.name);
+                System.err.printf("Unkown how to draw this Influcener instance %s%n.", e.getName());
             }
         }
     }

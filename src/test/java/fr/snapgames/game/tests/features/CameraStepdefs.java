@@ -38,7 +38,7 @@ public class CameraStepdefs implements En {
         });
         And("the current Camera name is {string}", (String camName) -> {
             game = (Game) TestContext.get("game");
-            assertEquals(camName, game.getRenderer().getCurrentCamera().name);
+            assertEquals(camName, game.getRenderer().getCurrentCamera().getName());
         });
         And("I set Camera {string} target as GameEntity {string}", (String camName, String targetName) -> {
             game = (Game) TestContext.get("game");
@@ -58,7 +58,7 @@ public class CameraStepdefs implements En {
                             new Point2D.Double(
                                     camPos.x + (cam.viewport.getWidth() * 0.5),
                                     camPos.y + (cam.viewport.getHeight() * 0.5))),
-                    String.format("The %s camera does not match the %s target position by %s", cam.name, target.name, camPos.distance(targetPos)));
+                    String.format("The %s camera does not match the %s target position by %s", cam.getName(), target.getName(), camPos.distance(targetPos)));
         });
         And("I set Camera {string} viewport as {int},{int}", (String camName, Integer vpWidth, Integer vpHeight) -> {
             game = (Game) TestContext.get("game");

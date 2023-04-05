@@ -254,18 +254,19 @@ public class DemoScene extends AbstractScene {
      */
     public void createCoins(String namePattern, int nb, World world, Behavior<?> b) {
         for (int i = 0; i < nb; i++) {
-            GameEntity e = new GameEntity(namePattern + GameEntity.index)
+            GameEntity e = new GameEntity(namePattern + GameEntity.getIndex())
                     .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(),
                             Math.random() * world.getPlayArea().getHeight()))
                     .setImage(coinImg)
                     .setMaterial(Material.SUPER_BALL)
+                    .setType(EntityType.CIRCLE)
                     .setMass(25.0)
                     .setLayer(4)
                     .setPriority(4 + i)
                     .setAttribute("maxVelocity", 4.0)
                     .setAttribute("maxAcceleration", 5.0)
                     .setAttribute("attractionDistance", 80.0)
-                    .setAttribute("attractionForce", 3.0)
+                    .setAttribute("attractionForce", 2.0)
                     .setAttribute("value", (int) (Math.random() * 50.0) - 15)
                     .addBehavior(b);
 

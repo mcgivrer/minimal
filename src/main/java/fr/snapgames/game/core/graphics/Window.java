@@ -96,7 +96,7 @@ public class Window {
                 g2.setColor(new Color(0.3f, 0.0f, 0.0f, 0.8f));
                 g2.fillRect(0, frame.getHeight() - 32, frame.getWidth(), 32);
                 g2.setColor(Color.ORANGE);
-                String displayLine = StringUtils.prepareStatsString(stats);
+                String displayLine = StringUtils.prepareStatsString(stats, "[ ", " ]", " | ");
                 g2.setFont(g2.getFont().deriveFont(15.0f));
                 g2.drawString(displayLine, 16, frame.getHeight() - 16);
             }

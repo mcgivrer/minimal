@@ -8,18 +8,19 @@ import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Animations;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.Window;
+import fr.snapgames.game.core.io.ActionListener;
 import fr.snapgames.game.core.io.GameKeyListener;
 import fr.snapgames.game.core.io.InputHandler;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
+import fr.snapgames.game.core.utils.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.List;
 
 /**
  * Main Game Java2D test.
@@ -85,7 +86,7 @@ public class Game extends JPanel {
     public Game(String configFilePath, boolean mode) {
         this.testMode = testMode;
         config = new Configuration(ConfigAttribute.values())
-                .setConfigurationFile("/game.properties")
+                .setConfigurationFile(configFilePath)
                 .parseConfigFile();
         soundSystem = new SoundSystem(this);
     }
@@ -95,7 +96,7 @@ public class Game extends JPanel {
      *
      * @param args Java command line arguments
      */
-    private void initialize(String[] args) {
+    public void initialize(String[] args) {
         config.parseArgs(args);
         debug = (int) config.get(ConfigAttribute.DEBUG_LEVEL);
         FPS = (int) config.get(ConfigAttribute.RENDER_FPS);
@@ -107,7 +108,6 @@ public class Game extends JPanel {
 
         // set input handlers
         inputHandler = new InputHandler(this);
-        inputHandler.addListener(new GameKeyListener(this));
 
         scale = (double) config.get(ConfigAttribute.WINDOW_SCALE);
 
@@ -124,7 +124,7 @@ public class Game extends JPanel {
 
         scm.activateDefaultScene();
         create(window.getGraphics());
-
+        inputHandler.addListener(new GameKeyListener(this));
     }
 
     private void create(Graphics2D g) {
@@ -167,6 +167,7 @@ public class Game extends JPanel {
             renderer.getCurrentCamera().update(elapsed);
         }
         scm.getActiveScene().update(this, elapsed);
+        scm.getActiveScene().removeEntitiesMarkAsDeleted();
     }
 
     /**
@@ -188,6 +189,7 @@ public class Game extends JPanel {
         // FPS measure
         long frames = 0;
         long realFPS = 0;
+        long internalTime = 0;
 
         long ups = 0;
         long realUPS = 0;
@@ -204,7 +206,7 @@ public class Game extends JPanel {
                 update(dt * .04);
                 ups += 1;
             }
-
+            internalTime += dt;
             frames += 1;
             timeFrame += dt;
             if (timeFrame > 1000) {
@@ -214,14 +216,19 @@ public class Game extends JPanel {
                 ups = 0;
                 timeFrame = 0;
             }
-            loopData.put("cnt", loopCounter);
-            loopData.put("fps", realFPS);
-            loopData.put("ups", realUPS);
+            loopData.put("1_dbg", getDebug());
+            loopData.put("1_fps", realFPS);
+            loopData.put("1_ups", realUPS);
 
-            loopData.put("pause", isUpdatePause() ? "ON" : "OFF");
-            loopData.put("obj", getSceneManager().getActiveScene().getEntities().size());
-            loopData.put("scn", getSceneManager().getActiveScene().getName());
-            loopData.put("dbg", getDebug());
+            loopData.put("2_pause", isUpdatePause() ? "ON" : "OFF");
+            loopData.put("3_obj", getSceneManager().getActiveScene().getEntities().size());
+            loopData.put("3_scn", getSceneManager().getActiveScene().getName());
+
+            loopData.put("4_mute", getSoundSystem().isMute() ? "ON" : "OFF");
+            loopData.put("4_volume", getSoundSystem().getAudioVolume());
+
+            loopData.put("9_cnt", loopCounter);
+            loopData.put("9_time", StringUtils.formatDuration(internalTime));
 
             draw(loopData);
             waitUntilStepEnd(dt);
@@ -312,6 +319,7 @@ public class Game extends JPanel {
     public void requestPause(boolean pause) {
         this.pause = pause;
     }
+
     public SoundSystem getSoundSystem() {
         return soundSystem;
     }
@@ -322,5 +330,12 @@ public class Game extends JPanel {
 
     public void setPauseAutorized(boolean authorized) {
         this.pauseAuthorized = authorized;
+    }
+
+    public void clearSystem() {
+        getPhysicEngine().reset();
+        getRenderer().reset();
+        List<ActionListener> toBeRemoved = getInputHandler().getListeners().stream().filter(al -> !(al instanceof GameKeyListener)).toList();
+        getInputHandler().getListeners().removeAll(toBeRemoved);
     }
 }
