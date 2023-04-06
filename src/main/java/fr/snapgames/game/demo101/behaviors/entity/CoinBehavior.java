@@ -20,8 +20,10 @@ public class CoinBehavior implements Behavior<GameEntity> {
             if (attrDist > 0) {
                 Color debugColor = (Color) e.getAttribute("debugAttrColor", Color.YELLOW);
                 g.setColor(debugColor);
-
-                g.draw(e.getCollisionBox());
+                if (Optional.ofNullable(e).isPresent()
+                        && Optional.ofNullable(e.getCollisionBox()).isPresent()) {
+                    g.draw(e.getCollisionBox());
+                }
             }
             g.setStroke(bckUp);
         }
