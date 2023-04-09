@@ -5,6 +5,8 @@ import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.gameloop.GameLoop;
+import fr.snapgames.game.core.gameloop.impl.FixedFrameGameLoop;
 import fr.snapgames.game.core.graphics.Animations;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.graphics.Window;
@@ -19,8 +21,10 @@ import fr.snapgames.game.core.utils.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Main Game Java2D test.
@@ -48,6 +52,8 @@ public class Game extends JPanel {
 
     // Internal components
     private Configuration config;
+
+    private GameLoop gameLoop;
 
     private Window window;
     // all the services.
@@ -105,6 +111,7 @@ public class Game extends JPanel {
         // retrieve some Window parameters
         String title = I18n.get("game.window.title");
         Dimension dim = (Dimension) config.get(ConfigAttribute.WINDOW_SIZE);
+        gameLoop = new FixedFrameGameLoop(this);
 
         // set input handlers
         inputHandler = new InputHandler(this);
@@ -138,7 +145,7 @@ public class Game extends JPanel {
      * @param stats a list of stats in a {@link Map} to be displayed in the debug
      *              bar.
      */
-    private void draw(Map<String, Object> stats) {
+    public void draw(Map<String, Object> stats) {
         renderer.draw(stats);
         window.drawFrom(renderer, stats, scale);
     }
@@ -146,7 +153,7 @@ public class Game extends JPanel {
     /**
      * update game entities according to input
      */
-    private void input() {
+    public void input() {
         Scene s = scm.getActiveScene();
         for (GameEntity e : s.getEntities().values()) {
             for (Behavior b : e.behaviors) {
@@ -182,48 +189,8 @@ public class Game extends JPanel {
      * Main Game loop
      */
     public void loop() {
-        // elapsed Game Time
-        double start = 0;
-        double end = 0;
-        double dt = 0;
-        // FPS measure
-        long frames = 0;
-        long realFPS = 0;
-        long internalTime = 0;
-
-        long ups = 0;
-        long realUPS = 0;
-        long timeFrame = 0;
-        long loopCounter = 0;
-        int maxLoopCounter = (int) config.get(ConfigAttribute.EXIT_TEST_COUNT_FRAME);
-        Map<String, Object> loopData = new HashMap<>();
-        while (!exit && !testMode
-                && !(maxLoopCounter != -1 && loopCounter > maxLoopCounter)) {
-            start = System.nanoTime() / 1000000.0;
-            loopCounter++;
-            input();
-            if (!pause) {
-                update(dt * .04);
-                ups += 1;
-            }
-            internalTime += dt;
-            frames += 1;
-            timeFrame += dt;
-            if (timeFrame > 1000) {
-                realFPS = frames;
-                frames = 0;
-                realUPS = ups;
-                ups = 0;
-                timeFrame = 0;
-            }
-            prepareData(realFPS, internalTime, realUPS, loopCounter, loopData);
-
-            draw(loopData);
-            waitUntilStepEnd(dt);
-
-            end = System.nanoTime() / 1000000.0;
-            dt = end - start;
-        }
+        Map<String, Object> context = new ConcurrentHashMap<>();
+        gameLoop.loop(context);
 
     }
 
@@ -334,6 +301,14 @@ public class Game extends JPanel {
 
     public void setPauseAutorized(boolean authorized) {
         this.pauseAuthorized = authorized;
+    }
+
+    public boolean isExitRequested() {
+        return exit;
+    }
+
+    public boolean isTestMode() {
+        return testMode;
     }
 
     public void clearSystem() {

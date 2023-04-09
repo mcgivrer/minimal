@@ -159,8 +159,9 @@ public class Game {
         } catch (InterruptedException ie) {
             System.err.println("error while trying to wait for sometime");
         }
-    }}
-    //...
+    }
+}
+//...
 }
 ```
 
@@ -203,93 +204,102 @@ an overview of the solution:
 
 _figure 6 - An overview of my implementation_
 
-## The Game interface
+## The GameLoop interface
 
-The `Game` interface provides a standard contract to any application which want to be a game.
+The `GameLoop` interface provides a standard contract to delegate the loop management to a specialized class
+implementation.
 
-Defining a standard lifecycle to a game with:
+We will be able to create a Fixed time frame loop, where graphics are rendered in priority , or a Fixed time update loop
+where physic and gameplay are prioritized first.
 
-1. `initialize()`,
-2. `create()`,
-3. and then `loop()` on the created resources,
-4. and finally `dispose()` them.
+Defining a standard loop to a game with:
+
+1. `input()`,
+2. `update()`,
+3. and then `draw()` on the screen.
+
+This is exactly what our loop implementation will have to provide.
 
 ```java
 public interface Game {
-    void initialize(String[] args);
 
-    void create(Game g);
+    void loop(Map<String, Object> context);
 
-    void input(Game g);
+    boolean isExit();
 
-    void update(Game g, double elapsed);
-
-    void render(Game g, int fps);
-
-    default void loop() {
-    }
-
-    default void run(String[] args) {
-
-        initialize(args);
-        loop();
-        dispose();
-    }
-
-    void dispose();
-
-    boolean isPaused();
-
-    boolean isExitRequested();
+    boolean isTestMode();
 
 }
 ```
 
-Inside a loop, the 3 historical game operations are prformed:
+Let's have a try with a FixedFrameGameLoop first, where the Game loop update and render everything even if it takes too
+long, freezing the game play.
 
-- input(),
-- update(),
-- render().
+### The Fixed Frame Loop
 
-but let's dive in the loop in the default loop implementation.
-
-### The loop
-
-The default loop implementation would be a simple time frame based one. Trying to stick as far as poosible to the frame
+The default loop implementation would be a simple time frame based one. Trying to stick as far as possible to the frame
 per second value set. In our sample code, we use a 1000.0/60.0 frame time corresponding to 60 frames per second.
 
-And during a loop, we call the 3 parts of the loop : manage `input()`, `update()` all game objects and `render()` all of
-those.
-And if the loop is during less than a frame time, add a litle wait.
+First things first, just initialize our GameLoop for the game :
 
 ```java
-public interface Game {
+public interface FixedFrameGameLoop {
+
+    private final Game game;
+    double FPS = 60.0;
+    double fpsDelay = 1000000.0 / 60.0;
+
+    public FixedFrameGameLoop(Game game) {
+        this.game = game;
+    }
+    //...
+}
+```
+
+And if the loop is during less than a frame time, add a little wait.
+
+```java
+public interface FixedFrameGameLoop {
     //...
     default void loop() {
-        int frames = 0;
-        int fps = getTargetFps();
-        double internalTime = 0;
-        double previousTime = System.currentTimeMillis();
-        double currentTime = System.currentTimeMillis();
-        double elapsed = currentTime - previousTime;
-        create(this);
-        while (!isExitRequested()) {
-            currentTime = System.currentTimeMillis();
-            input(this);
-            elapsed = currentTime - previousTime;
-            if (!isPaused()) {
-                update(this, elapsed);
+        double start = 0;
+        double end = 0;
+        double dt = 0;
+        // FPS measure
+        long frames = 0;
+        long realFPS = 0;
+
+        long updates = 0;
+        long realUPS = 0;
+        long timeFrame = 0;
+        long loopCounter = 0;
+        int maxLoopCounter = (int) game.getConfiguration().get(ConfigAttribute.EXIT_TEST_COUNT_FRAME);
+        Map<String, Object> loopData = new HashMap<>();
+        while (!(isExit() || isTestMode() || isMaxLoopCounterReached(loopCounter, maxLoopCounter))) {
+            start = System.nanoTime() / 1000000.0;
+            loopCounter++;
+            game.input();
+            if (!game.isUpdatePause()) {
+                game.update(dt * .04);
+                updates += 1;
             }
-            render(this, fps);
+
             frames += 1;
-            internalTime += elapsed;
-            if (internalTime > 1000.0) {
-                fps = frames;
+            timeFrame += dt;
+            if (timeFrame > 1000) {
+                realFPS = frames;
                 frames = 0;
-                internalTime = 0;
+                realUPS = updates;
+                updates = 0;
+                timeFrame = 0;
             }
-            waitUntilNextFrame(elapsed);
-            previousTime = currentTime;
+            prepareData(realFPS, realUPS, loopCounter, loopData);
+
+            game.draw(loopData);
+            waitUntilStepEnd(dt);
+
+            end = System.nanoTime() / 1000000.0;
+            dt = end - start;
         }
     }
 
@@ -302,12 +312,39 @@ public interface Game {
             System.err.println("error while trying to wait for sometime");
         }
     }
+
+    private void prepareData(long realFPS, long realUPS, long loopCounter, Map<String, Object> loopData) {
+        loopData.put("cnt", loopCounter);
+        loopData.put("fps", realFPS);
+        loopData.put("ups", realUPS);
+        loopData.put("pause", game.isUpdatePause() ? "ON" : "OFF");
+        loopData.put("obj", game.getSceneManager().getActiveScene().getEntities().size());
+        loopData.put("scn", game.getSceneManager().getActiveScene().getName());
+        loopData.put("dbg", game.getDebug());
+    }
     //...
 }
 ```
 
-You can notice that we also compute the real frame rate (fps) with the `previousTime` and `currentTime` variables, and
-maintain an internal `frames` counter.
+And we need to link the exit and pause mode to the game with these 2 methods:
+
+```java
+public class FixedFrameGameLoop {
+    //...
+    @Override
+    public boolean isTestMode() {
+        return game.isTestMode();
+    }
+
+    @Override
+    public boolean isExit() {
+        return game.isExitRequested();
+    }
+}
+```
+
+You can notice that we also compute the real frame rate (`fps`) with the `end` and `start` variables, and
+maintain an internal `frames` counter. An `ups` counter is also maintained.
 
 ## Conclusion
 

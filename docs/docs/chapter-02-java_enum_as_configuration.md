@@ -1,14 +1,18 @@
 # Enum as Configuration
 
-_(TO BE REVIEWED)_
-
 One of the first thing you have to provide, before any game mechanic, it's a way to set configuration values.
 
-To satisfy this need, we will use a well known java structure with in a particular way: `enum` !
+There is 2 possibilities:
+
+- the first one consists in using a simple Configuration class loading a properties file, with
+  the possibilities to save it with new values.
+- the second one would be more structured by using a well known java structure, the enumeration, to define configuration
+  keys, values and description with help support.
 
 ## Introduction
 
-First we need to understand what would be the age for our configuration. we need to define some value to be set by
+In the ideal world, we need to understand what would be the age for our configuration. we need to define some value to
+be set by
 configuration (via a file), or fall back to a default value. the default model must support providing a description. We
 will also need to override the configuration value at execution time by providing a different value through the CLI.
 
@@ -26,7 +30,136 @@ So our implementation will be a little more complex to allow an easy way to mana
 
 ![the configuration attributes implementation](https://www.plantuml.com/plantuml/png/RP1VIyGm4CJVyodYcwAVG4Jkj5KE_rp1qzSZrqxRbMHRaWqYudStfGebtkl-PfQPMGKnNgApwaHwEEZH6cBLKmDjH3mTeY0eOe5lJGszkHsufMxznxwKFjSTP3ey6uVJiykNXBZxlS_o1tpcO38K2BMdKMZW71TeJRJoPcn4Ojl3EsfPM2lZ0tmYTv7hwS7LRB_Gi_Gw5wfl5VhXGsVv5otdrZbta7veWW97zm-I6oqSMCAnOTPLjTzjTe-bqaLvytg_VzeMPSgn0ZTfyXy0)
 
-## The attribute interface
+Ok, first things first let's start with a simple configraition clasee
+
+## Configuration from properties
+
+### the properties file as input
+
+To start simple , juste create a properties file:
+
+```properties
+game.debug.level=0
+game.window.fullscreen.mode=false
+game.window.title=My Main Window Title
+game.window.size=dim(640,400)
+game.physic.acceleration.max=20.0
+game.physic.world.material=mat(test,1.0,0.2,0.8)
+game.physic.world.gravity=v(0,-0.981)
+game.physic.world.play.area=r2d(1000.0,1000.0)
+```
+
+So here are defined multiple keys with specific
+values:  `integer`, `boolean`, `String`, `Dimension`, `Double`, `Material`, `Vector2D`,
+and `Rectangle2D`.
+
+In our first implementation, the value will be converted at access time with a dedicated getter.
+
+### the Configuration class
+
+This first implementation, where values a converted at getting time may fit at start to define some minimum
+configuration keys. but each time you will access it with getter, the conversion will take some nanoseconds.
+
+Anyway, let's start with this one:
+
+![The first Configuration implementation](http://www.plantuml.com/plantuml/png/VP6nJiCm48RtF8NPOa4Nnam5kh1L87L13DVcubfSpf7lN0aXtfrGxAGW1G_sVxxlky5UYqBKr5DrfKViqGm4dgi3WOXv2DnvboAe3_nH6RCodIVSWXwRPusUtVaETCpxf2ZDDeO1etgKQZMkiNtzUqhzPu1jJi6tC-nG7rdhDtpFm8rfiOD4kWDAs7XM-xqL-3u4Gk1bOVy3s1AAk0bfJxZijUU-pUTa-HvPVE1bSKBi78k-muE6UBjPjWjXfrJSfx46TeJ_wHUGlIpc1nuW2jv5btfabHgYappgvJL_neW9dB3EvMUrHcvJJry0)
+
+so the corresponding code could be:
+
+```java
+public class Configuration {
+    private final Properties parameters = new Properties();
+    String filePath;
+
+    public Configuration(String file) {
+        this.filePath = file;
+        try {
+            parameters.load(Game.class.getResourceAsStream(filePath));
+            System.out.printf("Configuration:The configuration file %s has been loaded%n", file);
+        } catch (IOException e) {
+            System.err.printf("Configuration:The configuration file %s can not been loaded: %s%n", file, e.getMessage());
+        }
+    }
+
+    public void parseArguments(String[] args) {
+        for (String s : args) {
+            String[] p = s.split("=");
+            String key = p[0];
+            String value = p[1];
+            if (parameters.containsKey(s)) {
+                parameters.setProperty(key, value);
+            }
+        }
+    }
+
+    //...
+    public void save() {
+        try {
+            String rootPath = this.getClass().getResource("/").getPath();
+            OutputStream output = new FileOutputStream(rootPath + filePath);
+            parameters.store(output, "updated From CommandLine");
+            System.out.printf("Configuration:Configuration saved into the properties file: %s%n", filePath);
+            System.out.printf("Configuration:Content: %s%n", parameters);
+        } catch (IOException e) {
+            System.err.printf("Configuration:Unable to save configuration into properties file: %s%n", e.getMessage());
+        }
+    }
+    //...
+}
+```
+
+In this first part, we found :
+
+- `Configuration(String)` the constructor to start reading the properties file,
+- `parseArguments(String[])` to read arguments from the Command line,
+- `save()` to save loaded or parsed values to the properties file.
+
+In the second part, we detail only 2 getters, a basic one with boolean and a more intelligent one to convert a string
+value to a Rectangle2D object:
+
+```java
+public class Configuration {
+    //...
+    public int getInteger(String key, int defaultValue) {
+        if (parameters.containsKey(key)) {
+            return Integer.parseInt(parameters.getProperty(key));
+        }
+        return defaultValue;
+    }
+
+    //...
+    public Rectangle2D getRectangle2D(String key, Rectangle2D defaultValue) {
+        String param = parameters.getProperty(key, "");
+        if (!param.equals("") && param.startsWith("r2d(") && param.endsWith(")")) {
+            String[] k = param.substring("r2d(".length(), param.length() - 1).split(",");
+            double width = Double.valueOf(k[0]);
+            double height = Double.valueOf(k[0]);
+            return new Rectangle2D.Double(0, 0, width, height);
+        } else {
+            System.err.printf("Configuration: Rectangle2D value not found for %s, use %s as default value.%n", key, defaultValue);
+            return defaultValue;
+        }
+    }
+    //...
+}
+```
+
+- the first getter, `getInteger()` is reading the property value as String and convert it to an `int` type value, for
+  other type like boolean, double, float, you can use the same kind of implementation, relying on the `parse[TYPE]()`
+  method.
+- the second one, `getRectangle2D`, convert a coded string value `r2d([WIDTH],[HEIGHT]` into an instance
+  of `Rectangle2D` class.
+
+## Configuration and ConfigAttribute
+
+For this second solution, we will go further into structuration of the configuration keys and their values.
+We will use a specific interface to define the way to define and implement an enumeration that will contain every
+configuration value required.
+
+let's start with the interface `IConfigAttribute`, the `ConfigAttribute` enumeration, and then the main `Configuration`
+class.
+
+### The attribute interface
 
 the `IConfigAttribute` will be our interface to enumeration to define configuration attribute to be provided through a
 file of command line:
@@ -99,25 +232,14 @@ but this is nothing without the `Configuration` system to retrieve and manage va
 The `Configuration` system will provide access to the configuration attribute values, from file AND from command line
 argument.
 
-![The Configuration class to operate IConfigAttribute values](https://www.plantuml.com/plantuml/png/RL5lRxem67pVJz7VEynlVW6o69d0PZQLA2vBbeLKU81kRI7zus8Ml_leG8UuDqtptDtJk-jKQIAruGpzqoLmm3KZLA2IPe29rfBkZ0Q5gD0WSv82diygaTF2Es5V2F_71MWxM18EpiZTD90ekdbBVuJ34B027rGgQQrf9OQm3panJ3yJPkpErUuTKjsJHaGga0qI6f7Q1RUj_0QtrCcGY8v8bTKd7lZlfMnJ3t4EkgmoXK0OVWLINZFW8BJwgnWlYf9u7Zy52Fl1tVO-MQpyvXwypECa3ZPnCbjjbt4Ihhr5Cru7IpzO9s6qQQocZ2ZLFMSaiG5_cbQWBuOXPU3apM6xxneSkHUKJdOsvknjfyeT6dvz6xdxYcPToSu77Auu_O_8gAePEJm0gnUW52d0-LrGszOzMIY7D4TdpBv0XJxZxN8RuQGyeWlhU3oUN1Nhzdvi2Y8pd7q3
+![The Configuration class to operate IConfigAttribute values](http://www.plantuml.com/plantuml/png/RLBRJeCm6BxlKzGx5jqB4BCC1-YYsyZ6Z8anf8CVgBQ5z32pcBsxLDXXp9k6_D_X__hHiT94QiCPkj4bSC0r8rIWacQ0YTQIRem6XQZG87EI0fvEAf7JmZjWFmZVuWAq7Sm91sVWhXf85DsyfJ_3hWzOWGygbRJMj19zs8US6APV2JFMSx7vX5IVIICY5SW62Or8hS5zAx_3BNNK9w8z0c4uxkN7bDSCE0Yj_hkR5qL9F8rV0eJzu67zcCmMVlCTl4tZ90vMSJ9PhETn4YwzMJDU1dC_M2PXj6gsfOmerQqpajYCVsKfq1V3a39mykQmzNKb3DmBIYSx1dEsjXRbzWE_VmpSRKMphYVd2tPNdFCkCwfgHdPFmEePA4KAS4u6jItEauLoI7DqmUm6AlGHRytj5GxAFRg8ZeV3qLMnxjdJKcNrVVLJJdZx5Fiu1rrMcK9Z49dXx1S0
 "The Configuration class to operate IConfigAttribute values")
 
 But first, initialize the attributes with their default values:
 
 ```Java
 public class Configuration {
-
-    IConfigAttribute[] attributes;
-    private Map<IConfigAttribute, Object> configurationValues = new ConcurrentHashMap<>();
-
-    public Configuration(IConfigAttribute[] attributes) {
-        setAttributes(attributes);
-        // initialize all default values.
-        Arrays.stream(attributes).forEach(ca -> {
-            configurationValues.put(ca, ca.getDefaultValue());
-        });
-    }
-    //...
+    // TODO get implementation...
 }
 ```
 
@@ -125,37 +247,21 @@ Now we can delegate the argument parsing to our Configuration class, to extract 
 
 ```Java
 
-public class App implements Game {
+public class Game {
     //...
-    public int parseArgs(String[] args) {
-        boolean displayHelpMessage = false;
-
-        if (args.length > 0) {
-            for (String arg : args) {
-                String[] kv = arg.split("=");
-                if (!isArgumentFound(kv)) {
-                    displayHelpMessage(kv[0], kv[1]);
-                    return -1;
-                }
-            }
-            if (displayHelpMessage) {
-                displayHelpMessage();
-            }
-        }
-        return 0;
-    }
-
-    private boolean isArgumentFound(String[] kv) {
-        boolean found = false;
-        for (IConfigAttribute ca : attributes) {
-            if (ca.getAttrName().equals(kv[0]) || ca.getConfigKey().equals(kv[0])) {
-                configurationValues.put(ca, ca.getAttrParser().apply(kv[1]));
-                found = true;
-            }
-        }
-        return found;
-    }
+    private Configruation config;
     //...
+    public Game(String configFilePath){
+      config = new Configuration(ConfigAttribute.values())
+              .setConfigurationFile(configFilePath)
+              .parseConfigFile();
+    }
+    
+    //...
+    public int initialize(String[] args) {
+        config.parseArgs(args);
+        //...
+    }
 }
 ```
 
@@ -181,7 +287,7 @@ public class Configuration {
 }
 ```
 
-And when al least we get some configuration values, we can get it :
+And when at least we get some configuration values, we can get it :
 
 ```Java
 public class Configuration {
