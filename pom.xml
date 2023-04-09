@@ -6,6 +6,7 @@
     <artifactId>minimal</artifactId>
     <version>0.0.6-SNAPSHOT</version>
     <name>Minimal</name>
+    <packaging>jar</packaging>
     <description>A project demonstrating how to create sustainable project in a Game dev context</description>
     <inceptionYear>2023</inceptionYear>
 
@@ -37,7 +38,8 @@
     <scm>
         <url>https://github.com/${project.organization.name}/${project.name}</url>
         <connection>scm:git:git@github.com:${project.organization.name}/${project.name}.git</connection>
-        <developerConnection>scm:git:https://github.com/${project.organization.name}/${project.name}.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/${project.organization.name}/${project.name}.git
+        </developerConnection>
         <tag>v${project.version}</tag>
     </scm>
     <issueManagement>
@@ -81,6 +83,18 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.6</version>
         </dependency-->
+
+        <dependency>
+            <groupId>net.java.jinput</groupId>
+            <artifactId>jinput</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.jinput</groupId>
+            <artifactId>jinput</artifactId>
+            <version>2.0.9</version>
+            <classifier>natives-all</classifier>
+        </dependency>
         <dependency>
             <groupId>com.googlecode.soundlibs</groupId>
             <artifactId>jlayer</artifactId>
@@ -163,6 +177,22 @@
                     <target>19</target>
                 </configuration>
             </plugin>
+
+            <!-- integrate natives libs -->
+            <plugin>
+                <groupId>com.googlecode.mavennatives</groupId>
+                <artifactId>maven-nativedependencies-plugin</artifactId>
+                <version>0.0.7</version>
+                <executions>
+                    <execution>
+                        <id>unpacknatives</id>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Resource copying -->
             <plugin>
                 <groupId>
