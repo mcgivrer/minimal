@@ -216,19 +216,7 @@ public class Game extends JPanel {
                 ups = 0;
                 timeFrame = 0;
             }
-            loopData.put("1_dbg", getDebug());
-            loopData.put("1_fps", realFPS);
-            loopData.put("1_ups", realUPS);
-
-            loopData.put("2_pause", isUpdatePause() ? "ON" : "OFF");
-            loopData.put("3_obj", getSceneManager().getActiveScene().getEntities().size());
-            loopData.put("3_scn", getSceneManager().getActiveScene().getName());
-
-            loopData.put("4_mute", getSoundSystem().isMute() ? "ON" : "OFF");
-            loopData.put("4_volume", getSoundSystem().getAudioVolume());
-
-            loopData.put("9_cnt", loopCounter);
-            loopData.put("9_time", StringUtils.formatDuration(internalTime));
+            prepareData(realFPS, internalTime, realUPS, loopCounter, loopData);
 
             draw(loopData);
             waitUntilStepEnd(dt);
@@ -237,6 +225,22 @@ public class Game extends JPanel {
             dt = end - start;
         }
 
+    }
+
+    private void prepareData(long realFPS, long internalTime, long realUPS, long loopCounter, Map<String, Object> loopData) {
+        loopData.put("1_dbg", getDebug());
+        loopData.put("1_fps", realFPS);
+        loopData.put("1_ups", realUPS);
+
+        loopData.put("2_pause", isUpdatePause() ? "ON" : "OFF");
+        loopData.put("3_obj", getSceneManager().getActiveScene().getEntities().size());
+        loopData.put("3_scn", getSceneManager().getActiveScene().getName());
+
+        loopData.put("4_mute", getSoundSystem().isMute() ? "ON" : "OFF");
+        loopData.put("4_volume", getSoundSystem().getAudioVolume());
+
+        loopData.put("9_cnt", loopCounter);
+        loopData.put("9_time", StringUtils.formatDuration(internalTime));
     }
 
     private void waitUntilStepEnd(double dt) {
