@@ -4,7 +4,7 @@ Feature: U400 - the Game has a PhysicEngine and Collision detection
   a corresponding `CollisionResponseBehavior` interface.
 
   @PhysicEngine @GameEntity
-  Scenario: U301 - A GameEntity is under gravity influence
+  Scenario: U401 - A GameEntity is under gravity influence
     Given a Game is instantiated with configuration "/collision-test.properties"
     And A Scene "test" is created
     And A GameEntity "player" with size of 32.0x32.0 is created at 100.0,100.0 in Scene "test"

@@ -74,7 +74,6 @@ public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
         GameEntity coin = ce.getSource();
         if (player.getName().equals("player") && Optional.ofNullable(player).isPresent()) {
             if (coin.getBoundingBox().intersects(player.getBoundingBox().getBounds2D()) && coin.isActive()) {
-                coin.setActive(false);
                 int score = (int) player.getAttribute("score", 0);
                 score += (int) coin.getAttribute("value", 20);
                 player.setAttribute("score", score);

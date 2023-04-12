@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import fr.snapgames.game.core.behaviors.Behavior;
+import fr.snapgames.game.core.graphics.Animation;
+import fr.snapgames.game.core.graphics.Animations;
 import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.PhysicType;
 import fr.snapgames.game.core.math.Vector2D;
@@ -54,6 +56,10 @@ public class GameEntity {
 
     public BufferedImage image;
 
+    public String currentAnimation = "";
+    public Map<String, Animation> animations = new HashMap<>();
+    ;
+
     public boolean active;
     public long life;
     public long duration;
@@ -79,6 +85,8 @@ public class GameEntity {
      * @see fr.snapgames.game.core.math.PhysicEngine
      */
     private boolean markAsDelete;
+    public boolean relativeToParent;
+    public GameEntity parent;
 
     /**
      * Create a new {@link GameEntity} with a name, and set all characteristics to
@@ -106,30 +114,25 @@ public class GameEntity {
         return index;
     }
 
-
     public GameEntity setPosition(Vector2D pos) {
         this.position = pos;
         return this;
     }
-
 
     public GameEntity setStickToCamera(boolean flag) {
         this.stickToCamera = flag;
         return this;
     }
 
-
     public boolean isStickToCamera() {
         return stickToCamera;
     }
-
 
     public GameEntity setSize(Vector2D s) {
         this.size = s;
         updateBox();
         return this;
     }
-
 
     public GameEntity setType(EntityType t) {
         this.type = t;
@@ -152,18 +155,15 @@ public class GameEntity {
         return this;
     }
 
-
     public GameEntity setSpeed(Vector2D speed) {
         this.speed = speed;
         return this;
     }
 
-
     public GameEntity setMaterial(Material m) {
         this.material = m;
         return this;
     }
-
 
     public GameEntity setMass(double m) {
         this.mass = m;
@@ -189,18 +189,15 @@ public class GameEntity {
         return ls;
     }
 
-
     public GameEntity setAttribute(String key, Object value) {
         attributes.put(key, value);
         return this;
     }
 
-
     public GameEntity addChild(GameEntity ge) {
         child.add(ge);
         return this;
     }
-
 
     public List<GameEntity> getChild() {
         return child;
@@ -231,62 +228,51 @@ public class GameEntity {
         return this;
     }
 
-
     public GameEntity addBehavior(Behavior<?> b) {
         this.behaviors.add(b);
         return this;
     }
 
-
     public Object getAttribute(String attrName, Object defaultValue) {
         return attributes.getOrDefault(attrName, defaultValue);
     }
 
-
     public boolean isActive() {
         return this.active;
     }
-
 
     public GameEntity setActive(boolean active) {
         this.active = active;
         return this;
     }
 
-
     public Class<?> getRenderedBy() {
         return renderedByPlugin;
     }
-
 
     public GameEntity setDrawnBy(Class<?> rendererPluginClass) {
         this.renderedByPlugin = rendererPluginClass;
         return this;
     }
 
-
     public GameEntity setDirection(int d) {
         this.direction = d;
         return this;
     }
-
 
     public GameEntity setLayer(int l) {
         this.layer = l;
         return this;
     }
 
-
     public GameEntity setPriority(int p) {
         this.priority = p;
         return this;
     }
 
-
     public int getLayer() {
         return layer;
     }
-
 
     public int getPriority() {
         return priority;
@@ -347,37 +333,30 @@ public class GameEntity {
         return this;
     }
 
-
     public String toString() {
         return this.getClass().getSimpleName() + ":" + this.name;
     }
-
 
     public Shape getBoundingBox() {
         return box;
     }
 
-
     public EntityType getType() {
         return type;
     }
-
 
     public GameEntity setCollisionBox(Shape collisionBox) {
         this.collisionBox = collisionBox;
         return this;
     }
 
-
     public Shape getCollisionBox() {
         return this.collisionBox;
     }
 
-
     public PhysicType getPhysicType() {
         return this.physicType;
     }
-
 
     public List<Behavior<?>> getBehaviors() {
         return this.behaviors;
@@ -407,5 +386,30 @@ public class GameEntity {
     public GameEntity markedAsDeleted(boolean b) {
         this.markAsDelete = b;
         return this;
+    }
+
+    public GameEntity setSize(int width, int height) {
+        this.size.x = width;
+        this.size.y = height;
+        return this;
+    }
+
+    public GameEntity add(String name, Animation a) {
+        this.animations.put(name, a);
+        if (currentAnimation.equals("")) {
+            currentAnimation = name;
+            this.size.x = animations.get(currentAnimation).getFrame().getWidth();
+            this.size.y = animations.get(currentAnimation).getFrame().getHeight();
+        }
+        return this;
+    }
+
+    public GameEntity setAnimation(String name) {
+        this.currentAnimation = name;
+        return this;
+    }
+
+    public Map<String, Animation> getAnimations() {
+        return animations;
     }
 }

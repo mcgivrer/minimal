@@ -4,7 +4,35 @@ import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.math.CollisionEvent;
 
 /**
- * This interface propose implementation to respond to a {@link CollisionEvent}.
+ * The {@link CollisionResponseBehavior} interface propose implementation to respond to a {@link CollisionEvent}.
+ *
+ * <p>This can be used as in the following sample code:</p>
+ * <pre>
+ * public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
+ *   public void collide(Game game, CollisionEvent ce) {
+ *     GameEntity player = ce.getCollider();
+ *
+ *     GameEntity coin = ce.getSource();
+ *     if (player.getName().equals("player") && Optional.ofNullable(player).isPresent()) {
+ *       if (coin.getBoundingBox().intersects(player.getBoundingBox().getBounds2D()) && coin.isActive()) {
+ *          int score = (int) player.getAttribute("score", 0);
+ *          score += (int) coin.getAttribute("value", 20);
+ *          player.setAttribute("score", score);
+ *          game.getSoundSystem().play("collectCoin", 1.0f);
+ *          coin.markedAsDeleted(true);
+ *       }
+ *     }
+ *   }
+ *   public String getFilteredNames() {
+ *     return "player";
+ *   }
+ * }
+ * </pre>
+ *
+ * <p>This sample code illustrate the Collision response between a {@link fr.snapgames.game.core.entity.GameEntity} named "coin"
+ * and another {@link fr.snapgames.game.core.entity.GameEntity} named "player" collecting coins.</p>
+ * <p>When "coin" collides with "player"n, the "value" attribute of "coin" is added to the "score" attributes of "payer",
+ * and the "coins" {@link fr.snapgames.game.core.entity.GameEntity} is marked as to be deleted.</p>
  *
  * @param <T> the colliding Entity object.
  * @author Frédéric Delorme

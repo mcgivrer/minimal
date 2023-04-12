@@ -1,16 +1,33 @@
 package fr.snapgames.game.demo101.scenes;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Optional;
+
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.audio.SoundClip;
-import fr.snapgames.game.core.audio.SoundSystem;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
-import fr.snapgames.game.core.entity.*;
+import fr.snapgames.game.core.entity.Camera;
+import fr.snapgames.game.core.entity.EntityType;
+import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.entity.Influencer;
+import fr.snapgames.game.core.entity.Light;
+import fr.snapgames.game.core.entity.ParticlesEntity;
+import fr.snapgames.game.core.entity.TextEntity;
+import fr.snapgames.game.core.graphics.Animations;
 import fr.snapgames.game.core.graphics.TextAlign;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
 import fr.snapgames.game.core.lang.I18n;
-import fr.snapgames.game.core.math.*;
+import fr.snapgames.game.core.math.Material;
+import fr.snapgames.game.core.math.PhysicType;
+import fr.snapgames.game.core.math.RandomUtils;
+import fr.snapgames.game.core.math.Vector2D;
+import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
 import fr.snapgames.game.demo101.behaviors.entity.CoinBehavior;
@@ -20,12 +37,6 @@ import fr.snapgames.game.demo101.behaviors.entity.StormBehavior;
 import fr.snapgames.game.demo101.behaviors.scene.PauseBehavior;
 import fr.snapgames.game.demo101.behaviors.scene.WindyWeatherBehavior;
 import fr.snapgames.game.demo101.io.DemoListener;
-
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Optional;
 
 /**
  * The {@link DemoScene} implements in a demonstration purpose all the features
@@ -40,6 +51,8 @@ public class DemoScene extends AbstractScene {
     private BufferedImage backgroundImg;
     private BufferedImage coinImg;
     private DemoListener demoListener;
+
+    private Animations animations;
 
     private SoundClip collectCoinSound;
 
@@ -59,6 +72,8 @@ public class DemoScene extends AbstractScene {
         playerImg = ResourceManager.getImage("/images/sprites01.png").getSubimage(0, 0, 32, 32);
         coinImg = ResourceManager.getImage("/images/tiles01.png").getSubimage(8 * 16, 6 * 16, 16, 16);
         g.getSoundSystem().load("collectCoin", "/audio/sounds/collect-coin.wav");
+        animations = new Animations("/animations.properties");
+
     }
 
     @Override
@@ -138,11 +153,17 @@ public class DemoScene extends AbstractScene {
                 .setMaterial(Material.RUBBER)
                 .setAttribute("maxVelocity", 10.0)
                 .setAttribute("maxAcceleration", 8.0)
-                .setAttribute("speedStep", 0.4)
+                .setAttribute("speedStep", 0.02)
                 .setMass(8.0)
                 .setLayer(10)
                 .setPriority(1)
-                .addBehavior(new PlayerInputBehavior());
+                .addBehavior(new PlayerInputBehavior())
+                .setAttribute("player_jump", -4.0 * 0.2)
+                // define animations for the player Entity.
+                .add("player_idle", animations.get("player_idle").setSpeed(0.6))
+                .add("player_walk", animations.get("player_walk"))
+                .add("player_fall", animations.get("player_fall"))
+                .add("player_jump", animations.get("player_jump"));
         add(player);
 
         // Create enemies Entity.
