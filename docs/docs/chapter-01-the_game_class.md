@@ -112,9 +112,9 @@ public class Game {
 }
 ```
 
-So, what do you think of my (too?) basic class ? nothing fancy, nothing "bling bling". only useful and mandatory.
+So, what do you think of my (too?) basic class ? nothing fancy, nothing fancy. only useful and mandatory.
 
-So yes, as you maybe now, the gameloop is the heart of any old school game. and even some Big game engine keep running
+So yes, as you may be now, the game loop is the heart of any old school game. and even some Big game engine keep running
 such old loop.
 Let's dive into some details.
 
@@ -165,22 +165,24 @@ public class Game {
 }
 ```
 
-So to maintain a sustainable frequency for that loop, I use the default current traditional FPS: 60 frames per second.
+So to maintain a sustainable frequency for that loop, I use the default current frame-per-second ratio: 60 frames per
+second. here we will get it from the method `getTargetFps()`.
 
 So starting with that , defining the waiting time is a simple calculus.
 
 ```java
-int timeFrame=1000/60;
-        int wait=timeFrame-elapsed;
+
+int timeFrame=1000/getTargetFps();
+int wait=(int)(elapsed<timeFrame ?timeFrame-elapsed:1);;
 ```
 
 and the rest of the loop process is simple calls:
 
 ```java
 elapsed=currentTime-previousTime;
-        input();
-        update(elapsed);
-        render();
+input();
+update(elapsed);
+render();
 ```
 
 - input() will manage all the player's device input like keyboard, mouse or joystick,

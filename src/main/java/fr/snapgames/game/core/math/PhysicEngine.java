@@ -94,6 +94,7 @@ public class PhysicEngine {
     public void updateEntity(GameEntity entity, double elapsed) {
 
         if (!entity.isStickToCamera() && entity.physicType.equals(PhysicType.DYNAMIC)) {
+            entity.rotation = new Vector2D(-1.0, 0.0).angle(world.getGravity());
             // apply gravity
             entity.forces.add(world.getGravity().negate());
             // Apply influencer Effects (Material and force impacted)

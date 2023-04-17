@@ -36,15 +36,19 @@ public class DemoListener implements ActionListener {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_PAGE_UP -> {
+                // add 10 more balls
                 addNewBalls("ball_", 10);
             }
             case KeyEvent.VK_PAGE_DOWN -> {
-                removeAllObjectByNameFilter("ball_");
-            }
-            case KeyEvent.VK_DELETE -> {
+                // remove 10 balls
                 removeNbObjectByNameFilter("ball_", 10);
             }
-            case KeyEvent.VK_B -> {
+            case KeyEvent.VK_DELETE -> {
+                // remove all balls.
+                removeAllObjectByNameFilter("ball_");
+            }
+            case KeyEvent.VK_N -> {
+                // Day/Night mode switch
                 GameEntity backGndImd = scene.getEntities().get("backgroundImage");
                 if (Optional.ofNullable(backGndImd).isPresent()) {
                     if (backGndImd.isActive()) {
@@ -58,14 +62,17 @@ public class DemoListener implements ActionListener {
                     }
                 }
             }
+            case KeyEvent.VK_M -> {
+                // switching rainy day on/off
+                GameEntity rainy = scene.getEntity("rain");
+                rainy.setActive(!rainy.isActive());
+            }
             case KeyEvent.VK_G -> {
+                // reverse gravity
                 world.setGravity(world.getGravity().negate());
             }
-            case KeyEvent.VK_R -> {
-                scene.getEntities().get("rain").setActive(!scene.getEntities().get("rain").isActive());
-            }
-
             case KeyEvent.VK_BACK_SPACE -> {
+                // back to TITLE scene
                 game.getSceneManager().activate("title");
             }
         }
