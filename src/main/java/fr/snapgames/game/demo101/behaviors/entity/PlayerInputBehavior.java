@@ -40,8 +40,12 @@ public class PlayerInputBehavior implements Behavior<GameEntity> {
         }*/
 
         boolean move = false;
-        double accel = (double) entity.getAttribute("step", 0.022);
-        double jump = (double) entity.getAttribute("player_jump", -4.0 * 0.022);
+        double accel = (double) entity.getAttribute("step", 0.05);
+        // acceleration on CTRL or SHIFT key pressed
+        accel = inputHandler.isShiftPressed() ? (accel * 2.0) : accel;
+        accel = inputHandler.isCtrlPressed() ? accel * 1.5 : accel;
+        // Compute jump force
+        double jump = (double) entity.getAttribute("player_jump", -accel * 4.0);
         if (inputHandler.getKey(KeyEvent.VK_UP)) {
             entity.forces.add(new Vector2D(0, jump));
             entity.currentAnimation = "player_jump";

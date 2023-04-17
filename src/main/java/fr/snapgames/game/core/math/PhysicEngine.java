@@ -78,6 +78,14 @@ public class PhysicEngine {
                         detectCollision(entity);
                     }
                 });
+        // process Influencer behavior's update
+        entities.values().stream()
+                .filter(e -> e instanceof Influencer)
+                .forEach(entity -> {
+                    for (Behavior b : entity.behaviors) {
+                        b.update(game, entity, elapsed);
+                    }
+                });
     }
 
     private void detectCollision(GameEntity entity) {
@@ -141,7 +149,12 @@ public class PhysicEngine {
                     (double) entity.getAttribute("maxAccelY", maxAcceleration));
 
             // compute velocity
-            double roughness = entity.contact == 0 ? world.getMaterial().roughness : world.getMaterial().roughness * material.roughness;
+            double roughness = 1.0;
+            if (entity.contact > 0) {
+                roughness = material.roughness;
+            } else {
+                roughness = world.getMaterial().roughness;
+            }
             entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed)).multiply(roughness);
             entity.speed.maximize(
                     (double) entity.getAttribute("maxVelX", maxVelocity),
@@ -199,13 +212,11 @@ public class PhysicEngine {
                 ge.position.y = world.getPlayArea().height - ge.size.y;
                 ge.speed.y = ge.speed.y * -ge.material.elasticity;
                 ge.contact += 4;
-
             }
             if (ge.position.y < 0) {
                 ge.position.y = 0;
                 ge.speed.y = ge.speed.y * -ge.material.elasticity;
                 ge.contact += 8;
-
             }
         }
     }
