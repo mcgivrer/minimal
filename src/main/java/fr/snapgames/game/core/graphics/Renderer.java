@@ -133,9 +133,9 @@ public class Renderer {
         entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
             RendererPlugin rp = plugins.get(entity.getClass());
-            g.rotate(entity.rotation, entity.position.x, entity.position.y);
+            g.rotate(entity.rotation, entity.position.x + entity.size.x * 0.5, entity.position.y + entity.size.y * 0.5);
             rp.draw(this, g, entity);
-            g.rotate(-entity.rotation, entity.position.x, entity.position.y);
+            g.rotate(-entity.rotation, entity.position.x + entity.size.x * 0.5, entity.position.y + entity.size.y * 0.5);
             entity.setDrawnBy(rp.getClass());
         } else {
             System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
