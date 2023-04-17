@@ -55,9 +55,9 @@ public class Material {
      */
     public Material merge(Material material) {
         return new Material(this.name + ">" + material.name,
-                this.elasticity * material.elasticity,
-                this.density * material.density,
-                this.roughness * material.roughness
+                Math.min(this.elasticity, material.elasticity),
+                Math.min(this.density, material.density),
+                Math.min(this.roughness, material.roughness)
         );
 
     }

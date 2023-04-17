@@ -70,7 +70,7 @@ public class RainEffectBehavior implements ParticleBehavior<ParticlesEntity> {
     @Override
     public void create(Game g, ParticlesEntity pes) {
         if (pes.getChild().size() < nbParticles) {
-            GameEntity p = new GameEntity(pes.name + "_" + (++counter))
+            GameEntity p = new GameEntity(pes.getName() + "_" + (++counter))
                     .setType(EntityType.CIRCLE)
                     .setPhysicType(PhysicType.DYNAMIC)
                     .setSize(new Vector2D(1.0, 1.0))

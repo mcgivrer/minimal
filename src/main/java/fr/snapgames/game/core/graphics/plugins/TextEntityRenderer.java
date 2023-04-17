@@ -69,7 +69,6 @@ public class TextEntityRenderer implements RendererPlugin<TextEntity> {
 
     @Override
     public void drawDebug(Renderer r, Graphics2D g, TextEntity te) {
-        g.setColor(Color.ORANGE);
         double offX = 0;
         switch (te.getTexAlign()) {
             case RIGHT -> {
@@ -82,10 +81,23 @@ public class TextEntityRenderer implements RendererPlugin<TextEntity> {
                 offX = te.size.x * 0.5;
             }
         }
+        Font f = g.getFont();
+        g.setFont(te.getFont());
+        FontMetrics fm = g.getFontMetrics();
+        g.setFont(f);
+        // draw text area
+        g.setColor(Color.ORANGE);
         g.drawRect(
                 (int) (te.position.x + offX),
-                (int) te.position.y - (g.getFontMetrics().getHeight() + g.getFontMetrics().getAscent()),
-                (int) te.size.x, (int) te.size.y);
+                (int) te.position.y - fm.getAscent(),
+                (int) te.size.x, fm.getAscent() + fm.getDescent());
+        // draw text position
+        g.setColor(Color.WHITE);
+        g.drawRect(
+                (int) te.position.x, (int) te.position.y,
+                1, 1);
+        // draw metadata
+        g.setColor(Color.ORANGE);
         int il = 0;
         for (String s : te.getDebugInfo()) {
             g.drawString(s, (int) (te.position.x + te.size.x + offX + 4.0), (int) te.position.y + il);

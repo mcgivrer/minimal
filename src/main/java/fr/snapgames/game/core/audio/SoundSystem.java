@@ -38,6 +38,10 @@ public class SoundSystem {
      * mute the full soudsystem
      */
     private boolean mute = false;
+    /**
+     * current audio volume.
+     */
+    private float audioVolume;
 
     /**
      * Internal constructor.
@@ -142,7 +146,7 @@ public class SoundSystem {
 
     public void play(String code, float volume, float pan, boolean loop) {
         if (!mute) {
-
+            this.audioVolume = volume;
             if (soundBank.containsKey(code)) {
                 SoundClip sc = soundBank.get(code);
                 if (loop && sc != null) {
@@ -215,5 +219,9 @@ public class SoundSystem {
 
     public void stopAll() {
         soundBank.values().forEach(sb -> sb.stop());
+    }
+
+    public float getAudioVolume() {
+        return audioVolume;
     }
 }

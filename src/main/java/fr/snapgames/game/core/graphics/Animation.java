@@ -1,6 +1,7 @@
 package fr.snapgames.game.core.graphics;
 
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
 /**
  * This {@link Animation} object set the Frames as a sprite animation.
@@ -70,5 +71,9 @@ public class Animation {
     public Animation reset() {
         index = 0;
         return this;
+    }
+
+    public BufferedImage[] getFrames() {
+        return frames;
     }
 }
