@@ -59,17 +59,4 @@ public class InfluencerRenderer implements RendererPlugin<Influencer> {
             }
         }
     }
-
-    @Override
-    public void drawDebug(Renderer r, Graphics2D g, Influencer v) {
-        g.setColor(Color.ORANGE);
-        g.drawRect((int) v.position.x, (int) v.position.y,
-                (int) v.size.x, (int) v.size.y);
-        int il = 0;
-        for (String s : v.getDebugInfo()) {
-            g.drawString(s, (int) (v.position.x + v.size.x + 4.0), (int) v.position.y + il);
-            il += 10;
-        }
-
-    }
 }

@@ -56,6 +56,7 @@ public abstract class AbstractScene implements Scene {
         ge.getChild().forEach(c -> this.entities.put(c.getName(), c));
     }
 
+    @Override
     public void removeEntitiesMarkAsDeleted() {
         List<GameEntity> toBeDeleted = new ArrayList<>();
         entities.values().stream().filter(t -> t.isMarkedAsDelete()).forEach(t2 -> toBeDeleted.add(t2));

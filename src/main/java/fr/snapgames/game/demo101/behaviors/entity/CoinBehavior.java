@@ -44,7 +44,7 @@ public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
             if (attrDist > 0) {
                 Color debugColor = (Color) e.getAttribute("debugAttrColor", Color.YELLOW);
                 g.setColor(debugColor);
-                g.draw(e.getCollisionBox());
+                g.draw(new Ellipse2D.Double(e.position.x - (attrDist - e.size.x) * 0.5, e.position.y - (attrDist - e.size.y) * 0.5, attrDist, attrDist));
                 if (debugColor != Color.YELLOW) {
                     g.setColor(new Color(1.0f, 1.0f, 1.0f, 0.6f));
                     g.fill(e.getBoundingBox());
@@ -79,6 +79,7 @@ public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
                 player.setAttribute("score", score);
                 game.getSoundSystem().play("collectCoin", 1.0f);
                 coin.markedAsDeleted(true);
+                coin.setActive(false);
             }
         }
     }

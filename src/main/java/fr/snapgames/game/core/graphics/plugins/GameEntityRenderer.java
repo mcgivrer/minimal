@@ -23,7 +23,7 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
     @Override
     public void draw(Renderer r, Graphics2D g, GameEntity e) {
         // if an image is defined, use it to draw the GameEntity.
-        if (e.image != null || !e.currentAnimation.equals("")) {
+        if (e.image != null || (!e.currentAnimation.equals("") && e.animations.size() > 0)) {
             drawImage(g, e);
         } else {
             switch (e.type) {
@@ -100,16 +100,4 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
         }
     }
 
-    @Override
-    public void drawDebug(Renderer r, Graphics2D g, GameEntity v) {
-        g.setColor(Color.ORANGE);
-        g.drawRect((int) v.position.x, (int) v.position.y,
-                (int) v.size.x, (int) v.size.y);
-        int il = 0;
-        for (String s : v.getDebugInfo()) {
-            g.drawString(s, (int) (v.position.x + v.size.x + 4.0), (int) v.position.y + il);
-            il += 10;
-        }
-
-    }
 }

@@ -155,6 +155,9 @@ public class PhysicEngine {
         for (Behavior b : entity.behaviors) {
             b.update(game, entity, elapsed);
         }
+        if (!entity.currentAnimation.equals("")) {
+            entity.animations.get(entity.currentAnimation).update((int) elapsed);
+        }
     }
 
     private Material appliedInfluencerToEntity(GameEntity e, World world) {
