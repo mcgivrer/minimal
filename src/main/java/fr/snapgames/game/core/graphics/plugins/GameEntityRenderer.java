@@ -22,7 +22,7 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
     @Override
     public void draw(Renderer r, Graphics2D g, GameEntity e) {
         switch (e.type) {
-            case IMAGE:
+            case IMAGE -> {
                 if (Optional.ofNullable(e.image).isPresent()) {
                     boolean direction = e.direction > 0;
                     if (direction) {
@@ -37,8 +37,8 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
                                 null);
                     }
                 }
-                break;
-            case RECTANGLE:
+            }
+            case RECTANGLE -> {
                 if (Optional.ofNullable(e.borderColor).isPresent()) {
                     Stroke b = g.getStroke();
                     g.setColor(e.borderColor);
@@ -52,8 +52,8 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
                 g.fillRect(
                         (int) e.position.x, (int) e.position.y,
                         (int) e.size.x, (int) e.size.y);
-                break;
-            case CIRCLE:
+            }
+            case CIRCLE -> {
                 Ellipse2D el = new Ellipse2D.Double(
                         e.position.x, e.position.y,
                         e.size.x, e.size.y);
@@ -67,7 +67,7 @@ public class GameEntityRenderer implements RendererPlugin<GameEntity> {
                 g.setColor(e.color);
                 g.setPaint(e.color);
                 g.fill(el);
-                break;
+            }
         }
     }
 

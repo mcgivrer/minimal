@@ -17,6 +17,7 @@ import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
