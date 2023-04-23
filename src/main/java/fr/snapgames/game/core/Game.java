@@ -19,7 +19,6 @@ import fr.snapgames.game.core.scene.SceneManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;

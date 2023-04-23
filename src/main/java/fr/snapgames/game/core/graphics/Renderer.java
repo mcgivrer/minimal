@@ -6,7 +6,6 @@ import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.plugins.*;
-import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.World;
 
 import java.awt.*;
@@ -133,12 +132,16 @@ public class Renderer {
         entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
             RendererPlugin rp = plugins.get(entity.getClass());
-            g.rotate(entity.rotation, entity.position.x, entity.position.y);
+            g.rotate(entity.rotation,
+                    entity.position.x + entity.size.x * 0.5,
+                    entity.position.y + entity.size.y * 0.5);
             rp.draw(this, g, entity);
-            g.rotate(-entity.rotation, entity.position.x, entity.position.y);
+            g.rotate(-entity.rotation,
+                    entity.position.x + entity.size.x * 0.5,
+                    entity.position.y + entity.size.y * 0.5);
             entity.setDrawnBy(rp.getClass());
         } else {
-            System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
+            System.err.printf("ERROR: Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
         }
         entity.getChild().forEach(c -> drawEntity(g, c));
     }
@@ -186,7 +189,7 @@ public class Renderer {
                         RendererPlugin rp = ((RendererPlugin) plugins.get(v.getClass()));
                         rp.drawDebug(this, g, v);
                     } else {
-                        System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n",
+                        System.err.printf("ERROR: Renderer:Unknown rendering plugin for Entity class %s%n",
                                 v.getClass().getName());
                     }
 
@@ -200,7 +203,7 @@ public class Renderer {
         g.drawRect(10, 10, (int) camera.viewport.getWidth() - 20, (int) camera.viewport.getHeight() - 20);
         g.drawString(String.format("cam: %s", camera.name), 20, 20);
         g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
-        g.drawString(String.format("targ: %s", camera.target.name), 20, 44);
+        g.drawString(String.format("tgt: %s", camera.target.name), 20, 44);
     }
 
     public void setCurrentCamera(Camera cam) {

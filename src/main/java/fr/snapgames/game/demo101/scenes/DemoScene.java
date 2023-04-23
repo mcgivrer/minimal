@@ -2,7 +2,6 @@ package fr.snapgames.game.demo101.scenes;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.audio.SoundClip;
-import fr.snapgames.game.core.audio.SoundSystem;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
@@ -22,7 +21,6 @@ import fr.snapgames.game.demo101.behaviors.scene.WindyWeatherBehavior;
 import fr.snapgames.game.demo101.io.DemoListener;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Optional;
