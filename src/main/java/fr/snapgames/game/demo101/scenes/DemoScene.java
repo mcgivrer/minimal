@@ -205,8 +205,21 @@ public class DemoScene extends AbstractScene {
                 .addForce(world.getGravity().multiply(0.98))
                 .setLayer(10)
                 .setPriority(2)
-                .addBehavior(new WaterEffectBehavior(20.0, 120.0, 1.2));
+                .addBehavior(new WaterEffectBehavior(0.0, 120.0, 0.4));
         add(water);
+
+        Influencer wind = (Influencer) new Influencer("wind")
+                .setType(EntityType.RECTANGLE)
+                .setPosition(new Vector2D(0, 0))
+                .setSize(new Vector2D(playArea.width, playArea.width))
+                .setColor(new Color(0.0f, 0.4f, 0.0f, 0.05f))
+                .setBorderColor(Color.GREEN)
+                .setBorderWidth(1)
+                .setMaterial(Material.AIR)
+                .addForce(new Vector2D(-0.08, 0.0))
+                .setLayer(10)
+                .setPriority(1);
+        add(wind);
 
         Camera cam = new Camera("camera")
                 .setTarget(player)

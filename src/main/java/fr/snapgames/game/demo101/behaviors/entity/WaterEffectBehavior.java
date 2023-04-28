@@ -44,7 +44,6 @@ public class WaterEffectBehavior implements Behavior<Influencer> {
         }
         entity.position.y = initialHeight - this.waterHeight;
         entity.size.y = this.waterHeight;
-        entity.forces.add(new Vector2D(0.0, -this.vWater * 0.005));
         entity.updateBox();
         internalTime += dt;
     }

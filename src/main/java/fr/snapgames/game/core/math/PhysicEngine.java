@@ -181,8 +181,12 @@ public class PhysicEngine {
                 .filter(i -> i.box.intersects(e.box.getBounds2D()))
                 .toList();
         for (GameEntity ge : influencerList) {
-            material = material.merge(ge.material);
-            e.addForces(ge.forces);
+            Influencer f = (Influencer) ge;
+            material = material.merge(f.material);
+            double buoyant = f.material.density * world.gravity.y *
+                    (e.mass / e.material.density) * 0.005;
+            e.addForce(new Vector2D(0.0, buoyant));
+            e.addForces(f.forces);
         }
         return material;
     }
