@@ -44,7 +44,10 @@ public class Window {
         frame.setIgnoreRepaint(true);
         frame.enableInputMethods(true);
         frame.setFocusTraversalKeysEnabled(false);
-        frame.setLocationByPlatform(false);
+
+        // on which Display the Window must appear ?
+        moveToScreen("Display0");
+
         // define Window content and size.
         frame.setLayout(new GridLayout());
         game.getLayout().layoutContainer(frame);
@@ -60,11 +63,92 @@ public class Window {
         }
     }
 
+    /**
+     * Move this Window to a specific screen ({@link GraphicsDevice}) named screenId (see {@link GraphicsDevice#getIDstring()}.
+     *
+     * @param screenId
+     */
+    public void moveToScreen(String screenId) {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] screens = ge.getScreenDevices();
+        int n = screens.length;
+        for (int i = 0; i < n; i++) {
+            if (screens[i].getIDstring().contains(screenId)) {
+                JFrame dummy = new JFrame(screens[i].getDefaultConfiguration());
+                frame.setLocationRelativeTo(dummy);
+                dummy.dispose();
+            }
+        }
+    }
+
+    /**
+     * Move the {@link Window} at position (x,y) where x,y can be pixels or ratio percentage of the targeted screen.
+     *
+     * @param screen the unique id of the targeted screen.
+     * @param x      the horizontal position on that screen (in pixel or as a ratio  of the screen space)
+     * @param y      the vertical position on that screen (in pixel or as a ratio of the screen space)
+     */
+    public void setLocation(int screen, double x, double y) {
+        GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] d = g.getScreenDevices();
+
+        if (screen >= d.length) {
+            screen = d.length - 1;
+        }
+
+        Rectangle bounds = d[screen].getDefaultConfiguration().getBounds();
+
+        // Is double?
+        if (x == Math.floor(x) && !Double.isInfinite(x)) {
+            x *= bounds.x;  // Decimal -> percentage
+        }
+        if (y == Math.floor(y) && !Double.isInfinite(y)) {
+            y *= bounds.y;  // Decimal -> percentage
+        }
+
+        x = bounds.x + x;
+        y = frame.getY() + y;
+
+        if (x > bounds.x) x = bounds.x;
+        if (y > bounds.y) y = bounds.y;
+
+        // If double we do want to floor the value either way
+        frame.setLocation((int) x, (int) y);
+    }
+
+    /**
+     * Move the {@link Window} at position (x,y) where x,y can be pixels or ratio percentage of the targeted screen.
+     *
+     * @param screenId the unique String as id of the targeted screen.
+     * @param x        the horizontal position on that screen (in pixel or as a ratio  of the screen space)
+     * @param y        the vertical position on that screen (in pixel or as a ratio of the screen space)
+     */
+    public void setLocation(String screenId, double x, double y) {
+        GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] d = g.getScreenDevices();
+        for (int i = 0; i < d.length; i++) {
+            if (d[i].getIDstring().contains(screenId)) {
+                setLocation(i, x, y);
+            }
+        }
+    }
+
+    /**
+     * Add a KeyListener to this {@link Window}.
+     *
+     * @param kl the KeyListener instance to be added.
+     * @return the updated Window.
+     */
     public Window add(KeyListener kl) {
         frame.addKeyListener(kl);
         return this;
     }
 
+    /**
+     * Retrieve the {@link Graphics2D} API for this {@link Window}.
+     *
+     * @return
+     */
     public Graphics2D getGraphics() {
         return (Graphics2D) frame.getGraphics();
     }
@@ -107,6 +191,9 @@ public class Window {
         }
     }
 
+    /**
+     * Close this {@link Window} instance.
+     */
     public void close() {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
         frame.dispose();
