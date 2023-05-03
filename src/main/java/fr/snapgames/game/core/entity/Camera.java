@@ -11,15 +11,13 @@ import java.awt.geom.Rectangle2D;
  * @author Frédéric Delorme
  * @since 0.0.2
  */
-public class Camera {
-    public String name;
-    public Vector2D position;
+public class Camera extends GameEntity{
     public GameEntity target;
     public double rotation = 0.0f, tween = 0.0f;
     public Rectangle2D viewport;
 
     public Camera(String name) {
-        this.name = name;
+        super(name);
         position = new Vector2D(0, 0);
         target = null;
     }

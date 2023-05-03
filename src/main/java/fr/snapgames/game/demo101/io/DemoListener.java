@@ -36,36 +36,43 @@ public class DemoListener implements ActionListener {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_PAGE_UP -> {
+                // add 10 more balls
                 addNewBalls("ball_", 10);
             }
             case KeyEvent.VK_PAGE_DOWN -> {
-                removeAllObjectByNameFilter("ball_");
-            }
-            case KeyEvent.VK_DELETE -> {
+                // remove 10 balls
                 removeNbObjectByNameFilter("ball_", 10);
             }
-            case KeyEvent.VK_B -> {
+            case KeyEvent.VK_DELETE -> {
+                // remove all balls.
+                removeAllObjectByNameFilter("ball_");
+            }
+            case KeyEvent.VK_N -> {
+                // Day/Night mode switch
                 GameEntity backGndImd = scene.getEntities().get("backgroundImage");
                 if (Optional.ofNullable(backGndImd).isPresent()) {
                     if (backGndImd.isActive()) {
                         backGndImd.setActive(false);
-                        scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_"))
+                        scene.getEntities().values().stream().filter(e1 -> e1.getName().startsWith("star_"))
                                 .forEach(e2 -> e2.setActive(true));
                     } else {
                         backGndImd.setActive(true);
-                        scene.getEntities().values().stream().filter(e1 -> e1.name.startsWith("star_"))
+                        scene.getEntities().values().stream().filter(e1 -> e1.getName().startsWith("star_"))
                                 .forEach(e2 -> e2.setActive(false));
                     }
                 }
             }
+            case KeyEvent.VK_M -> {
+                // switching rainy day on/off
+                GameEntity rainy = scene.getEntity("rain");
+                rainy.setActive(!rainy.isActive());
+            }
             case KeyEvent.VK_G -> {
+                // reverse gravity
                 world.setGravity(world.getGravity().negate());
             }
-            case KeyEvent.VK_R -> {
-                scene.getEntities().get("rain").setActive(!scene.getEntities().get("rain").isActive());
-            }
-
             case KeyEvent.VK_BACK_SPACE -> {
+                // back to TITLE scene
                 game.getSceneManager().activate("title");
             }
         }
@@ -91,7 +98,7 @@ public class DemoListener implements ActionListener {
         List<GameEntity> toBeRemoved = new ArrayList<>();
         int count = 0;
         for (GameEntity e : scene.getEntities().values()) {
-            if (e.name.contains(objectName)) {
+            if (e.getName().contains(objectName)) {
                 toBeRemoved.add(e);
                 count++;
                 if (count > nb) {
@@ -99,7 +106,7 @@ public class DemoListener implements ActionListener {
                 }
             }
         }
-        toBeRemoved.forEach(e -> scene.getEntities().remove(e.name));
+        toBeRemoved.forEach(e -> scene.getEntities().remove(e.getName()));
     }
 
     /**
@@ -111,10 +118,10 @@ public class DemoListener implements ActionListener {
     private void removeAllObjectByNameFilter(String objectNameFilter) {
         List<GameEntity> toBeRemoved = new ArrayList<>();
         for (GameEntity e : scene.getEntities().values()) {
-            if (e.name.contains(objectNameFilter)) {
+            if (e.getName().contains(objectNameFilter)) {
                 toBeRemoved.add(e);
             }
         }
-        toBeRemoved.forEach(e -> scene.getEntities().remove(e.name));
+        toBeRemoved.forEach(e -> scene.getEntities().remove(e.getName()));
     }
 }

@@ -24,13 +24,13 @@ public class GameStepdefs implements En {
                 Scene scene = game.getSceneManager().getActiveScene();
                 Renderer rdr = game.getRenderer();
                 System.out.printf("camera %s position: %f,%f%n",
-                        rdr.getCurrentCamera().name,
+                        rdr.getCurrentCamera().getName(),
                         rdr.getCurrentCamera().position.x,
                         rdr.getCurrentCamera().position.y);
 
                 scene.getEntities().values().forEach(e -> {
                     System.out.printf("entity %s position: %f,%f%n",
-                            e.name,
+                            e.getName(),
                             e.position.x,
                             e.position.y);
                 });

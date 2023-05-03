@@ -32,4 +32,8 @@ public interface Scene {
     GameEntity getEntity(String name);
 
     void add(GameEntity e);
+
+    default void removeEntitiesMarkAsDeleted() {
+
+    }
 }

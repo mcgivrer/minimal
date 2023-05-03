@@ -52,7 +52,7 @@ public class Renderer {
 
     public void addEntity(GameEntity e) {
 
-        this.entities.put(e.name, e);
+        this.entities.put(e.getName(), e);
         pipeline.add(e);
         pipeline.sort(Renderer::compare);
     }
@@ -89,10 +89,10 @@ public class Renderer {
                         if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
                             currentCamera.preDraw(g);
                         }
+                        drawEntity(g, entity);
                         for (Behavior b : entity.behaviors) {
                             b.draw(game, g, entity);
                         }
-                        drawEntity(g, entity);
                         if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
                             currentCamera.postDraw(g);
                         }
@@ -112,7 +112,7 @@ public class Renderer {
         entities.values().stream()
                 .filter(e -> !e.isActive())
                 .toList()
-                .forEach(ed -> entities.remove(ed.name));
+                .forEach(ed -> entities.remove(ed.getName()));
     }
 
     private boolean isInViewPort(Camera currentCamera, GameEntity e) {
@@ -133,7 +133,9 @@ public class Renderer {
         entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
             RendererPlugin rp = plugins.get(entity.getClass());
+            g.rotate(entity.rotation, entity.position.x + entity.size.x * 0.5, entity.position.y + entity.size.y * 0.5);
             rp.draw(this, g, entity);
+            g.rotate(-entity.rotation, entity.position.x + entity.size.x * 0.5, entity.position.y + entity.size.y * 0.5);
             entity.setDrawnBy(rp.getClass());
         } else {
             System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
@@ -196,9 +198,9 @@ public class Renderer {
 
     private void drawCameraDebug(Graphics2D g, Camera camera) {
         g.drawRect(10, 10, (int) camera.viewport.getWidth() - 20, (int) camera.viewport.getHeight() - 20);
-        g.drawString(String.format("cam: %s", camera.name), 20, 20);
+        g.drawString(String.format("cam: %s", camera.getName()), 20, 20);
         g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
-        g.drawString(String.format("targ: %s", camera.target.name), 20, 44);
+        g.drawString(String.format("targ: %s", camera.target.getName()), 20, 44);
     }
 
     public void setCurrentCamera(Camera cam) {
@@ -217,5 +219,9 @@ public class Renderer {
 
     public BufferedImage getBuffer() {
         return this.buffer;
+    }
+
+    public void removeEntity(String entityName) {
+        entities.remove(entityName);
     }
 }

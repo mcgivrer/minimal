@@ -52,8 +52,20 @@ public abstract class AbstractScene implements Scene {
     public void add(GameEntity ge) {
         game.getRenderer().addEntity(ge);
         game.getPhysicEngine().addEntity(ge);
-        this.entities.put(ge.name, ge);
-        ge.getChild().forEach(c -> this.entities.put(c.name, c));
+        this.entities.put(ge.getName(), ge);
+        ge.getChild().forEach(c -> this.entities.put(c.getName(), c));
+    }
+
+    @Override
+    public void removeEntitiesMarkAsDeleted() {
+        List<GameEntity> toBeDeleted = new ArrayList<>();
+        entities.values().stream().filter(t -> t.isMarkedAsDelete()).forEach(t2 -> toBeDeleted.add(t2));
+        // remove entity marked as deleted
+        toBeDeleted.forEach(tbd -> {
+            entities.remove(tbd.getName());
+            game.getRenderer().removeEntity(tbd.getName());
+            game.getPhysicEngine().removeEntity(tbd.getName());
+        });
     }
 
     /**
