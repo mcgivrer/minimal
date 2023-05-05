@@ -63,12 +63,13 @@ public class WaterEffectBehavior implements Behavior<Influencer> {
                             (int) (e.position.x + e.size.x), (int) e.position.y);
                     g.setStroke(b);
                 }
-                g.setColor(e.color);
-                Rectangle2D rectWater = new Rectangle2D.Double(
-                        e.position.x, e.position.y,
-                        e.size.x, e.size.y);
-                g.fill(rectWater);
-                break;
+                if (Optional.ofNullable(e.color).isPresent()) {
+                    g.setColor(e.color);
+                    Rectangle2D rectWater = new Rectangle2D.Double(
+                            e.position.x, e.position.y,
+                            e.size.x, e.size.y);
+                    g.fill(rectWater);
+                }
             }
             case CIRCLE -> {
                 Ellipse2D el = new Ellipse2D.Double(
@@ -81,13 +82,14 @@ public class WaterEffectBehavior implements Behavior<Influencer> {
                     g.draw(el);
                     g.setStroke(b);
                 }
-                g.setColor(e.color);
-                g.setPaint(e.color);
-                g.fill(el);
-                break;
+                if (Optional.ofNullable(e.color).isPresent()) {
+                    g.setColor(e.color);
+                    g.setPaint(e.color);
+                    g.fill(el);
+                }
             }
             default -> {
-                System.err.printf("ERROR: Unknown how to draw this Influencer instance %s%n.", e.getName());
+                System.err.printf("ERROR: Do not known how to draw this Influencer instance %s%n.", e.getName());
             }
         }
     }
