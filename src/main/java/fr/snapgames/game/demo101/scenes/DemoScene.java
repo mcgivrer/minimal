@@ -30,10 +30,7 @@ import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.behaviors.entity.CoinBehavior;
-import fr.snapgames.game.demo101.behaviors.entity.PlayerInputBehavior;
-import fr.snapgames.game.demo101.behaviors.entity.RainEffectBehavior;
-import fr.snapgames.game.demo101.behaviors.entity.StormBehavior;
+import fr.snapgames.game.demo101.behaviors.entity.*;
 import fr.snapgames.game.demo101.behaviors.scene.PauseBehavior;
 import fr.snapgames.game.demo101.behaviors.scene.WindyWeatherBehavior;
 import fr.snapgames.game.demo101.io.DemoListener;
@@ -81,6 +78,7 @@ public class DemoScene extends AbstractScene {
         // define world play area with constrains
         Dimension playArea = (Dimension) config.get(ConfigAttribute.PLAY_AREA_SIZE);
         World world = pe.getWorld().setPlayArea(playArea);
+        world.setMaterial(Material.AIR);
 
         demoListener = new DemoListener(g, this);
         g.getInputHandler().addListener(demoListener);
@@ -153,12 +151,12 @@ public class DemoScene extends AbstractScene {
                 .setMaterial(Material.RUBBER)
                 .setAttribute("maxVelocity", 10.0)
                 .setAttribute("maxAcceleration", 8.0)
-                .setAttribute("speedStep", 0.02)
+                .setAttribute("speedStep", 2.0)
                 .setMass(8.0)
                 .setLayer(10)
                 .setPriority(1)
                 .addBehavior(new PlayerInputBehavior())
-                .setAttribute("player_jump", -4.0 * 0.2)
+                .setAttribute("player_jump", -4.0 * 2.0)
                 // define animations for the player Entity.
                 .add("player_idle", animations.get("player_idle").setSpeed(0.6))
                 .add("player_walk", animations.get("player_walk"))
@@ -198,16 +196,30 @@ public class DemoScene extends AbstractScene {
         // define Camera to track player.
         Influencer water = (Influencer) new Influencer("water")
                 .setType(EntityType.RECTANGLE)
-                .setPosition(new Vector2D(0, playArea.height * 0.85))
-                .setSize(new Vector2D(playArea.width, playArea.height * 0.15))
+                .setPosition(new Vector2D(0, playArea.height))
+                .setSize(new Vector2D(playArea.width, 120))
                 .setColor(new Color(0.0f, 0.3f, 0.8f, 0.7f))
                 .setBorderColor(Color.CYAN)
                 .setBorderWidth(1)
                 .setMaterial(Material.WATER)
                 .addForce(world.getGravity().multiply(0.98))
                 .setLayer(10)
-                .setPriority(2);
+                .setPriority(2)
+                .addBehavior(new WaterEffectBehavior(0.0, 120.0, 0.4));
         add(water);
+
+        Influencer wind = (Influencer) new Influencer("wind")
+                .setType(EntityType.RECTANGLE)
+                .setPosition(new Vector2D(0, 0))
+                .setSize(new Vector2D(playArea.width, playArea.width))
+                .setColor(new Color(0.0f, 0.4f, 0.0f, 0.05f))
+                .setBorderColor(Color.GREEN)
+                .setBorderWidth(1)
+                .setMaterial(Material.AIR)
+                .addForce(new Vector2D(-0.04, 0.0))
+                .setLayer(10)
+                .setPriority(1);
+        add(wind);
 
         Camera cam = new Camera("camera")
                 .setTarget(player)
