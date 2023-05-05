@@ -44,10 +44,16 @@ public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
             if (attrDist > 0) {
                 Color debugColor = (Color) e.getAttribute("debugAttrColor", Color.YELLOW);
                 g.setColor(debugColor);
+<<<<<<< HEAD
                 g.draw(new Ellipse2D.Double(e.position.x - (attrDist - e.size.x) * 0.5, e.position.y - (attrDist - e.size.y) * 0.5, attrDist, attrDist));
                 if (debugColor != Color.YELLOW) {
                     g.setColor(new Color(1.0f, 1.0f, 1.0f, 0.6f));
                     g.fill(e.getBoundingBox());
+=======
+                if (Optional.ofNullable(e).isPresent()
+                        && Optional.ofNullable(e.getCollisionBox()).isPresent()) {
+                    g.draw(e.getCollisionBox());
+>>>>>>> develop
                 }
             }
             g.setStroke(bckUp);

@@ -46,11 +46,11 @@ public class LightRenderer implements RendererPlugin<Light> {
     public void drawDebug(Renderer r, Graphics2D g, Light e) {
         g.setColor(Color.ORANGE);
         if (e.getType() == EntityType.CIRCLE) {
-            g.translate(-e.box.getBounds2D().getCenterX(), -e.box.getBounds2D().getCenterY());
+            g.translate(-e.box.getBounds2D().getWidth() * 0.5, -e.box.getBounds2D().getHeight() * 0.5);
         }
-        g.draw(e.box);
+        g.draw(e.collisionBox);
         if (e.getType() == EntityType.CIRCLE) {
-            g.translate(e.box.getBounds2D().getCenterX(), e.box.getBounds2D().getCenterY());
+            g.translate(e.box.getBounds2D().getWidth() * 0.5, e.box.getBounds2D().getHeight() * 0.5);
         }
     }
 }
