@@ -46,7 +46,7 @@ $ java -jar target/game-0.0.1-SNAPSHOT-shaded.jar
 
 After starting the latest jar file, the following picture may appear:
 
-![Latest enhanced minimal game framework](docs/docs/illustrations/figure-screenshot-0.0.3.png "Latest enhanced minimal game framework")
+![Latest enhanced minimal game framework](docs/docs/illustrations/figure-new-balls-images.png "Latest enhanced minimal game framework")
 
 _figure 1 - Latest enhanced minimal game framework_
 
