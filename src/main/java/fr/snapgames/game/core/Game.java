@@ -80,9 +80,9 @@ public class Game extends JPanel {
      * @see Configuration
      */
     public Game(String configFilePath, boolean mode) {
-        this.testMode = testMode;
+        this.testMode = mode;
         config = new Configuration(ConfigAttribute.values())
-                .setConfigurationFile("/game.properties")
+                .setConfigurationFile(configFilePath)
                 .parseConfigFile();
     }
 
@@ -91,7 +91,7 @@ public class Game extends JPanel {
      *
      * @param args Java command line arguments
      */
-    private void initialize(String[] args) {
+    public Game initialize(String[] args) {
         config.parseArgs(args);
         debug = (int) config.get(ConfigAttribute.DEBUG_LEVEL);
         FPS = (int) config.get(ConfigAttribute.RENDER_FPS);
@@ -120,7 +120,7 @@ public class Game extends JPanel {
 
         scm.activateDefaultScene();
         create(window.getGraphics());
-
+        return this;
     }
 
     private void create(Graphics2D g) {
@@ -234,7 +234,7 @@ public class Game extends JPanel {
                 Thread.sleep((long) (fpsDelay - dt) / 1000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                System.err.printf("ERROR: Unable to wait for %d ms: %s%n", fpsDelay - dt, e.getMessage());
+                System.err.printf("ERROR: Unable to wait for %f ms: %s%n", fpsDelay - dt, e.getMessage());
             }
         }
     }

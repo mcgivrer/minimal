@@ -16,19 +16,17 @@ public class GameEntityStepdefs implements En {
     public GameEntityStepdefs() {
         Given("a Game is instantiated", () -> {
             TestContext.clear();
-            game = (Game) TestContext.get("game", new Game("/test.properties", true));
+            game = (Game) TestContext.get("game", new Game("/test.properties", true).initialize(new String[]{}));
             game.getSceneManager().activateDefaultScene();
         });
-        And("the entities map is empty", () -> {
-            assertTrue(game.getSceneManager().getActiveScene().getEntities().isEmpty());
-        });
+        And("the entities map is empty",
+                () -> assertTrue(game.getSceneManager().getActiveScene().getEntities().isEmpty()));
         Then("I Add a new GameEntity named {string}", (String entityName) -> {
             game = (Game) TestContext.get("game");
             game.getSceneManager().getActiveScene().add(new GameEntity(entityName));
         });
-        And("the entities map size is {int}", (Integer nbEntities) -> {
-            assertEquals(nbEntities.intValue(), game.getSceneManager().getActiveScene().getEntities().size());
-        });
+        And("the entities map size is {int}",
+                (Integer nbEntities) -> assertEquals(nbEntities.intValue(), game.getSceneManager().getActiveScene().getEntities().size()));
         And("I add a new GameEntity named {string} at {double},{double}", (String entityName, Double posX, Double posY) -> {
             game = (Game) TestContext.get("game");
             GameEntity e = new GameEntity(entityName)
