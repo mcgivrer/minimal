@@ -1,15 +1,19 @@
 package fr.snapgames.game.core.scene;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Renderer;
 import fr.snapgames.game.core.io.InputHandler;
+import fr.snapgames.game.core.scene.transition.Transition;
 
 import java.util.Map;
 
 public interface Scene {
 
     String getName();
+
+    Transition getTransition();
 
     void setName(String name);
 
@@ -23,7 +27,7 @@ public interface Scene {
 
     void update(Game g, double dt);
 
-    void draw(Game g, Renderer r);
+    void draw(int i, Game g, Renderer r);
 
     void dispose(Game g);
 
@@ -40,4 +44,8 @@ public interface Scene {
     <T> T getAttribute(String attrName, Object defaultValue);
 
     Scene setAttribute(String attrName, Object defaultValue);
+
+    Map<String, GameEntity> getColliders();
+
+    Camera getActiveCamera();
 }

@@ -108,7 +108,6 @@ public class TitleScene extends AbstractScene {
     public void dispose(Game g) {
         getEntities().clear();
         game.getPhysicEngine().reset();
-        game.getRenderer().reset();
         g.getInputHandler().removeListener(titleListener);
         g.setPauseAutorized(true);
         g.getSoundSystem().stopAll();
