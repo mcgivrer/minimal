@@ -8,6 +8,7 @@ import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.plugins.*;
 import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.World;
+import fr.snapgames.game.core.scene.Scene;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -23,21 +24,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 0.0.2
  **/
 public class Renderer {
-    BufferedImage buffer;
-    Configuration config;
+    private List<BufferedImage> buffers = new ArrayList<>();
+    private Configuration config;
     private Game game;
     private Color clearColor = Color.BLACK;
     private double scale;
-    private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
-    private List<GameEntity> pipeline = new CopyOnWriteArrayList<>();
 
-    private Camera currentCamera;
     private Map<Class<?>, RendererPlugin<?>> plugins = new HashMap<>();
 
     public Renderer(Game g, Dimension bufferSize) {
         this.game = g;
         this.config = game.getConfiguration();
-        this.buffer = new BufferedImage(bufferSize.width, bufferSize.height, BufferedImage.TYPE_INT_ARGB);
+        // initialize the 2 image Buffers
+        this.buffers.clear();
+        this.buffers.add(new BufferedImage(bufferSize.width, bufferSize.height, BufferedImage.TYPE_INT_ARGB));
+        this.buffers.add(new BufferedImage(bufferSize.width, bufferSize.height, BufferedImage.TYPE_INT_ARGB));
+
         // Add required renderer plugins
         addPlugin(new GameEntityRenderer());
         addPlugin(new TextEntityRenderer());
@@ -46,27 +48,24 @@ public class Renderer {
         addPlugin(new InfluencerRenderer());
     }
 
-    public void addEntities(Collection<GameEntity> entities) {
-        entities.forEach(this::addEntity);
-    }
-
-    public void addEntity(GameEntity e) {
-
-        this.entities.put(e.getName(), e);
-        pipeline.add(e);
-        pipeline.sort(Renderer::compare);
-    }
 
     private static int compare(GameEntity e1, GameEntity e2) {
-        return e1.getLayer() == e2.getLayer() ? (Integer.compare(e1.getPriority(), e2.getPriority()))
-                : e1.getLayer() > e2.getLayer() ? 1 : -1;
+        return e1.getLayer() == e2.getLayer()
+                ? e1.getPriority() == e2.getPriority() ? 0
+                : Integer.compare(e1.getPriority(), e2.getPriority())
+                : Integer.compare(e1.getLayer(), e2.getLayer());
     }
 
     public void addPlugin(RendererPlugin<?> rendererPlugin) {
         this.plugins.put(rendererPlugin.getObjectClass(), rendererPlugin);
     }
 
-    public void draw(Map<String, Object> stats) {
+    public void draw(Scene scene, Map<String, Object> stats) {
+        draw(0, scene, stats);
+    }
+
+    public void draw(int bufferId, Scene scene, Map<String, Object> stats) {
+        BufferedImage buffer = buffers.get(bufferId);
         if (Optional.ofNullable(buffer).isPresent()) {
             Graphics2D g = buffer.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -76,14 +75,11 @@ public class Renderer {
             // clear scene
             g.setColor(clearColor);
             g.clearRect(0, 0, buffer.getWidth(), buffer.getHeight());
-
+            Camera currentCamera = scene.getActiveCamera();
             // draw all entities according to Camera
-            pipeline.stream()
+            scene.getEntities().values().stream()
                     .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
-                    .sorted((e1, e2) -> e1.getLayer() == e2.getLayer()
-                            ? e1.getPriority() == e2.getPriority() ? 0
-                            : Integer.compare(e1.getPriority(), e2.getPriority())
-                            : Integer.compare(e1.getLayer(), e2.getLayer()))
+                    .sorted(Renderer::compare)
                     .forEach(entity -> {
                         // draw Scene
                         if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
@@ -98,21 +94,21 @@ public class Renderer {
                         }
                     });
             if (game.getDebug() > 0) {
-                drawDebugGrid(g, 32);
+                drawDebugGrid(scene, g, 32);
                 if (Optional.ofNullable(currentCamera).isPresent()) {
                     drawCameraDebug(g, currentCamera);
                 }
                 if (game.getDebug() > 2) {
-                    drawEntitesDebug(g);
+                    drawEntitesDebug(scene, g);
                 }
             }
             g.dispose();
         }
         // remove inactive object.
-        entities.values().stream()
+        scene.getEntities().values().stream()
                 .filter(e -> !e.isActive())
                 .toList()
-                .forEach(ed -> entities.remove(ed.getName()));
+                .forEach(ed -> scene.getEntities().remove(ed.getName()));
     }
 
     private boolean isInViewPort(Camera currentCamera, GameEntity e) {
@@ -149,10 +145,11 @@ public class Renderer {
      * @param g    Graphics API
      * @param step Step to draw for grid
      */
-    private void drawDebugGrid(Graphics2D g, int step) {
+    private void drawDebugGrid(Scene scene, Graphics2D g, int step) {
         World world = game.getPhysicEngine().getWorld();
         g.setFont(g.getFont().deriveFont(8.5f));
 
+        Camera currentCamera = scene.getActiveCamera();
         if (Optional.ofNullable(currentCamera).isPresent()) {
             currentCamera.preDraw(g);
         }
@@ -174,8 +171,9 @@ public class Renderer {
         g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
-    public void drawEntitesDebug(Graphics2D g) {
-        entities.values().stream()
+    public void drawEntitesDebug(Scene scene, Graphics2D g) {
+        Camera currentCamera = scene.getActiveCamera();
+        scene.getEntities().values().stream()
                 .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
                 .sorted(Renderer::compare)
                 .forEach(v -> {
@@ -203,25 +201,20 @@ public class Renderer {
         g.drawString(String.format("targ: %s", camera.target.getName()), 20, 44);
     }
 
-    public void setCurrentCamera(Camera cam) {
-        this.currentCamera = cam;
-    }
-
-    public Camera getCurrentCamera() {
-        return this.currentCamera;
-    }
 
     public void reset() {
-        pipeline.clear();
-        entities.clear();
-        currentCamera = null;
+        buffers.clear();
     }
 
     public BufferedImage getBuffer() {
-        return this.buffer;
+        return this.buffers.get(0);
     }
 
-    public void removeEntity(String entityName) {
-        entities.remove(entityName);
+    public BufferedImage getBuffer(int bufferId) {
+        return this.buffers.get(bufferId);
+    }
+
+    public BufferedImage getOutputBuffer() {
+        return buffers.get(0);
     }
 }

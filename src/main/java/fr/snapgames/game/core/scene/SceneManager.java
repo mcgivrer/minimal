@@ -1,8 +1,14 @@
 package fr.snapgames.game.core.scene;
 
 import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
+import fr.snapgames.game.core.entity.Camera;
+import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.graphics.Renderer;
+import fr.snapgames.game.core.io.InputHandler;
+import fr.snapgames.game.core.scene.transition.Transition;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -32,6 +38,7 @@ public class SceneManager {
     private Configuration config;
 
     private Scene activeScene;
+    private Transition activeTransition;
 
     /**
      * Create the SceneManager with a parent Game instance.
@@ -124,7 +131,11 @@ public class SceneManager {
         if (availableScenes.containsKey(name)) {
             Class<? extends Scene> sceneClass = availableScenes.get(name);
             if (Optional.ofNullable(activeScene).isPresent()) {
-                activeScene.dispose(game);
+                if (Optional.ofNullable(activeScene.getTransition()).isPresent()) {
+                    this.activeTransition = activeScene.getTransition();
+                } else {
+                    activeScene.dispose(game);
+                }
                 System.out.printf("INFO: SceneManager: the Scene %s has been disposed.%n", activeScene.getName());
             }
             try {
@@ -169,5 +180,63 @@ public class SceneManager {
 
     public Scene getScene(String sceneName) {
         return scenes.get(sceneName);
+    }
+
+    /**
+     * Manage input for the current active {@link Scene}.
+     *
+     * @param game         the parent {@link Game}.
+     * @param inputHandler the {@link InputHandler} instance to capture input states.
+     */
+    public void input(Game game, InputHandler inputHandler) {
+        Scene s = getActiveScene();
+        for (GameEntity gameEntity : s.getEntities().values()) {
+            for (Behavior b : gameEntity.behaviors) {
+                b.input(game, gameEntity);
+            }
+        }
+        s.input(game, inputHandler);
+    }
+
+
+    /**
+     * Draw the current Active {@link Scene} of the current active {@link Transition}.
+     *
+     * @param game     the parent {@link Game}.
+     * @param renderer the active {@link Renderer} System.
+     * @param stats    the statistics map.
+     */
+    public void draw(Game game, Renderer renderer, Map<String, Object> stats) {
+        if (Optional.ofNullable(getActiveTransition()).isPresent()) {
+            getActiveTransition().draw(game, renderer, stats);
+        } else {
+            renderer.draw(getActiveScene(), stats);
+        }
+    }
+
+    /**
+     * Update the current active {@link Scene} of the current active {@link Transition}.
+     *
+     * @param game    the parent {@link Game}.
+     * @param elapsed the elapsed time since previous call.
+     * @param stats   the statistics map.
+     */
+    public void update(Game game, double elapsed, Map<String, Object> stats) {
+        Scene s = getActiveScene();
+        if (Optional.ofNullable(getActiveTransition()).isPresent()) {
+            getActiveTransition().update(game, elapsed);
+        } else {
+            game.getPhysicEngine().update(s, elapsed);
+        }
+        s.update(game, elapsed);
+    }
+
+    /**
+     * Return the current active Transition between 2 scenes on Scene activation time.
+     *
+     * @return
+     */
+    public Transition getActiveTransition() {
+        return this.activeTransition;
     }
 }

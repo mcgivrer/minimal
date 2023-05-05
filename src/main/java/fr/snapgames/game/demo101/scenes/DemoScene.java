@@ -211,8 +211,8 @@ public class DemoScene extends AbstractScene {
         Influencer wind = (Influencer) new Influencer("wind")
                 .setType(EntityType.RECTANGLE)
                 .setPosition(new Vector2D(0, 0))
-                .setSize(new Vector2D(playArea.width, playArea.width))
-                .setColor(new Color(0.0f, 0.4f, 0.0f, 0.05f))
+                .setSize(new Vector2D(playArea.width * 0.25, playArea.height))
+                .setColor(new Color(0.9f, 0.4f, 0.2f, 0.08f))
                 .setBorderColor(Color.GREEN)
                 .setBorderWidth(1)
                 .setMaterial(Material.AIR)
@@ -225,10 +225,12 @@ public class DemoScene extends AbstractScene {
                 .setTarget(player)
                 .setTween(0.1)
                 .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height));
-        renderer.setCurrentCamera(cam);
+        add(cam);
 
         // add randomly wind.
         add(new WindyWeatherBehavior(20.0, 0.0, 0.3, 5.0));
+
+        // add pause state processing.
         add(new PauseBehavior(pauseText));
     }
 
@@ -311,7 +313,6 @@ public class DemoScene extends AbstractScene {
     public void dispose(Game g) {
         getEntities().clear();
         game.getPhysicEngine().reset();
-        game.getRenderer().reset();
         game.getSoundSystem().stopAll();
         if (Optional.ofNullable(demoListener).isPresent()) {
             g.getInputHandler().removeListener(demoListener);

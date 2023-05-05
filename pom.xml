@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.snapgames.game</groupId>
     <artifactId>minimal</artifactId>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.0.7-SNAPSHOT</version>
     <name>Minimal</name>
     <description>A project demonstrating how to create sustainable project in a Game dev context</description>
     <inceptionYear>2023</inceptionYear>
@@ -37,7 +37,8 @@
     <scm>
         <url>https://github.com/${project.organization.name}/${project.name}</url>
         <connection>scm:git:git@github.com:${project.organization.name}/${project.name}.git</connection>
-        <developerConnection>scm:git:https://github.com/${project.organization.name}/${project.name}.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/${project.organization.name}/${project.name}.git
+        </developerConnection>
         <tag>v${project.version}</tag>
     </scm>
     <issueManagement>

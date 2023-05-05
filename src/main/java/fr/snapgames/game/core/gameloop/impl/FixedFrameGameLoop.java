@@ -31,13 +31,13 @@ public class FixedFrameGameLoop implements GameLoop {
         long timeFrame = 0;
         long loopCounter = 0;
         int maxLoopCounter = (int) game.getConfiguration().get(ConfigAttribute.EXIT_TEST_COUNT_FRAME);
-        Map<String, Object> loopData = new HashMap<>();
+        Map<String, Object> stats = new HashMap<>();
         while (!(isExit() || isTestMode() || isMaxLoopCounterReached(loopCounter, maxLoopCounter))) {
             start = System.nanoTime() / 1000000.0;
             loopCounter++;
             game.input();
             if (!game.isUpdatePause()) {
-                game.update(dt * .04);
+                game.update(dt * .04, stats);
                 updates += 1;
             }
 
@@ -50,9 +50,9 @@ public class FixedFrameGameLoop implements GameLoop {
                 updates = 0;
                 timeFrame = 0;
             }
-            prepareData(realFPS, realUPS, loopCounter, loopData);
+            prepareData(realFPS, realUPS, loopCounter, stats);
 
-            game.draw(loopData);
+            game.draw(stats);
             waitUntilStepEnd(dt);
 
             end = System.nanoTime() / 1000000.0;

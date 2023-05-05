@@ -17,11 +17,9 @@ import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
-import fr.snapgames.game.core.utils.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -140,28 +138,12 @@ public class Game extends JPanel {
         s.loadResources(this);
     }
 
-    /**
-     * Draw all things on screen.
-     *
-     * @param stats a list of stats in a {@link Map} to be displayed in the debug
-     *              bar.
-     */
-    public void draw(Map<String, Object> stats) {
-        renderer.draw(stats);
-        window.drawFrom(renderer, stats, scale);
-    }
 
     /**
      * update game entities according to input
      */
     public void input() {
-        Scene s = scm.getActiveScene();
-        for (GameEntity e : s.getEntities().values()) {
-            for (Behavior b : e.behaviors) {
-                b.input(this, e);
-            }
-        }
-        scm.getActiveScene().input(this, inputHandler);
+        scm.input(this, inputHandler);
     }
 
     /**
@@ -169,13 +151,19 @@ public class Game extends JPanel {
      *
      * @param elapsed elapsed time since previous call.
      */
-    public void update(double elapsed) {
-        physicEngine.update(elapsed);
-        if (Optional.ofNullable(renderer.getCurrentCamera()).isPresent()) {
-            renderer.getCurrentCamera().update(elapsed);
-        }
-        scm.getActiveScene().update(this, elapsed);
-        scm.getActiveScene().removeEntitiesMarkAsDeleted();
+    public void update(double elapsed, Map<String, Object> stats) {
+        getSceneManager().update(this, elapsed, stats);
+    }
+
+    /**
+     * Draw all things on screen.
+     *
+     * @param stats a list of stats in a {@link Map} to be displayed in the debug
+     *              bar.
+     */
+    public void draw(Map<String, Object> stats) {
+        getSceneManager().draw(this, renderer, stats);
+        window.drawFrom(renderer, stats, scale);
     }
 
     /**
@@ -298,7 +286,6 @@ public class Game extends JPanel {
 
     public void clearSystem() {
         getPhysicEngine().reset();
-        getRenderer().reset();
         List<ActionListener> toBeRemoved = getInputHandler().getListeners().stream().filter(al -> !(al instanceof GameKeyListener)).toList();
         getInputHandler().getListeners().removeAll(toBeRemoved);
     }

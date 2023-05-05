@@ -165,7 +165,8 @@ public class Window {
      */
     public void drawFrom(Renderer r, Map<String, Object> stats, double scale) {
         if (Optional.ofNullable(frame).isPresent()
-                && frame.getBufferStrategy() != null) {
+                && Optional.ofNullable(frame.getBufferStrategy()).isPresent()
+                && Optional.ofNullable(r.getOutputBuffer()).isPresent()) {
             if (frame.getBufferStrategy().getDrawGraphics() == null) {
                 return;
             }
@@ -173,7 +174,7 @@ public class Window {
             g2.scale(scale, scale);
             g2.drawImage(r.getBuffer(),
                     0, 0, frame.getWidth(), frame.getHeight(),
-                    0, 0, r.getBuffer().getWidth(), r.getBuffer().getHeight(),
+                    0, 0, r.getOutputBuffer().getWidth(), r.getBuffer().getHeight(),
                     null);
             g2.scale(1.0 / scale, 1.0 / scale);
             if (game.isDebugGreaterThan(0)) {
