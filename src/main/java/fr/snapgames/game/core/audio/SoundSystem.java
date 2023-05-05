@@ -103,6 +103,7 @@ public class SoundSystem {
         if (!mute) {
             if (soundBank.containsKey(code)) {
                 SoundClip sc = soundBank.get(code);
+
                 sc.play();
                 System.out.printf("INFO: Play sound %s%n", code);
             } else {

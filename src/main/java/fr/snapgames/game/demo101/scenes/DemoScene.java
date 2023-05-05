@@ -216,7 +216,7 @@ public class DemoScene extends AbstractScene {
                 .setBorderColor(Color.GREEN)
                 .setBorderWidth(1)
                 .setMaterial(Material.AIR)
-                .addForce(new Vector2D(-0.08, 0.0))
+                .addForce(new Vector2D(-0.04, 0.0))
                 .setLayer(10)
                 .setPriority(1);
         add(wind);
