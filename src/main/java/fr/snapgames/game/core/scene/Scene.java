@@ -36,4 +36,8 @@ public interface Scene {
     default void removeEntitiesMarkAsDeleted() {
 
     }
+
+    <T> T getAttribute(String attrName, Object defaultValue);
+
+    Scene setAttribute(String attrName, Object defaultValue);
 }

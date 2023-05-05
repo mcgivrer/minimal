@@ -1,6 +1,7 @@
 package fr.snapgames.game.core.scene;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +26,8 @@ public abstract class AbstractScene implements Scene {
     protected Renderer renderer;
 
     protected List<Behavior<Scene>> behaviors = new ArrayList<>();
+
+    public Map<String, Object> attributes = new HashMap<>();
 
     @Override
     public String getName() {
@@ -103,5 +106,16 @@ public abstract class AbstractScene implements Scene {
     public void draw(Game g, Renderer r) {
         // A default empty implementation.
 
+    }
+
+
+    public <T> T getAttribute(String attrName, Object defaultValue) {
+        return (T) attributes.getOrDefault(attrName, defaultValue);
+    }
+
+
+    public Scene setAttribute(String key, Object value) {
+        attributes.put(key, value);
+        return this;
     }
 }

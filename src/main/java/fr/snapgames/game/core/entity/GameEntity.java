@@ -233,8 +233,8 @@ public class GameEntity {
         return this;
     }
 
-    public Object getAttribute(String attrName, Object defaultValue) {
-        return attributes.getOrDefault(attrName, defaultValue);
+    public <T> T getAttribute(String attrName, Object defaultValue) {
+        return (T) attributes.getOrDefault(attrName, defaultValue);
     }
 
     public boolean isActive() {

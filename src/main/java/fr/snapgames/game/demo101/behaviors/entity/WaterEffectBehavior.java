@@ -28,6 +28,7 @@ public class WaterEffectBehavior implements Behavior<Influencer> {
 
     @Override
     public void update(Game game, Influencer entity, double dt) {
+
         if (internalTime == 0.0) {
             this.waterHeight = this.minWaterHeight;
             this.initialHeight = entity.position.y;
@@ -46,6 +47,7 @@ public class WaterEffectBehavior implements Behavior<Influencer> {
         entity.size.y = this.waterHeight;
         entity.updateBox();
         internalTime += dt;
+        game.getSceneManager().getActiveScene().setAttribute("rainBottomLevel", entity.position.y);
     }
 
     @Override

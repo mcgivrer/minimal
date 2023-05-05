@@ -113,8 +113,6 @@ public class Light extends GameEntity {
 
     @Override
     public void updateBox() {
-        switch()
         super.updateBox();
-        this.collisionBox
     }
 }

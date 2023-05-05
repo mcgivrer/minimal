@@ -53,14 +53,16 @@ public class RainEffectBehavior implements ParticleBehavior<ParticlesEntity> {
             p.forces.add(world.getGravity().negate().multiply(1000.0));
 
             // TODO this will be replaced by a collision detection event processing.
-            if (p.position.y - p.size.y > pe.size.y * .85 ||
+            double bottomPosition = game.getSceneManager().getActiveScene().getAttribute("rainBottomLevel", pe.size.y * .85);
+
+            if (p.position.y - p.size.y > bottomPosition ||
                     p.position.x > pe.size.x ||
                     p.position.x < 0.0 ||
                     p.position.y < 0.0) {
                 p.setColor(color);
                 p.setPosition(new Vector2D(
                         Math.random() * world.getPlayArea().width,
-                        Math.random() * world.getPlayArea().height * 0.85));
+                        0));
             }
         });
         // create new particles if needed.

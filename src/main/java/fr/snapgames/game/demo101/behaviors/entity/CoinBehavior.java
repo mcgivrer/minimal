@@ -12,6 +12,8 @@ import java.awt.geom.Ellipse2D;
 import java.util.Optional;
 
 public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
+    boolean blink = false;
+
     @Override
     public void update(Game game, GameEntity entity, double dt) {
         // if player near this entity less than distance (attrDist),
@@ -29,8 +31,10 @@ public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
                 Vector2D v = p.position.substract(entity.position);
                 entity.forces.add(v.normalize().multiply(attrForce));
                 entity.setAttribute("debugAttrColor", Color.RED);
+                entity.setAttribute("attracted", true);
             } else {
                 entity.setAttribute("debugAttrColor", Color.YELLOW);
+                entity.setAttribute("attracted", false);
             }
         }
     }
@@ -44,19 +48,16 @@ public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
             if (attrDist > 0) {
                 Color debugColor = (Color) e.getAttribute("debugAttrColor", Color.YELLOW);
                 g.setColor(debugColor);
-<<<<<<< HEAD
                 g.draw(new Ellipse2D.Double(e.position.x - (attrDist - e.size.x) * 0.5, e.position.y - (attrDist - e.size.y) * 0.5, attrDist, attrDist));
-                if (debugColor != Color.YELLOW) {
-                    g.setColor(new Color(1.0f, 1.0f, 1.0f, 0.6f));
-                    g.fill(e.getBoundingBox());
-=======
-                if (Optional.ofNullable(e).isPresent()
-                        && Optional.ofNullable(e.getCollisionBox()).isPresent()) {
-                    g.draw(e.getCollisionBox());
->>>>>>> develop
-                }
             }
             g.setStroke(bckUp);
+
+        }
+        blink = !blink;
+        boolean attracted = e.getAttribute("attracted", false);
+        if (attracted && blink) {
+            g.setColor(new Color(1.0f, 1.0f, 1.0f, 0.6f));
+            g.fill(e.getBoundingBox());
         }
     }
 
