@@ -96,7 +96,7 @@ public enum ConfigAttribute implements IConfigAttribute {
             Integer::valueOf),
     PLAY_AREA_SIZE(
             "playAreaSize",
-            "game.physic.world.playarea.size",
+            "game.physic.world.play.area.size",
             "set the size of the play area: [width]x[height]",
             new Dimension(320, 200),
             StringUtils::toDimension),

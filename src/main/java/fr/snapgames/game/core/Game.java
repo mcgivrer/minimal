@@ -103,7 +103,7 @@ public class Game extends JPanel {
      *
      * @param args Java command line arguments
      */
-    public void initialize(String[] args) {
+    private void initialize(String[] args) {
         config.parseArgs(args);
         debug = (int) config.get(ConfigAttribute.DEBUG_LEVEL);
         FPS = (int) config.get(ConfigAttribute.RENDER_FPS);
