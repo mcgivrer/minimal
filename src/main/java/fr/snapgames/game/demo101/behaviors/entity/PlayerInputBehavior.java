@@ -20,30 +20,13 @@ public class PlayerInputBehavior implements Behavior<GameEntity> {
     @Override
     public void input(Game game, GameEntity entity) {
         InputHandler inputHandler = game.getInputHandler();
-/*        double accel = (Double) entity.getAttribute("speedStep", 0.02);
-        accel = inputHandler.isShiftPressed() ? accel * 2.0 : accel;
-        accel = inputHandler.isCtrlPressed() ? accel * 1.5 : accel;
-
-        if (inputHandler.getKey(KeyEvent.VK_UP)) {
-            entity.forces.add(new Vector2D(0, -accel * 3.0));
-        }
-        if (inputHandler.getKey(KeyEvent.VK_DOWN)) {
-            entity.forces.add(new Vector2D(0, accel));
-        }
-        if (inputHandler.getKey(KeyEvent.VK_RIGHT)) {
-            entity.setDirection(1);
-            entity.forces.add(new Vector2D(accel, 0));
-        }
-        if (inputHandler.getKey(KeyEvent.VK_LEFT)) {
-            entity.setDirection(-1);
-            entity.forces.add(new Vector2D(-accel, 0));
-        }*/
 
         boolean move = false;
-        double accel = (double) entity.getAttribute("step", 0.05);
+        double accel = (double) entity.getAttribute("step", 0.1);
         // acceleration on CTRL or SHIFT key pressed
         accel = inputHandler.isShiftPressed() ? (accel * 2.0) : accel;
         accel = inputHandler.isCtrlPressed() ? accel * 1.5 : accel;
+        entity.currentAnimation = "player_idle";
         // Compute jump force
         double jump = (double) entity.getAttribute("player_jump", -accel * 4.0);
         if (inputHandler.getKey(KeyEvent.VK_UP)) {

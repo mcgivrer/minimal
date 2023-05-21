@@ -44,9 +44,12 @@ public class GameEntity {
     public Color borderColor;
     public int borderWidth;
 
+    public boolean solid;
+
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior<?>> behaviors = new ArrayList<>();
     public Shape box;
+    public Shape boxOffset;
     public Shape collisionBox;
 
     /**
@@ -105,6 +108,7 @@ public class GameEntity {
         this.priority = 1;
         this.box = new Rectangle2D.Double();
         this.collisionBox = new Rectangle2D.Double();
+        this.boxOffset = new Rectangle2D.Double();
         attributes.put("maxSpeed", 8.0);
         attributes.put("maxAcceleration", 3.0);
 
@@ -126,6 +130,11 @@ public class GameEntity {
 
     public boolean isStickToCamera() {
         return stickToCamera;
+    }
+
+    public GameEntity setBoxOffset(double top, double left, double right, double bottom) {
+        boxOffset = new Rectangle2D.Double(left, top, right, bottom);
+        return this;
     }
 
     public GameEntity setSize(Vector2D s) {
@@ -228,6 +237,16 @@ public class GameEntity {
         return this;
     }
 
+    public GameEntity setSolid(boolean solid) {
+        this.solid = solid;
+        return this;
+    }
+
+    public boolean isSolid() {
+        return this.solid;
+    }
+
+
     public GameEntity addBehavior(Behavior<?> b) {
         this.behaviors.add(b);
         return this;
@@ -300,11 +319,19 @@ public class GameEntity {
         switch (type) {
             case CIRCLE -> {
                 this.box = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
-                this.collisionBox = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
+                this.collisionBox = new Ellipse2D.Double(
+                        position.x + boxOffset.getBounds2D().getX(),
+                        position.y + boxOffset.getBounds2D().getY(),
+                        size.x + boxOffset.getBounds2D().getWidth(),
+                        size.y + boxOffset.getBounds2D().getHeight());
             }
             case RECTANGLE -> {
                 this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
-                this.collisionBox = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
+                this.collisionBox = new Rectangle2D.Double(
+                        position.x + boxOffset.getBounds2D().getX(),
+                        position.y + boxOffset.getBounds2D().getY(),
+                        size.x + boxOffset.getBounds2D().getWidth() - boxOffset.getBounds2D().getX(),
+                        size.y + boxOffset.getBounds2D().getHeight() - boxOffset.getBounds2D().getY());
             }
         }
     }

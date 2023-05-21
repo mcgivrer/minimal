@@ -18,7 +18,7 @@ public interface RendererPlugin<T extends GameEntity> {
 
     default void drawDebug(Renderer r, Graphics2D g, T e) {
         g.setColor(Color.ORANGE);
-        g.draw(e.box);
+        g.draw(e.collisionBox);
         g.setColor(Color.ORANGE);
         int il = 0;
         for (String s : e.getDebugInfo()) {

@@ -46,7 +46,8 @@ public class Window {
         frame.setFocusTraversalKeysEnabled(false);
 
         // on which Display the Window must appear ?
-        moveToScreen("Display0");
+        frame.setLocationRelativeTo(null);
+        //moveToScreen("Display0");
 
         // define Window content and size.
         frame.setLayout(new GridLayout());

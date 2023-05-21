@@ -11,6 +11,7 @@ import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.audio.SoundClip;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
+import fr.snapgames.game.core.behaviors.SolidCollisionResponseBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.EntityType;
@@ -148,6 +149,7 @@ public class DemoScene extends AbstractScene {
                 .setPosition(new Vector2D(playArea.width / 2.0, playArea.height / 2.0))
                 .setImage(playerImg)
                 .setColor(Color.BLUE)
+                .setBoxOffset(4, 4, -4, -1)
                 .setMaterial(Material.RUBBER)
                 .setAttribute("maxVelocity", 10.0)
                 .setAttribute("maxAcceleration", 8.0)
@@ -208,11 +210,11 @@ public class DemoScene extends AbstractScene {
                 .addBehavior(new WaterEffectBehavior(0.0, 120.0, 0.4));
         add(water);
 
-        Influencer wind = (Influencer) new Influencer("wind")
+        Influencer wind = (Influencer) new Influencer("magnetic_field")
                 .setType(EntityType.RECTANGLE)
                 .setPosition(new Vector2D(0, 0))
-                .setSize(new Vector2D(playArea.width, playArea.width))
-                .setColor(new Color(0.0f, 0.4f, 0.0f, 0.05f))
+                .setSize(new Vector2D(playArea.width * 0.10, playArea.width))
+                .setColor(new Color(0.4f, 0.7f, 0.0f, 0.3f))
                 .setBorderColor(Color.GREEN)
                 .setBorderWidth(1)
                 .setMaterial(Material.AIR)
@@ -220,6 +222,8 @@ public class DemoScene extends AbstractScene {
                 .setLayer(10)
                 .setPriority(1);
         add(wind);
+
+        createPlatforms(playArea, 20, 3, 8, Color.LIGHT_GRAY, 16);
 
         Camera cam = new Camera("camera")
                 .setTarget(player)
@@ -230,6 +234,29 @@ public class DemoScene extends AbstractScene {
         // add randomly wind.
         add(new WindyWeatherBehavior(20.0, 0.0, 0.3, 5.0));
         add(new PauseBehavior(pauseText));
+    }
+
+    private void createPlatforms(Dimension playArea, int nbPf, int minHeight, int minWidth, Color c, int gridStep) {
+        World world = pe.getWorld();
+        int ws = (int) (world.getPlayArea().getWidth() / gridStep);
+        int hs = (int) (world.getPlayArea().getHeight() / gridStep);
+        for (int i = 0; i < nbPf; i++) {
+            GameEntity pf = new GameEntity("pf_" + i)
+                    .setType(EntityType.RECTANGLE)
+                    .setPosition(new Vector2D(
+                            (int) (ws * Math.random()) * gridStep,
+                            (int) (hs * Math.random()) * gridStep))
+                    .setSize(new Vector2D(
+                            (minWidth + (gridStep * (int) (Math.random() * 8.0))),
+                            (minHeight + (gridStep * (int) (Math.random() * 4.0)))))
+                    .setColor(c)
+                    .setBorderColor(Color.DARK_GRAY)
+                    .setPhysicType(PhysicType.STATIC)
+                    .setSolid(true)
+                    .addBehavior(new SolidCollisionResponseBehavior());
+
+            add(pf);
+        }
     }
 
     private void createStars(String prefixEntityName, int nbStars, World world, boolean active) {
