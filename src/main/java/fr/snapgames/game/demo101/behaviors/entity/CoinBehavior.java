@@ -1,15 +1,17 @@
 package fr.snapgames.game.demo101.behaviors.entity;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import java.util.Optional;
+
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.CollisionResponseBehavior;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.math.CollisionEvent;
 import fr.snapgames.game.core.math.Vector2D;
-
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.util.Optional;
 
 public class CoinBehavior implements CollisionResponseBehavior<GameEntity> {
     boolean blink = false;

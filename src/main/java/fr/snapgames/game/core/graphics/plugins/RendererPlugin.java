@@ -16,13 +16,18 @@ public interface RendererPlugin<T extends GameEntity> {
 
     void draw(Renderer r, Graphics2D g, T e);
 
-    default void drawDebug(Renderer r, Graphics2D g, T e) {
+    default void drawDebug(Renderer r, Graphics2D g, T e, double scale) {
+        g.setFont(r.getDebugFont());
         g.setColor(Color.ORANGE);
-        g.draw(e.box);
+        g.drawRect(
+                (int) (e.box.getBounds2D().getX() * scale),
+                (int) (e.box.getBounds2D().getY()),
+                (int) (e.box.getBounds2D().getWidth()),
+                (int) (e.box.getBounds2D().getHeight()));
         g.setColor(Color.ORANGE);
         int il = 0;
         for (String s : e.getDebugInfo()) {
-            g.drawString(s, (int) (e.position.x + e.size.x + 4.0), (int) e.position.y + il);
+            g.drawString(s, (int) ((e.position.x + e.size.x + 4.0) * scale), (int) ((e.position.y + il) * scale));
             il += 10;
         }
 

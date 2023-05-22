@@ -1,17 +1,23 @@
 package fr.snapgames.game.core.graphics;
 
-import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.configuration.ConfigAttribute;
-import fr.snapgames.game.core.configuration.IConfigAttribute;
-import fr.snapgames.game.core.resources.ResourceManager;
-import fr.snapgames.game.core.utils.StringUtils;
-
-import javax.swing.JFrame;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.swing.JFrame;
+
+import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.resources.ResourceManager;
+import fr.snapgames.game.core.utils.StringUtils;
 
 /**
  * The Window object support all window operation and manage the main display
@@ -184,6 +190,9 @@ public class Window {
                 g2.setFont(g2.getFont().deriveFont(15.0f));
                 g2.drawString(displayLine, 16, frame.getHeight() - 16);
             }
+
+            // draw Debug Information
+            r.drawDebugToWindow(g2, this);
             g2.dispose();
             if (frame.getBufferStrategy() != null) {
                 frame.getBufferStrategy().show();
@@ -197,5 +206,9 @@ public class Window {
     public void close() {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
         frame.dispose();
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }

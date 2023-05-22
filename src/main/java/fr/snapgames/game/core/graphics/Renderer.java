@@ -1,20 +1,27 @@
 package fr.snapgames.game.core.graphics;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.graphics.plugins.*;
-import fr.snapgames.game.core.lang.I18n;
+import fr.snapgames.game.core.graphics.plugins.GameEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.InfluencerRenderer;
+import fr.snapgames.game.core.graphics.plugins.LightRenderer;
+import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
+import fr.snapgames.game.core.graphics.plugins.TextEntityRenderer;
 import fr.snapgames.game.core.math.World;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Renderer service to draw every GameEntity on screen.
@@ -31,6 +38,8 @@ public class Renderer {
     private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
     private List<GameEntity> pipeline = new CopyOnWriteArrayList<>();
 
+    private Font debugFont;
+
     private Camera currentCamera;
     private Map<Class<?>, RendererPlugin<?>> plugins = new HashMap<>();
 
@@ -38,6 +47,7 @@ public class Renderer {
         this.game = g;
         this.config = game.getConfiguration();
         this.buffer = new BufferedImage(bufferSize.width, bufferSize.height, BufferedImage.TYPE_INT_ARGB);
+        debugFont = buffer.createGraphics().getFont().deriveFont(8.5f);
         // Add required renderer plugins
         addPlugin(new GameEntityRenderer());
         addPlugin(new TextEntityRenderer());
@@ -97,15 +107,6 @@ public class Renderer {
                             currentCamera.postDraw(g);
                         }
                     });
-            if (game.getDebug() > 0) {
-                drawDebugGrid(g, 32);
-                if (Optional.ofNullable(currentCamera).isPresent()) {
-                    drawCameraDebug(g, currentCamera);
-                }
-                if (game.getDebug() > 2) {
-                    drawEntitesDebug(g);
-                }
-            }
             g.dispose();
         }
         // remove inactive object.
@@ -174,33 +175,13 @@ public class Renderer {
         g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
-    public void drawEntitesDebug(Graphics2D g) {
-        entities.values().stream()
-                .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
-                .sorted(Renderer::compare)
-                .forEach(v -> {
-                    if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
-                        currentCamera.preDraw(g);
-                    }
-                    if (plugins.containsKey(v.getClass())) {
-                        RendererPlugin rp = ((RendererPlugin) plugins.get(v.getClass()));
-                        rp.drawDebug(this, g, v);
-                    } else {
-                        System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n",
-                                v.getClass().getName());
-                    }
-
-                    if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
-                        currentCamera.postDraw(g);
-                    }
-                });
-    }
-
-    private void drawCameraDebug(Graphics2D g, Camera camera) {
-        g.drawRect(10, 10, (int) camera.viewport.getWidth() - 20, (int) camera.viewport.getHeight() - 20);
+    private void drawCameraDebug(Graphics2D g, Camera camera, double scale) {
+        g.drawRect(20, 20,
+                (int) ((camera.viewport.getWidth() - 20) * scale),
+                (int) ((camera.viewport.getHeight() - 20) * scale));
         g.drawString(String.format("cam: %s", camera.getName()), 20, 20);
         g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
-        g.drawString(String.format("targ: %s", camera.target.getName()), 20, 44);
+        g.drawString(String.format("target: %s", camera.target.getName()), 20, 44);
     }
 
     public void setCurrentCamera(Camera cam) {
@@ -223,5 +204,33 @@ public class Renderer {
 
     public void removeEntity(String entityName) {
         entities.remove(entityName);
+    }
+
+    public void drawDebugToWindow(Graphics2D g, Window window) {
+        Collection<GameEntity> entities = game.getSceneManager().getActiveScene().getEntities().values();
+        double scale = window.getFrame().getWidth() / buffer.getWidth();
+        entities.forEach(e -> {
+            if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
+                g.translate(-currentCamera.position.x * scale, -currentCamera.position.y * scale);
+            }
+            if (plugins.containsKey(e.getClass())) {
+                RendererPlugin rp = ((RendererPlugin) plugins.get(e.getClass()));
+                rp.drawDebug(this, g, e, scale);
+            }
+            if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
+                g.translate(-currentCamera.position.x * scale, -currentCamera.position.y * scale);
+            }
+        });
+        if (game.getDebug() > 0) {
+            drawDebugGrid(g, 32);
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                drawCameraDebug(g, currentCamera, scale);
+            }
+        }
+
+    }
+
+    public Font getDebugFont() {
+        return debugFont;
     }
 }
