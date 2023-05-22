@@ -26,7 +26,7 @@
         <cucumber.version>7.7.0</cucumber.version>
         <junit.version>5.9.0</junit.version>
         <junit-platform.version>1.9.0</junit-platform.version>
-        <project.mainClass>fr.snapgames.game.core.Game</project.mainClass>
+        <project.mainClass>fr.snapgames.game.demo101.Minimal</project.mainClass>
     </properties>
 
     <!-- Project ecosystem definition -->
