@@ -12,13 +12,7 @@ import fr.snapgames.game.core.audio.SoundClip;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
-import fr.snapgames.game.core.entity.Camera;
-import fr.snapgames.game.core.entity.EntityType;
-import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.entity.Influencer;
-import fr.snapgames.game.core.entity.Light;
-import fr.snapgames.game.core.entity.ParticlesEntity;
-import fr.snapgames.game.core.entity.TextEntity;
+import fr.snapgames.game.core.entity.*;
 import fr.snapgames.game.core.graphics.Animations;
 import fr.snapgames.game.core.graphics.TextAlign;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
@@ -30,6 +24,7 @@ import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
+import fr.snapgames.game.core.utils.TileMapLoader;
 import fr.snapgames.game.demo101.behaviors.entity.*;
 import fr.snapgames.game.demo101.behaviors.scene.PauseBehavior;
 import fr.snapgames.game.demo101.behaviors.scene.WindyWeatherBehavior;
@@ -50,7 +45,7 @@ public class DemoScene extends AbstractScene {
     private DemoListener demoListener;
 
     private Animations animations;
-
+    private TileMap tmLevel;
     private SoundClip collectCoinSound;
 
     public DemoScene(Game g, String name) {
@@ -71,6 +66,7 @@ public class DemoScene extends AbstractScene {
         g.getSoundSystem().load("collectCoin", "/audio/sounds/collect-coin.wav");
         animations = new Animations("/animations.properties");
 
+        tmLevel = TileMapLoader.load("/maps/map-01.properties");
     }
 
     @Override
@@ -79,6 +75,9 @@ public class DemoScene extends AbstractScene {
         Dimension playArea = (Dimension) config.get(ConfigAttribute.PLAY_AREA_SIZE);
         World world = pe.getWorld().setPlayArea(playArea);
         world.setMaterial(Material.AIR);
+
+        // Loaded TileMap
+        add(tmLevel);
 
         demoListener = new DemoListener(g, this);
         g.getInputHandler().addListener(demoListener);

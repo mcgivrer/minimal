@@ -27,7 +27,7 @@ import fr.snapgames.game.core.math.Vector2D;
 public class GameEntity {
     private static long index = 0;
     private long id = ++index;
-    private String name = "noname" + (id);
+    protected String name = "noname" + (id);
     public Vector2D position = new Vector2D(0, 0);
     public Vector2D speed = new Vector2D(0, 0);
     public Vector2D acceleration = new Vector2D(0, 0);
