@@ -1,6 +1,7 @@
 package fr.snapgames.game.core.graphics;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
@@ -88,23 +89,37 @@ public class Renderer {
             g.clearRect(0, 0, buffer.getWidth(), buffer.getHeight());
 
             // draw all entities according to Camera
+            // draw Scene
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                currentCamera.preDraw(g);
+            }
             pipeline.stream()
-                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
+                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e) && !e.isStickToCamera())
                     .sorted((e1, e2) -> e1.getLayer() == e2.getLayer()
                             ? e1.getPriority() == e2.getPriority() ? 0
                             : Integer.compare(e1.getPriority(), e2.getPriority())
                             : Integer.compare(e1.getLayer(), e2.getLayer()))
                     .forEach(entity -> {
-                        // draw Scene
-                        if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
-                            currentCamera.preDraw(g);
-                        }
+
                         drawEntity(g, entity);
                         for (Behavior b : entity.behaviors) {
                             b.draw(game, g, entity);
                         }
-                        if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
-                            currentCamera.postDraw(g);
+                    });
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                currentCamera.postDraw(g);
+            }
+
+            pipeline.stream()
+                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e) && e.isStickToCamera())
+                    .sorted((e1, e2) -> e1.getLayer() == e2.getLayer()
+                            ? e1.getPriority() == e2.getPriority() ? 0
+                            : Integer.compare(e1.getPriority(), e2.getPriority())
+                            : Integer.compare(e1.getLayer(), e2.getLayer()))
+                    .forEach(entity -> {
+                        drawEntity(g, entity);
+                        for (Behavior b : entity.behaviors) {
+                            b.draw(game, g, entity);
                         }
                     });
             // update camera

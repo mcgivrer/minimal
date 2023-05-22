@@ -146,8 +146,7 @@ public class Game extends JPanel {
      */
     public void draw(Map<String, Object> stats) {
         renderer.draw(stats);
-
-        window.drawFrom(renderer, stats, scale);
+        window.drawFrom(renderer, stats, 1.0);
     }
 
     /**

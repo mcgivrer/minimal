@@ -23,5 +23,15 @@ public class CameraRollingBehavior implements Behavior<Camera> {
             entity.setRotation(0);
         }
 
+        if (inputHandler.getKey(KeyEvent.VK_A)) {
+            entity.setZoom(entity.zoom * 1.01);
+        }
+        if (inputHandler.getKey(KeyEvent.VK_Z)) {
+            entity.setZoom(entity.zoom * 0.99);
+        }
+        if (inputHandler.getKey(KeyEvent.VK_E)) {
+            entity.setZoom(1.0);
+        }
+
     }
 }
