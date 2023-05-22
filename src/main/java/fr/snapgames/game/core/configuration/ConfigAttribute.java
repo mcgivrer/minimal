@@ -227,7 +227,12 @@ public enum ConfigAttribute implements IConfigAttribute {
     AUDIO_SOUND_MUTE_ON("soundMute",
             "game.sound.mute",
             "Set sound mute", false,
-            Boolean::parseBoolean);
+            Boolean::parseBoolean),
+    DEBUG_FILTER("debugFilter",
+            "game.debug.filter",
+            "Define a list of entity's name to draw debug information for",
+            "",
+            v -> v);
     private final String attrName;
     private final String attrDescription;
     private final Object attrDefaultValue;

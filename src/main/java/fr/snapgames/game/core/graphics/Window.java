@@ -1,17 +1,23 @@
 package fr.snapgames.game.core.graphics;
 
-import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.configuration.ConfigAttribute;
-import fr.snapgames.game.core.configuration.IConfigAttribute;
-import fr.snapgames.game.core.resources.ResourceManager;
-import fr.snapgames.game.core.utils.StringUtils;
-
-import javax.swing.JFrame;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.swing.JFrame;
+
+import fr.snapgames.game.core.Game;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
+import fr.snapgames.game.core.resources.ResourceManager;
+import fr.snapgames.game.core.utils.StringUtils;
 
 /**
  * The Window object support all window operation and manage the main display
@@ -176,6 +182,9 @@ public class Window {
                     0, 0, r.getBuffer().getWidth(), r.getBuffer().getHeight(),
                     null);
             g2.scale(1.0 / scale, 1.0 / scale);
+            // draw Debug Information
+            r.drawDebugToWindow(g2, this);
+            // draw information bottom line
             if (game.isDebugGreaterThan(0)) {
                 g2.setColor(new Color(0.3f, 0.0f, 0.0f, 0.8f));
                 g2.fillRect(0, frame.getHeight() - 32, frame.getWidth(), 32);
@@ -184,6 +193,7 @@ public class Window {
                 g2.setFont(g2.getFont().deriveFont(15.0f));
                 g2.drawString(displayLine, 16, frame.getHeight() - 16);
             }
+
             g2.dispose();
             if (frame.getBufferStrategy() != null) {
                 frame.getBufferStrategy().show();
@@ -197,5 +207,9 @@ public class Window {
     public void close() {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
         frame.dispose();
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }

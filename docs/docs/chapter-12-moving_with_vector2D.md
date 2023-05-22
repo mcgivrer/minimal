@@ -28,3 +28,14 @@ public class Entity<T>{
     public Vector2D acceleration;
 }
 ```
+
+With this introduction a lot of changes in the global design, thourght multiple systems are impacted: Renderer, PhysicEngine are the most impacted.
+
+let's dive into those 2 big pals.
+
+## PhysicEngine with Vector2D
+
+
+
+## Renderer with Vector2D
+

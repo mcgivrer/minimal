@@ -1,9 +1,8 @@
 package fr.snapgames.game.core.io;
 
-import fr.snapgames.game.core.Game;
-
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+
+import fr.snapgames.game.core.Game;
 
 /**
  * A Common listener to key to support Game operation like

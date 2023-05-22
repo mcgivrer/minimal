@@ -17,11 +17,9 @@ import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
-import fr.snapgames.game.core.utils.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -103,7 +101,7 @@ public class Game extends JPanel {
      *
      * @param args Java command line arguments
      */
-    private void initialize(String[] args) {
+    public void initialize(String[] args) {
         config.parseArgs(args);
         debug = (int) config.get(ConfigAttribute.DEBUG_LEVEL);
         FPS = (int) config.get(ConfigAttribute.RENDER_FPS);
@@ -253,16 +251,7 @@ public class Game extends JPanel {
         return this.animations;
     }
 
-    /**
-     * Entry point for executing game.
-     *
-     * @param args list of command line arguments
-     */
-    public static void main(String[] args) {
 
-        Game game = new Game();
-        game.run(args);
-    }
 
     public void setDebug(int debug) {
         this.debug = debug;
