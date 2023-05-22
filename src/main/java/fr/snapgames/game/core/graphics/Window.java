@@ -186,7 +186,7 @@ public class Window {
             r.drawDebugToWindow(g2, this);
             // draw information bottom line
             if (game.isDebugGreaterThan(0)) {
-                g2.setColor(new Color(0.3f, 0.0f, 0.0f, 0.8f));
+                g2.setColor(new Color(0.3f, 0.0f, 0.0f, 0.4f));
                 g2.fillRect(0, frame.getHeight() - 32, frame.getWidth(), 32);
                 g2.setColor(Color.ORANGE);
                 String displayLine = StringUtils.prepareStatsString(stats, "[ ", " ]", " | ");

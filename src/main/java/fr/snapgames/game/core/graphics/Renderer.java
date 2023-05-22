@@ -154,9 +154,7 @@ public class Renderer {
         World world = game.getPhysicEngine().getWorld();
         g.setFont(g.getFont().deriveFont(8.5f));
 
-        if (Optional.ofNullable(currentCamera).isPresent()) {
-            g.translate(-currentCamera.position.x * scale, -currentCamera.position.y * scale);
-        }
+        moveToCameraViewport(g, currentCamera, 1.0, -1, true);
 
         g.setColor(Color.LIGHT_GRAY);
         for (int x = 0; x < world.getPlayArea().getWidth(); x += step) {
@@ -171,9 +169,8 @@ public class Renderer {
                 (int) (world.getPlayArea().width * scale),
                 (int) (world.getPlayArea().height * scale));
 
-        if (Optional.ofNullable(currentCamera).isPresent()) {
-            g.translate(currentCamera.position.x * scale, currentCamera.position.y * scale);
-        }
+        moveToCameraViewport(g, currentCamera, 1.0, 1, true);
+
     }
 
     private void drawCameraDebug(Graphics2D g, Camera camera, double scale) {
@@ -181,8 +178,8 @@ public class Renderer {
                 (int) ((camera.viewport.getWidth() - 20) * scale),
                 (int) ((camera.viewport.getHeight() - 20) * scale));
         g.drawString(String.format("cam: %s", camera.getName()), 20, 20);
-        g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
-        g.drawString(String.format("target: %s", camera.target.getName()), 20, 44);
+        g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 30, 42);
+        g.drawString(String.format("target: %s", camera.target.getName()), 30, 54);
     }
 
     public void setCurrentCamera(Camera cam) {
@@ -213,25 +210,30 @@ public class Renderer {
             drawDebugGrid(g, 32, scale);
             Collection<GameEntity> entities = game.getSceneManager().getActiveScene().getEntities().values();
             double scale = window.getFrame().getWidth() / buffer.getWidth();
-            entities.stream()
+            entities
+                    .stream()
                     .filter(e -> Arrays.stream(debugFilter.split(",")).anyMatch(df -> e.getName().startsWith(df)))
                     .forEach(e -> {
-                        if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
-                            g.translate(-currentCamera.position.x * scale, -currentCamera.position.y * scale);
-                        }
+                        moveToCameraViewport(g, getCurrentCamera(), scale, -1, !e.isStickToCamera());
                         if (plugins.containsKey(e.getClass())) {
                             RendererPlugin rp = ((RendererPlugin) plugins.get(e.getClass()));
                             rp.drawDebug(this, g, e, scale);
                         }
-                        if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
-                            g.translate(currentCamera.position.x * scale, currentCamera.position.y * scale);
-                        }
+                        // if exists call behavior debugging draw operation.
+                        //e.getBehaviors().stream().filter(b-> b.drawDebugInfo(game,g,e,scale));
+                        moveToCameraViewport(g, getCurrentCamera(), scale, 1, !e.isStickToCamera());
                     });
             if (Optional.ofNullable(currentCamera).isPresent()) {
                 drawCameraDebug(g, currentCamera, scale);
             }
         }
 
+    }
+
+    private void moveToCameraViewport(Graphics2D g, Camera currentCamera, double scale, double direction, boolean flag) {
+        if (Optional.ofNullable(currentCamera).isPresent() && flag) {
+            g.translate(direction * currentCamera.position.x * scale, direction * currentCamera.position.y * scale);
+        }
     }
 
     public Font getDebugFont() {
