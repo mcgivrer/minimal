@@ -11,7 +11,7 @@ import java.awt.geom.Rectangle2D;
  * @author Frédéric Delorme
  * @since 0.0.2
  */
-public class Camera extends GameEntity{
+public class Camera extends GameEntity {
     public GameEntity target;
     public double rotation = 0.0f, tween = 0.0f;
     public Rectangle2D viewport;
@@ -43,23 +43,23 @@ public class Camera extends GameEntity{
     }
 
     public void preDraw(Graphics2D g) {
+        g.rotate(-rotation, viewport.getWidth() * 0.5,
+                viewport.getHeight() * 0.5);
         g.translate(-position.x, -position.y);
-        g.rotate(-rotation);
+
     }
 
     public void postDraw(Graphics2D g) {
-
-        g.rotate(rotation);
         g.translate(position.x, position.y);
+        g.rotate(rotation, viewport.getWidth() * 0.5,
+                viewport.getHeight() * 0.5);
     }
 
     public void update(double dt) {
-        this.position.x += Math
-                .ceil((target.position.x + (target.size.x * 0.5) - ((viewport.getWidth()) * 0.5) - this.position.x)
-                        * tween * Math.min(dt, 10));
-        this.position.y += Math
-                .ceil((target.position.y + (target.size.y * 0.5) - ((viewport.getHeight()) * 0.5) - this.position.y)
-                        * tween * Math.min(dt, 10));
+        this.position.x += (target.position.x + (target.size.x * 0.5) - ((viewport.getWidth()) * 0.5) - this.position.x)
+                * tween * Math.min(dt, 10);
+        this.position.y += (target.position.y + (target.size.y * 0.5) - ((viewport.getHeight()) * 0.5) - this.position.y)
+                * tween * Math.min(dt, 10);
 
         this.viewport.setRect(this.position.x, this.position.y, this.viewport.getWidth(), this.viewport.getHeight());
     }
