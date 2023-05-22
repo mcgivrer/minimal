@@ -29,7 +29,7 @@
         <project.mainClass>fr.snapgames.game.core.Game</project.mainClass>
     </properties>
 
-    <!-- Project eco-system definition -->
+    <!-- Project ecosystem definition -->
     <organization>
         <name>SnapGames</name>
         <url>https://snapgames.github.io/${project.name}</url>
@@ -37,7 +37,8 @@
     <scm>
         <url>https://github.com/${project.organization.name}/${project.name}</url>
         <connection>scm:git:git@github.com:${project.organization.name}/${project.name}.git</connection>
-        <developerConnection>scm:git:https://github.com/${project.organization.name}/${project.name}.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/${project.organization.name}/${project.name}.git
+        </developerConnection>
         <tag>v${project.version}</tag>
     </scm>
     <issueManagement>
@@ -58,9 +59,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>
-                    org.junit
-                </groupId>
+                <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>5.9.0</version>
                 <type>pom</type>
@@ -71,7 +70,8 @@
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
-        <!--dependency>
+        <!--
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.6</version>
@@ -80,7 +80,8 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.6</version>
-        </dependency-->
+        </dependency>
+        -->
         <dependency>
             <groupId>com.googlecode.soundlibs</groupId>
             <artifactId>jlayer</artifactId>

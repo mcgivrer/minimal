@@ -150,8 +150,8 @@ public class Configuration {
      * @param ca the IConfigAttribute key to retrieve the value for.
      * @return an Object corresponding the retrieved value.
      */
-    public Object get(IConfigAttribute ca) {
-        return configurationValues.get(ca);
+    public <T> T get(IConfigAttribute ca) {
+        return (T) configurationValues.get(ca);
     }
 
     /**

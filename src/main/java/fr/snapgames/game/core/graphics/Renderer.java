@@ -2,16 +2,14 @@ package fr.snapgames.game.core.graphics;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
@@ -39,9 +37,10 @@ public class Renderer {
     private List<GameEntity> pipeline = new CopyOnWriteArrayList<>();
 
     private Font debugFont;
-
+    private String debugFilter = "";
     private Camera currentCamera;
     private Map<Class<?>, RendererPlugin<?>> plugins = new HashMap<>();
+
 
     public Renderer(Game g, Dimension bufferSize) {
         this.game = g;
@@ -54,6 +53,7 @@ public class Renderer {
         addPlugin(new ParticlesEntityRenderer());
         addPlugin(new LightRenderer());
         addPlugin(new InfluencerRenderer());
+        debugFilter = config.get(ConfigAttribute.DEBUG_FILTER);
     }
 
     public void addEntities(Collection<GameEntity> entities) {
@@ -150,29 +150,30 @@ public class Renderer {
      * @param g    Graphics API
      * @param step Step to draw for grid
      */
-    private void drawDebugGrid(Graphics2D g, int step) {
+    private void drawDebugGrid(Graphics2D g, int step, double scale) {
         World world = game.getPhysicEngine().getWorld();
         g.setFont(g.getFont().deriveFont(8.5f));
 
         if (Optional.ofNullable(currentCamera).isPresent()) {
-            currentCamera.preDraw(g);
+            g.translate(-currentCamera.position.x * scale, -currentCamera.position.y * scale);
         }
+
         g.setColor(Color.LIGHT_GRAY);
         for (int x = 0; x < world.getPlayArea().getWidth(); x += step) {
-            g.drawLine(x, 0, x, (int) world.getPlayArea().getHeight());
+            g.drawLine((int) (x * scale), 0, (int) (x * scale), (int) (world.getPlayArea().getHeight() * scale));
         }
         for (int y = 0; y < world.getPlayArea().getHeight(); y += step) {
-            g.drawLine(0, y, (int) world.getPlayArea().getWidth(), y);
+            g.drawLine(0, (int) (y * scale), (int) (world.getPlayArea().getWidth() * scale), (int) (y * scale));
         }
         g.setColor(Color.CYAN);
-        g.drawRect(0, 0,
-                (int) world.getPlayArea().getWidth(),
-                (int) world.getPlayArea().getHeight());
+        g.drawRect(
+                0, 0,
+                (int) (world.getPlayArea().width * scale),
+                (int) (world.getPlayArea().height * scale));
+
         if (Optional.ofNullable(currentCamera).isPresent()) {
-            currentCamera.postDraw(g);
+            g.translate(currentCamera.position.x * scale, currentCamera.position.y * scale);
         }
-        g.setColor(Color.ORANGE);
-        g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
     private void drawCameraDebug(Graphics2D g, Camera camera, double scale) {
@@ -207,22 +208,25 @@ public class Renderer {
     }
 
     public void drawDebugToWindow(Graphics2D g, Window window) {
-        Collection<GameEntity> entities = game.getSceneManager().getActiveScene().getEntities().values();
-        double scale = window.getFrame().getWidth() / buffer.getWidth();
-        entities.forEach(e -> {
-            if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
-                g.translate(-currentCamera.position.x * scale, -currentCamera.position.y * scale);
-            }
-            if (plugins.containsKey(e.getClass())) {
-                RendererPlugin rp = ((RendererPlugin) plugins.get(e.getClass()));
-                rp.drawDebug(this, g, e, scale);
-            }
-            if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
-                g.translate(-currentCamera.position.x * scale, -currentCamera.position.y * scale);
-            }
-        });
-        if (game.getDebug() > 0) {
-            drawDebugGrid(g, 32);
+
+        if (game.isDebugGreaterThan(0)) {
+            drawDebugGrid(g, 32, scale);
+            Collection<GameEntity> entities = game.getSceneManager().getActiveScene().getEntities().values();
+            double scale = window.getFrame().getWidth() / buffer.getWidth();
+            entities.stream()
+                    .filter(e -> Arrays.stream(debugFilter.split(",")).anyMatch(df -> e.getName().startsWith(df)))
+                    .forEach(e -> {
+                        if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
+                            g.translate(-currentCamera.position.x * scale, -currentCamera.position.y * scale);
+                        }
+                        if (plugins.containsKey(e.getClass())) {
+                            RendererPlugin rp = ((RendererPlugin) plugins.get(e.getClass()));
+                            rp.drawDebug(this, g, e, scale);
+                        }
+                        if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
+                            g.translate(currentCamera.position.x * scale, currentCamera.position.y * scale);
+                        }
+                    });
             if (Optional.ofNullable(currentCamera).isPresent()) {
                 drawCameraDebug(g, currentCamera, scale);
             }

@@ -182,6 +182,9 @@ public class Window {
                     0, 0, r.getBuffer().getWidth(), r.getBuffer().getHeight(),
                     null);
             g2.scale(1.0 / scale, 1.0 / scale);
+            // draw Debug Information
+            r.drawDebugToWindow(g2, this);
+            // draw information bottom line
             if (game.isDebugGreaterThan(0)) {
                 g2.setColor(new Color(0.3f, 0.0f, 0.0f, 0.8f));
                 g2.fillRect(0, frame.getHeight() - 32, frame.getWidth(), 32);
@@ -191,8 +194,6 @@ public class Window {
                 g2.drawString(displayLine, 16, frame.getHeight() - 16);
             }
 
-            // draw Debug Information
-            r.drawDebugToWindow(g2, this);
             g2.dispose();
             if (frame.getBufferStrategy() != null) {
                 frame.getBufferStrategy().show();
