@@ -35,30 +35,32 @@ public class SolidCollisionResponseBehavior implements CollisionResponseBehavior
 
         Vector2D pv = new Vector2D(dx, dy);
         System.out.printf("%s vs %s : pv=(%f,%f)%n", player.getName(), platform.getName(), dx, dy);
-
         // test player bottom side
-        if (platform.position.y < player.collisionBox.getBounds2D().getY() + player.collisionBox.getBounds2D().getHeight()) {
-            player.position.y = platform.position.y - player.collisionBox.getBounds2D().getHeight();
-            player.acceleration.y = 0;
-            player.speed.y = 0;
-            player.currentAnimation = "player_idle";
+        if (platform.position.y < player.collisionBox.getBounds2D().getY() + player.collisionBox.getBounds2D().getHeight() && platform.position.y > player.position.y) {
+            player.position.y = platform.position.y - player.collisionBox.getBounds2D().getHeight() - player.boxOffset.getBounds2D().getY();
+            //player.acceleration.y = 0;
+            player.speed.y = -player.speed.y * player.material.elasticity;
+            player.currentAnimation = "player_jump";
+            player.contact |= 4;
         } else
             // test player left side
             if (platform.position.y < player.position.y
                     && platform.position.x < player.collisionBox.getBounds2D().getY() + player.collisionBox.getBounds2D().getWidth()) {
-                player.position.x = platform.position.x - player.collisionBox.getBounds2D().getWidth();
+                player.position.x = platform.position.x - player.collisionBox.getBounds2D().getWidth() - player.boxOffset.getBounds2D().getX();
                 player.acceleration.x = 0;
                 player.speed.x = 0;
                 player.currentAnimation = "player_idle";
+                player.contact |= 2;
             } else
                 // test player right side
                 if (platform.position.y < player.position.y
                         && platform.position.x + platform.size.x < player.collisionBox.getBounds2D().getY()) {
-                    player.position.x = platform.position.x + platform.size.x;
+                    player.position.x = platform.position.x + platform.size.x + player.boxOffset.getBounds2D().getX();
                     player.updateBox();
                     player.acceleration.x = 0;
                     player.speed.x = 0;
                     player.currentAnimation = "player_idle";
+                    player.contact |= 1;
                 }
 
         player.updateBox();

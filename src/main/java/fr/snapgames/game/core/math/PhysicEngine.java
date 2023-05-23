@@ -70,6 +70,11 @@ public class PhysicEngine {
         entities.values().stream()
                 .filter(e -> !(e instanceof Influencer))
                 .forEach(entity -> {
+
+                    entity.setContact(0);
+                    if (entity.isCollider()) {
+                        detectCollision(entity);
+                    }
                     updateEntity(entity, time);
                     if (Optional.ofNullable(world).isPresent()) {
                         constrainEntityToWorld(world, entity);
@@ -142,11 +147,12 @@ public class PhysicEngine {
             // Apply influencer Effects (Material and force impacted)
             Material material = appliedInfluencerToEntity(entity, world);
             // compute acceleration
-            entity.acceleration = entity.acceleration.addAll(entity.forces).multiply(material.density);
-            entity.acceleration = entity.acceleration.multiply((double) entity.mass);
+            entity.acceleration = entity.acceleration.addAll(entity.forces);
+            entity.acceleration = entity.acceleration.multiply(entity.mass * material.density);
             entity.acceleration.maximize(
-                    (double) entity.getAttribute("maxAccelX", maxAcceleration),
-                    (double) entity.getAttribute("maxAccelY", maxAcceleration));
+                            (double) entity.getAttribute("maxAccelX", maxAcceleration),
+                            (double) entity.getAttribute("maxAccelY", maxAcceleration))
+                    .thresholdToZero(0.01);
 
             // compute velocity
             double roughness = 1.0;
@@ -155,10 +161,11 @@ public class PhysicEngine {
             } else {
                 roughness = world.getMaterial().roughness;
             }
-            entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed)).multiply(roughness);
+            entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed * elapsed * 0.5)).multiply(roughness);
             entity.speed.maximize(
-                    (double) entity.getAttribute("maxVelX", maxVelocity),
-                    (double) entity.getAttribute("maxVelY", maxVelocity));
+                            (double) entity.getAttribute("maxVelX", maxVelocity),
+                            (double) entity.getAttribute("maxVelY", maxVelocity))
+                    .thresholdToZero(0.8);
 
             // compute position
             entity.position = entity.position.add(entity.speed.multiply(elapsed));
@@ -169,7 +176,7 @@ public class PhysicEngine {
         for (Behavior b : entity.behaviors) {
             b.update(game, entity, elapsed);
         }
-        if (!entity.currentAnimation.equals("")) {
+        if (!entity.currentAnimation.equals("") && entity.animations.containsKey(entity.currentAnimation)) {
             entity.animations.get(entity.currentAnimation).update((int) elapsed);
         }
     }
@@ -200,27 +207,26 @@ public class PhysicEngine {
      * @see World
      */
     private void constrainEntityToWorld(World world, GameEntity ge) {
-        ge.contact = 0;
         if (world.isNotContaining(ge)) {
             if (ge.position.x + ge.size.x > world.getPlayArea().width) {
                 ge.position.x = world.getPlayArea().width - ge.size.x;
                 ge.speed.x = ge.speed.x * -ge.material.elasticity;
-                ge.contact += 1;
+                ge.contact |= 1;
             }
             if (ge.position.x < 0) {
                 ge.position.x = 0;
                 ge.speed.x = ge.speed.x * -ge.material.elasticity;
-                ge.contact += 2;
+                ge.contact |= 2;
             }
             if (ge.position.y + ge.size.y > world.getPlayArea().height) {
                 ge.position.y = world.getPlayArea().height - ge.size.y;
                 ge.speed.y = ge.speed.y * -ge.material.elasticity;
-                ge.contact += 4;
+                ge.contact |= 4;
             }
             if (ge.position.y < 0) {
                 ge.position.y = 0;
                 ge.speed.y = ge.speed.y * -ge.material.elasticity;
-                ge.contact += 8;
+                ge.contact |= 8;
             }
         }
     }
