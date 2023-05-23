@@ -6,7 +6,9 @@ import fr.snapgames.game.core.math.Vector2D;
 import fr.snapgames.game.core.utils.StringUtils;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -94,7 +96,7 @@ public enum ConfigAttribute implements IConfigAttribute {
             Integer::valueOf),
     PLAY_AREA_SIZE(
             "playAreaSize",
-            "game.physic.world.playarea.size",
+            "game.physic.world.play.area.size",
             "set the size of the play area: [width]x[height]",
             new Dimension(320, 200),
             StringUtils::toDimension),
@@ -172,13 +174,22 @@ public enum ConfigAttribute implements IConfigAttribute {
     SCENE_LIST("sceneList",
             "game.scene.list",
             "List of available scene implementations for that application",
-            new String[0],
-            v -> Arrays.stream(v.split(",")).toList()
+            new String[]{"default:fr.snapgames.game.core.scene.DefaultScene"},
+            v -> {
+                String[] list;
+                if (v.contains(",")) {
+                    list = v.split(",");
+                } else {
+                    list = new String[1];
+                    list[0] = v;
+                }
+                return list;
+            }
     ),
     SCENE_DEFAULT("sceneDefault",
             "game.scene.default",
             "define the default scene to be activated at start",
-            "",
+            "default",
             v -> v),
     GAME_RESHUFFLE_FORCE("reshuffleForce",
             "game.physic.ingame.balls.reshuffle.force",
@@ -216,7 +227,12 @@ public enum ConfigAttribute implements IConfigAttribute {
     AUDIO_SOUND_MUTE_ON("soundMute",
             "game.sound.mute",
             "Set sound mute", false,
-            Boolean::parseBoolean);
+            Boolean::parseBoolean),
+    DEBUG_FILTER("debugFilter",
+            "game.debug.filter",
+            "Define a list of entity's name to draw debug information for",
+            "",
+            v -> v);
     private final String attrName;
     private final String attrDescription;
     private final Object attrDefaultValue;

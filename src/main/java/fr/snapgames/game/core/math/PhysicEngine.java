@@ -2,16 +2,15 @@ package fr.snapgames.game.core.math;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
+import fr.snapgames.game.core.behaviors.CollisionResponseBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.entity.Influencer;
 
 import java.awt.*;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,17 +24,19 @@ public class PhysicEngine {
 
     private static final double TIME_FACTOR = 0.45;
     private final Game game;
-    private Configuration config;
     private World world;
 
-    private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
+    private final Map<String, GameEntity> entities = new ConcurrentHashMap<>();
+    private final Map<String, GameEntity> colliders = new ConcurrentHashMap<>();
+
 
     private final double maxAcceleration;
     private final double maxVelocity;
+    private final List<CollisionEvent> collisions = new ArrayList<CollisionEvent>();
 
     public PhysicEngine(Game g) {
         this.game = g;
-        config = g.getConfiguration();
+        Configuration config = g.getConfiguration();
         maxAcceleration = (double) config.get(ConfigAttribute.PHYSIC_MAX_ACCELERATION_X);
         maxVelocity = (double) config.get(ConfigAttribute.PHYSIC_MAX_SPEED_X);
         Dimension playArea = (Dimension) config.get(ConfigAttribute.PLAY_AREA_SIZE);
@@ -53,15 +54,19 @@ public class PhysicEngine {
     }
 
     public void addEntities(Collection<GameEntity> entities) {
-        entities.stream().forEach(e -> this.entities.put(e.name, e));
+        entities.forEach(this::addEntity);
     }
 
     public void addEntity(GameEntity e) {
-        this.entities.put(e.name, e);
+        this.entities.put(e.getName(), e);
+        if (e.isCollider()) {
+            this.colliders.put(e.getName(), e);
+        }
     }
 
     public void update(double elapsed) {
         double time = elapsed * TIME_FACTOR;
+        collisions.clear();
         entities.values().stream()
                 .filter(e -> !(e instanceof Influencer))
                 .forEach(entity -> {
@@ -69,6 +74,43 @@ public class PhysicEngine {
                     if (Optional.ofNullable(world).isPresent()) {
                         constrainEntityToWorld(world, entity);
                     }
+                    if (entity.isCollider()) {
+                        detectCollision(entity);
+                    }
+                });
+        // process Influencer behavior's update
+        entities.values().stream()
+                .filter(e -> e instanceof Influencer)
+                .forEach(entity -> {
+                    for (Behavior b : entity.behaviors) {
+                        b.update(game, entity, elapsed);
+                    }
+                });
+    }
+
+    private void detectCollision(GameEntity entity) {
+        colliders.values().stream()
+                .filter(e ->
+                        !(e instanceof Influencer)
+                                && entity.getId() != e.getId()
+                                && e.isActive()
+                                && e.getPhysicType().equals(PhysicType.DYNAMIC)
+                                && entity.getCollisionBox().intersects(e.getCollisionBox().getBounds2D()))
+                .forEach(ec -> {
+
+                    // parse all entities to detect possible collision and call the filtered CollisionResponseBehavior.
+                    entity.getBehaviors().stream()
+                            .filter(b -> b instanceof CollisionResponseBehavior
+                                    && !((CollisionResponseBehavior<?>) b).getFilteredNames().equals(""))
+                            .forEach(crb -> {
+                                String[] etl = ((CollisionResponseBehavior<?>) crb).getFilteredNames().split(",");
+                                if (Arrays.stream(etl).anyMatch(fn -> fn.contains(ec.getName()))) {
+                                    CollisionEvent collision = new CollisionEvent(entity, ec);
+                                    collisions.add(collision);
+                                    ((CollisionResponseBehavior<?>) crb)
+                                            .collide(game, collision);
+                                }
+                            });
                 });
     }
 
@@ -107,7 +149,12 @@ public class PhysicEngine {
                     (double) entity.getAttribute("maxAccelY", maxAcceleration));
 
             // compute velocity
-            double roughness = entity.contact == 0 ? world.getMaterial().roughness : world.getMaterial().roughness * material.roughness;
+            double roughness = 1.0;
+            if (entity.contact > 0) {
+                roughness = material.roughness;
+            } else {
+                roughness = world.getMaterial().roughness;
+            }
             entity.speed = entity.speed.add(entity.acceleration.multiply(elapsed)).multiply(roughness);
             entity.speed.maximize(
                     (double) entity.getAttribute("maxVelX", maxVelocity),
@@ -122,6 +169,9 @@ public class PhysicEngine {
         for (Behavior b : entity.behaviors) {
             b.update(game, entity, elapsed);
         }
+        if (!entity.currentAnimation.equals("")) {
+            entity.animations.get(entity.currentAnimation).update((int) elapsed);
+        }
     }
 
     private Material appliedInfluencerToEntity(GameEntity e, World world) {
@@ -131,8 +181,12 @@ public class PhysicEngine {
                 .filter(i -> i.box.intersects(e.box.getBounds2D()))
                 .toList();
         for (GameEntity ge : influencerList) {
-            material = material.merge(ge.material);
-            e.addForces(ge.forces);
+            Influencer f = (Influencer) ge;
+            material = material.merge(f.material);
+            double buoyant = f.material.density * world.gravity.y *
+                    (e.mass / e.material.density) * 0.005;
+            e.addForce(new Vector2D(0.0, buoyant));
+            e.addForces(f.forces);
         }
         return material;
     }
@@ -140,7 +194,7 @@ public class PhysicEngine {
     /**
      * Constrain the GameEntity ge to stay in the world play area.
      *
-     * @param world the defne World for the Game
+     * @param world the defined World for the Game
      * @param ge    the GameEntity to be checked against world's play area constrains
      * @see GameEntity
      * @see World
@@ -162,18 +216,25 @@ public class PhysicEngine {
                 ge.position.y = world.getPlayArea().height - ge.size.y;
                 ge.speed.y = ge.speed.y * -ge.material.elasticity;
                 ge.contact += 4;
-
             }
             if (ge.position.y < 0) {
                 ge.position.y = 0;
                 ge.speed.y = ge.speed.y * -ge.material.elasticity;
                 ge.contact += 8;
-
             }
         }
     }
 
     public void reset() {
         entities.clear();
+        colliders.clear();
+    }
+
+    public List<CollisionEvent> getCollisionEvents() {
+        return collisions;
+    }
+
+    public void removeEntity(String entityName) {
+        entities.remove(entityName);
     }
 }

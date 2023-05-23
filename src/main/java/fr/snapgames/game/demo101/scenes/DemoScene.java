@@ -1,29 +1,39 @@
 package fr.snapgames.game.demo101.scenes;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Optional;
+
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.audio.SoundClip;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.behaviors.LightBehavior;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
-import fr.snapgames.game.core.entity.*;
+import fr.snapgames.game.core.entity.Camera;
+import fr.snapgames.game.core.entity.EntityType;
+import fr.snapgames.game.core.entity.GameEntity;
+import fr.snapgames.game.core.entity.Influencer;
+import fr.snapgames.game.core.entity.Light;
+import fr.snapgames.game.core.entity.ParticlesEntity;
+import fr.snapgames.game.core.entity.TextEntity;
+import fr.snapgames.game.core.graphics.Animations;
 import fr.snapgames.game.core.graphics.TextAlign;
 import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
 import fr.snapgames.game.core.lang.I18n;
-import fr.snapgames.game.core.math.*;
+import fr.snapgames.game.core.math.Material;
+import fr.snapgames.game.core.math.PhysicType;
+import fr.snapgames.game.core.math.RandomUtils;
+import fr.snapgames.game.core.math.Vector2D;
+import fr.snapgames.game.core.math.World;
 import fr.snapgames.game.core.resources.ResourceManager;
 import fr.snapgames.game.core.scene.AbstractScene;
-import fr.snapgames.game.demo101.behaviors.entity.CoinBehavior;
-import fr.snapgames.game.demo101.behaviors.entity.PlayerInputBehavior;
-import fr.snapgames.game.demo101.behaviors.entity.RainEffectBehavior;
-import fr.snapgames.game.demo101.behaviors.entity.StormBehavior;
+import fr.snapgames.game.demo101.behaviors.entity.*;
 import fr.snapgames.game.demo101.behaviors.scene.PauseBehavior;
 import fr.snapgames.game.demo101.behaviors.scene.WindyWeatherBehavior;
 import fr.snapgames.game.demo101.io.DemoListener;
-
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.util.Optional;
 
 /**
  * The {@link DemoScene} implements in a demonstration purpose all the features
@@ -38,6 +48,8 @@ public class DemoScene extends AbstractScene {
     private BufferedImage backgroundImg;
     private BufferedImage coinImg;
     private DemoListener demoListener;
+
+    private Animations animations;
 
     private SoundClip collectCoinSound;
 
@@ -57,6 +69,8 @@ public class DemoScene extends AbstractScene {
         playerImg = ResourceManager.getImage("/images/sprites01.png").getSubimage(0, 0, 32, 32);
         coinImg = ResourceManager.getImage("/images/tiles01.png").getSubimage(8 * 16, 6 * 16, 16, 16);
         g.getSoundSystem().load("collectCoin", "/audio/sounds/collect-coin.wav");
+        animations = new Animations("/animations.properties");
+
     }
 
     @Override
@@ -64,6 +78,7 @@ public class DemoScene extends AbstractScene {
         // define world play area with constrains
         Dimension playArea = (Dimension) config.get(ConfigAttribute.PLAY_AREA_SIZE);
         World world = pe.getWorld().setPlayArea(playArea);
+        world.setMaterial(Material.AIR);
 
         demoListener = new DemoListener(g, this);
         g.getInputHandler().addListener(demoListener);
@@ -109,7 +124,7 @@ public class DemoScene extends AbstractScene {
         String pauseStr = I18n.get("game.state.pause.message");
         int textWidth = g.getFontMetrics(pauseFont).stringWidth(pauseStr);
         int textHeight = g.getFontMetrics(pauseFont).getHeight();
-        TextEntity pauseText = (TextEntity) new TextEntity("pause")
+        TextEntity pauseText = (TextEntity) new TextEntity("text-pause")
                 .setText(pauseStr)
                 .setFont(pauseFont)
                 .setTextAlign(TextAlign.CENTER)
@@ -136,11 +151,17 @@ public class DemoScene extends AbstractScene {
                 .setMaterial(Material.RUBBER)
                 .setAttribute("maxVelocity", 10.0)
                 .setAttribute("maxAcceleration", 8.0)
-                .setAttribute("speedStep", 0.4)
+                .setAttribute("speedStep", 2.0)
                 .setMass(8.0)
                 .setLayer(10)
                 .setPriority(1)
-                .addBehavior(new PlayerInputBehavior());
+                .addBehavior(new PlayerInputBehavior())
+                .setAttribute("player_jump", -4.0 * 2.0)
+                // define animations for the player Entity.
+                .add("player_idle", animations.get("player_idle").setSpeed(0.6))
+                .add("player_walk", animations.get("player_walk"))
+                .add("player_fall", animations.get("player_fall"))
+                .add("player_jump", animations.get("player_jump"));
         add(player);
 
         // Create enemies Entity.
@@ -150,7 +171,7 @@ public class DemoScene extends AbstractScene {
         createRainParticlesEntity("rain", 200, world);
 
         // add an ambient light
-        Light ambientLight = (Light) new Light("ambient",
+        Light ambientLight = (Light) new Light("light-ambient",
                 new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
                 .setLayer(12)
@@ -159,7 +180,7 @@ public class DemoScene extends AbstractScene {
                 .addBehavior(new StormBehavior(500, 4, 50));
         add(ambientLight);
 
-        Light thunderLight = (Light) new Light("thunderLight",
+        Light thunderLight = (Light) new Light("light-thunderLight",
                 new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.9f)
                 .setColor(Color.WHITE)
                 .setLayer(12)
@@ -170,21 +191,35 @@ public class DemoScene extends AbstractScene {
         add(thunderLight);
 
         // add some spotlights
-        createSpotLights("spot", 10, world);
+        createSpotLights("light-spot", 10, world);
 
         // define Camera to track player.
-        Influencer water = (Influencer) new Influencer("water")
+        Influencer water = (Influencer) new Influencer("influ-water")
                 .setType(EntityType.RECTANGLE)
-                .setPosition(new Vector2D(0, playArea.height * 0.85))
-                .setSize(new Vector2D(playArea.width, playArea.height * 0.15))
+                .setPosition(new Vector2D(0, playArea.height))
+                .setSize(new Vector2D(playArea.width, 120))
                 .setColor(new Color(0.0f, 0.3f, 0.8f, 0.7f))
                 .setBorderColor(Color.CYAN)
                 .setBorderWidth(1)
                 .setMaterial(Material.WATER)
                 .addForce(world.getGravity().multiply(0.98))
                 .setLayer(10)
-                .setPriority(2);
+                .setPriority(2)
+                .addBehavior(new WaterEffectBehavior(0.0, 120.0, 0.4));
         add(water);
+
+        Influencer wind = (Influencer) new Influencer("influ-magnetic-field")
+                .setType(EntityType.RECTANGLE)
+                .setPosition(new Vector2D(0, 0))
+                .setSize(new Vector2D(playArea.width*.15, playArea.height))
+                .setColor(new Color(0.9f, 0.7f, 0.1f, 0.5f))
+                .setBorderColor(Color.GREEN)
+                .setBorderWidth(1)
+                .setMaterial(Material.AIR)
+                .addForce(new Vector2D(-0.04, 0.0))
+                .setLayer(10)
+                .setPriority(1);
+        add(wind);
 
         Camera cam = new Camera("camera")
                 .setTarget(player)
@@ -252,18 +287,19 @@ public class DemoScene extends AbstractScene {
      */
     public void createCoins(String namePattern, int nb, World world, Behavior<?> b) {
         for (int i = 0; i < nb; i++) {
-            GameEntity e = new GameEntity(namePattern + GameEntity.index)
+            GameEntity e = new GameEntity(namePattern + GameEntity.getIndex())
                     .setPosition(new Vector2D(Math.random() * world.getPlayArea().getWidth(),
                             Math.random() * world.getPlayArea().getHeight()))
                     .setImage(coinImg)
                     .setMaterial(Material.SUPER_BALL)
+                    .setType(EntityType.CIRCLE)
                     .setMass(25.0)
                     .setLayer(4)
                     .setPriority(4 + i)
                     .setAttribute("maxVelocity", 4.0)
                     .setAttribute("maxAcceleration", 5.0)
                     .setAttribute("attractionDistance", 80.0)
-                    .setAttribute("attractionForce", 3.0)
+                    .setAttribute("attractionForce", 2.0)
                     .setAttribute("value", (int) (Math.random() * 50.0) - 15)
                     .addBehavior(b);
 

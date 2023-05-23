@@ -64,7 +64,7 @@ public class TitleScene extends AbstractScene {
         g2d.setFont(fontTitle);
         int titleTextWidth = g2d.getFontMetrics().stringWidth(titleString);
 
-        TextEntity titleTxt = (TextEntity) new TextEntity(("titleTxt"))
+        TextEntity titleTxt = (TextEntity) new TextEntity(("text-title"))
                 .setText(titleString)
                 .setFont(fontTitle)
                 .setColor(Color.WHITE)
@@ -79,7 +79,7 @@ public class TitleScene extends AbstractScene {
         String msgString = I18n.get("game.title.message");
         g2d.setFont(fontMessage);
         int msgTextWidth = g2d.getFontMetrics().stringWidth(msgString);
-        TextEntity msgTxt = (TextEntity) new TextEntity(("messageTxt"))
+        TextEntity msgTxt = (TextEntity) new TextEntity(("text-message"))
                 .setText(msgString)
                 .setFont(fontMessage)
                 .setColor(Color.WHITE)

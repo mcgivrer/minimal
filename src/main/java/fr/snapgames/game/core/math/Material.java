@@ -1,5 +1,7 @@
 package fr.snapgames.game.core.math;
 
+import java.util.Arrays;
+
 /**
  * The {@link Material} class host all Materials characteristics used by {@link PhysicEngine} and {@link fr.snapgames.game.core.entity.GameEntity}
  * and {@link fr.snapgames.game.core.entity.Influencer} to compute
@@ -14,7 +16,7 @@ public class Material {
     public static final Material SUPER_BALL = new Material("superball", 0.98, 0.7, 0.23);
     public static final Material WOOD = new Material("wood", 0.20, 0.65, 0.50);
     public static final Material STEEL = new Material("steel", 0.10, 1.2, 0.12);
-    public static final Material AIR = new Material("air", 0.0, 0.05, 0.99);
+    public static final Material AIR = new Material("air", 0.0, 0.05, 0.999);
     public static final Material WATER = new Material("water", 0.0, 0.90, 0.80);
 
     public String name;
@@ -55,11 +57,15 @@ public class Material {
      */
     public Material merge(Material material) {
         return new Material(this.name + ">" + material.name,
-                this.elasticity * material.elasticity,
-                this.density * material.density,
-                this.roughness * material.roughness
+                average(this.elasticity, material.elasticity),
+                Math.max(this.density, material.density),
+                Math.max(this.roughness, material.roughness)
         );
 
+    }
+
+    private double average(double... values) {
+        return Arrays.stream(values).average().getAsDouble();
     }
 
     /**

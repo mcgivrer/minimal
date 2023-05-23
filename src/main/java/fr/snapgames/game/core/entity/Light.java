@@ -110,4 +110,9 @@ public class Light extends GameEntity {
         this.dIntensity = di;
         return this;
     }
+
+    @Override
+    public void updateBox() {
+        super.updateBox();
+    }
 }

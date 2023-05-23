@@ -118,7 +118,7 @@ public class SoundClip {
                 clip.flush();
                 clip.stop();
                 clip.drain();
-                clip.setMicrosecondPosition(0);
+                clip.setFramePosition(0);
                 clip.start();
             } catch (RuntimeException e) {
                 System.err.printf("ERROR: Unable to play sound on %s%n", clip.getLineInfo());
