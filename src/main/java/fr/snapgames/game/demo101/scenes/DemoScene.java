@@ -149,7 +149,7 @@ public class DemoScene extends AbstractScene {
                 .setPosition(new Vector2D(playArea.width / 2.0, playArea.height / 2.0))
                 .setImage(playerImg)
                 .setColor(Color.BLUE)
-                .setBoxOffset(4, 4, -4, -1)
+                .setBoxOffset(4, 4, -8, -2)
                 .setMaterial(Material.RUBBER)
                 .setAttribute("maxVelocity", 10.0)
                 .setAttribute("maxAcceleration", 8.0)
@@ -225,7 +225,7 @@ public class DemoScene extends AbstractScene {
 
         createPlatforms(playArea, 20, 3, 8, Color.LIGHT_GRAY, 16);
 
-        Camera cam = new Camera("camera")
+        Camera cam = (Camera) new Camera("camera")
                 .setTarget(player)
                 .setTween(0.1)
                 .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height))

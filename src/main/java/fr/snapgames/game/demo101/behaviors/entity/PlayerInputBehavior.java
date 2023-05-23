@@ -53,7 +53,7 @@ public class PlayerInputBehavior implements Behavior<GameEntity> {
         }
         if (!move) {
             entity.setSpeed(entity.speed.multiply(entity.material.roughness));
-            if (entity.speed.y > 0) {
+            if (entity.speed.y > 0.5) {
                 entity.currentAnimation = "player_fall";
             } else {
                 entity.currentAnimation = "player_idle";

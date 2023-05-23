@@ -195,6 +195,11 @@ public class GameEntity {
         ls.add(String.format("spd: %04.2f,%04.2f", this.speed.x, this.speed.y));
         ls.add(String.format("acc: %04.2f,%04.2f", this.acceleration.x, this.acceleration.y));
         ls.add(String.format("mat: %s", this.material));
+        if (null != currentAnimation && currentAnimation != "") {
+            ls.add(String.format("anim: %s[%d]", this.currentAnimation, this.animations.get(this.currentAnimation).getIndex()));
+        }
+        ls.add(String.format("col: %s", this.colliderFlag ? "ON" : "OFF"));
+
         return ls;
     }
 
