@@ -68,7 +68,7 @@ public class TextEntityRenderer implements RendererPlugin<TextEntity> {
     }
 
     @Override
-    public void drawDebug(Renderer r, Graphics2D g, TextEntity te) {
+    public void drawDebug(Renderer r, Graphics2D g, TextEntity te, double scaleX, double scaleY) {
         double offX = 0;
         switch (te.getTexAlign()) {
             case RIGHT -> {
@@ -88,21 +88,20 @@ public class TextEntityRenderer implements RendererPlugin<TextEntity> {
         // draw text area
         g.setColor(Color.ORANGE);
         g.drawRect(
-                (int) (te.position.x + offX),
-                (int) te.position.y - fm.getAscent(),
-                (int) te.size.x, fm.getAscent() + fm.getDescent());
+                (int) ((te.position.x + offX) * scaleX),
+                (int) ((te.position.y - fm.getAscent()) * scaleY),
+                (int) (te.size.x * scaleX), (int) ((fm.getAscent() + fm.getDescent()) * scaleY));
         // draw text position
         g.setColor(Color.WHITE);
         g.drawRect(
-                (int) te.position.x, (int) te.position.y,
+                (int) (te.position.x * scaleX), (int) (te.position.y * scaleY),
                 1, 1);
         // draw metadata
         g.setColor(Color.ORANGE);
         int il = 0;
         for (String s : te.getDebugInfo()) {
-            g.drawString(s, (int) (te.position.x + te.size.x + offX + 4.0), (int) te.position.y + il);
+            g.drawString(s, (int) ((te.position.x + te.size.x + offX + 4.0) * scaleX), (int) ((te.position.y * scaleY) + il));
             il += 10;
         }
-
     }
 }

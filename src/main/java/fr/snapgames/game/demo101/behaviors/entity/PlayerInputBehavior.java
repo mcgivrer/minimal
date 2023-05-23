@@ -20,7 +20,6 @@ public class PlayerInputBehavior implements Behavior<GameEntity> {
     @Override
     public void input(Game game, GameEntity entity) {
         InputHandler inputHandler = game.getInputHandler();
-
         boolean move = false;
         double accel = (double) entity.getAttribute("step", 0.1);
         // acceleration on CTRL or SHIFT key pressed
@@ -34,6 +33,7 @@ public class PlayerInputBehavior implements Behavior<GameEntity> {
             entity.currentAnimation = "player_jump";
             move = true;
         }
+
         if (inputHandler.getKey(KeyEvent.VK_DOWN)) {
             entity.forces.add(new Vector2D(0, accel));
             entity.currentAnimation = "player_walk";

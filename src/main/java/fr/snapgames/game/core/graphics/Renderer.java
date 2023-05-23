@@ -1,20 +1,21 @@
 package fr.snapgames.game.core.graphics;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
+import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.plugins.*;
-import fr.snapgames.game.core.lang.I18n;
 import fr.snapgames.game.core.math.World;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Renderer service to draw every GameEntity on screen.
@@ -31,19 +32,24 @@ public class Renderer {
     private Map<String, GameEntity> entities = new ConcurrentHashMap<>();
     private List<GameEntity> pipeline = new CopyOnWriteArrayList<>();
 
+    private Font debugFont;
+    private String debugFilter = "";
     private Camera currentCamera;
     private Map<Class<?>, RendererPlugin<?>> plugins = new HashMap<>();
+
 
     public Renderer(Game g, Dimension bufferSize) {
         this.game = g;
         this.config = game.getConfiguration();
         this.buffer = new BufferedImage(bufferSize.width, bufferSize.height, BufferedImage.TYPE_INT_ARGB);
+        debugFont = buffer.createGraphics().getFont().deriveFont(8.5f);
         // Add required renderer plugins
         addPlugin(new GameEntityRenderer());
         addPlugin(new TextEntityRenderer());
         addPlugin(new ParticlesEntityRenderer());
         addPlugin(new LightRenderer());
         addPlugin(new InfluencerRenderer());
+        debugFilter = config.get(ConfigAttribute.DEBUG_FILTER);
     }
 
     public void addEntities(Collection<GameEntity> entities) {
@@ -78,32 +84,43 @@ public class Renderer {
             g.clearRect(0, 0, buffer.getWidth(), buffer.getHeight());
 
             // draw all entities according to Camera
+            // draw Scene
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                currentCamera.preDraw(g);
+            }
             pipeline.stream()
-                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
+                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e) && !e.isStickToCamera())
                     .sorted((e1, e2) -> e1.getLayer() == e2.getLayer()
                             ? e1.getPriority() == e2.getPriority() ? 0
                             : Integer.compare(e1.getPriority(), e2.getPriority())
                             : Integer.compare(e1.getLayer(), e2.getLayer()))
                     .forEach(entity -> {
-                        // draw Scene
-                        if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
-                            currentCamera.preDraw(g);
-                        }
+
                         drawEntity(g, entity);
                         for (Behavior b : entity.behaviors) {
                             b.draw(game, g, entity);
                         }
-                        if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
-                            currentCamera.postDraw(g);
+                    });
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                currentCamera.postDraw(g);
+            }
+
+            pipeline.stream()
+                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e) && e.isStickToCamera())
+                    .sorted((e1, e2) -> e1.getLayer() == e2.getLayer()
+                            ? e1.getPriority() == e2.getPriority() ? 0
+                            : Integer.compare(e1.getPriority(), e2.getPriority())
+                            : Integer.compare(e1.getLayer(), e2.getLayer()))
+                    .forEach(entity -> {
+                        drawEntity(g, entity);
+                        for (Behavior b : entity.behaviors) {
+                            b.draw(game, g, entity);
                         }
                     });
-            if (game.getDebug() > 0) {
-                drawDebugGrid(g, 32);
-                if (Optional.ofNullable(currentCamera).isPresent()) {
-                    drawCameraDebug(g, currentCamera);
-                }
-                if (game.getDebug() > 2) {
-                    drawEntitesDebug(g);
+            // update camera
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                for (Behavior b : currentCamera.behaviors) {
+                    b.draw(game, g, currentCamera);
                 }
             }
             g.dispose();
@@ -113,6 +130,7 @@ public class Renderer {
                 .filter(e -> !e.isActive())
                 .toList()
                 .forEach(ed -> entities.remove(ed.getName()));
+
     }
 
     private boolean isInViewPort(Camera currentCamera, GameEntity e) {
@@ -133,12 +151,16 @@ public class Renderer {
         entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
             RendererPlugin rp = plugins.get(entity.getClass());
-            g.rotate(entity.rotation, entity.position.x + entity.size.x * 0.5, entity.position.y + entity.size.y * 0.5);
+            g.rotate(entity.rotation,
+                    entity.position.x + entity.size.x * 0.5,
+                    entity.position.y + entity.size.y * 0.5);
             rp.draw(this, g, entity);
-            g.rotate(-entity.rotation, entity.position.x + entity.size.x * 0.5, entity.position.y + entity.size.y * 0.5);
+            g.rotate(-entity.rotation,
+                    entity.position.x + entity.size.x * 0.5,
+                    entity.position.y + entity.size.y * 0.5);
             entity.setDrawnBy(rp.getClass());
         } else {
-            System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
+            System.err.printf("ERROR: Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
         }
         entity.getChild().forEach(c -> drawEntity(g, c));
     }
@@ -149,58 +171,39 @@ public class Renderer {
      * @param g    Graphics API
      * @param step Step to draw for grid
      */
-    private void drawDebugGrid(Graphics2D g, int step) {
+    private void drawDebugGrid(Graphics2D g, int step, double scaleX, double scaleY) {
         World world = game.getPhysicEngine().getWorld();
         g.setFont(g.getFont().deriveFont(8.5f));
 
         if (Optional.ofNullable(currentCamera).isPresent()) {
-            currentCamera.preDraw(g);
+            g.translate(-currentCamera.position.x * scaleX, -currentCamera.position.y * scaleY);
         }
+
         g.setColor(Color.LIGHT_GRAY);
         for (int x = 0; x < world.getPlayArea().getWidth(); x += step) {
-            g.drawLine(x, 0, x, (int) world.getPlayArea().getHeight());
+            g.drawLine((int) (x * scaleX), 0, (int) (x * scaleX), (int) (world.getPlayArea().getHeight() * scaleY));
         }
         for (int y = 0; y < world.getPlayArea().getHeight(); y += step) {
-            g.drawLine(0, y, (int) world.getPlayArea().getWidth(), y);
+            g.drawLine(0, (int) (y * scaleY), (int) (world.getPlayArea().getWidth() * scaleX), (int) (y * scaleY));
         }
         g.setColor(Color.CYAN);
-        g.drawRect(0, 0,
-                (int) world.getPlayArea().getWidth(),
-                (int) world.getPlayArea().getHeight());
+        g.drawRect(
+                0, 0,
+                (int) (world.getPlayArea().width * scaleX),
+                (int) (world.getPlayArea().height * scaleY));
+
         if (Optional.ofNullable(currentCamera).isPresent()) {
-            currentCamera.postDraw(g);
+            g.translate(currentCamera.position.x * scaleX, currentCamera.position.y * scaleY);
         }
-        g.setColor(Color.ORANGE);
-        g.drawRect(0, 0, world.getPlayArea().width, world.getPlayArea().height);
     }
 
-    public void drawEntitesDebug(Graphics2D g) {
-        entities.values().stream()
-                .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
-                .sorted(Renderer::compare)
-                .forEach(v -> {
-                    if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
-                        currentCamera.preDraw(g);
-                    }
-                    if (plugins.containsKey(v.getClass())) {
-                        RendererPlugin rp = ((RendererPlugin) plugins.get(v.getClass()));
-                        rp.drawDebug(this, g, v);
-                    } else {
-                        System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n",
-                                v.getClass().getName());
-                    }
-
-                    if (Optional.ofNullable(currentCamera).isPresent() && !v.isStickToCamera()) {
-                        currentCamera.postDraw(g);
-                    }
-                });
-    }
-
-    private void drawCameraDebug(Graphics2D g, Camera camera) {
-        g.drawRect(10, 10, (int) camera.viewport.getWidth() - 20, (int) camera.viewport.getHeight() - 20);
+    private void drawCameraDebug(Graphics2D g, Camera camera, double scaleX, double scaleY) {
+        g.drawRect(20, 20,
+                (int) ((camera.viewport.getWidth() - 20) * scaleX),
+                (int) ((camera.viewport.getHeight() - 20) * scaleY));
         g.drawString(String.format("cam: %s", camera.getName()), 20, 20);
-        g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
-        g.drawString(String.format("targ: %s", camera.target.getName()), 20, 44);
+        g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 30, 42);
+        g.drawString(String.format("target: %s", camera.target.getName()), 30, 54);
     }
 
     public void setCurrentCamera(Camera cam) {
@@ -223,5 +226,45 @@ public class Renderer {
 
     public void removeEntity(String entityName) {
         entities.remove(entityName);
+    }
+
+    public void drawDebugToWindow(Graphics2D g, Window window) {
+
+        if (game.isDebugGreaterThan(0)) {
+            double scaleX = window.getFrame().getWidth() / buffer.getWidth();
+            double scaleY = window.getFrame().getHeight() / buffer.getHeight();
+
+            drawDebugGrid(g, 32, scaleX, scaleY);
+
+            Collection<GameEntity> entities = game.getSceneManager().getActiveScene().getEntities().values();
+            entities.stream()
+                    .filter(e -> Arrays.stream(debugFilter.split(",")).anyMatch(df -> e.getName().startsWith(df)))
+                    .forEach(e -> {
+                        if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
+                            g.translate(-currentCamera.position.x * scaleX, -currentCamera.position.y * scaleY);
+                        }
+                        if (plugins.containsKey(e.getClass())) {
+                            RendererPlugin rp = ((RendererPlugin) plugins.get(e.getClass()));
+                            rp.drawDebug(this, g, e, scaleX, scaleY);
+                        }
+                        if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
+                            g.translate(currentCamera.position.x * scaleX, currentCamera.position.y * scaleY);
+                        }
+                    });
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                drawCameraDebug(g, currentCamera, scaleX, scaleY);
+            }
+        }
+
+    }
+
+    private void moveToCameraViewport(Graphics2D g, Camera currentCamera, double scale, double direction, boolean flag) {
+        if (Optional.ofNullable(currentCamera).isPresent() && flag) {
+            g.translate(direction * currentCamera.position.x * scale, direction * currentCamera.position.y * scale);
+        }
+    }
+
+    public Font getDebugFont() {
+        return debugFont;
     }
 }

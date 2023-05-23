@@ -125,7 +125,7 @@ public class DemoScene extends AbstractScene {
         String pauseStr = I18n.get("game.state.pause.message");
         int textWidth = g.getFontMetrics(pauseFont).stringWidth(pauseStr);
         int textHeight = g.getFontMetrics(pauseFont).getHeight();
-        TextEntity pauseText = (TextEntity) new TextEntity("pause")
+        TextEntity pauseText = (TextEntity) new TextEntity("text-pause")
                 .setText(pauseStr)
                 .setFont(pauseFont)
                 .setTextAlign(TextAlign.CENTER)
@@ -173,7 +173,7 @@ public class DemoScene extends AbstractScene {
         createRainParticlesEntity("rain", 200, world);
 
         // add an ambient light
-        Light ambientLight = (Light) new Light("ambient",
+        Light ambientLight = (Light) new Light("light-ambient",
                 new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.2f)
                 .setColor(new Color(0.0f, 0.0f, 0.6f, 0.8f))
                 .setLayer(12)
@@ -182,7 +182,7 @@ public class DemoScene extends AbstractScene {
                 .addBehavior(new StormBehavior(500, 4, 50));
         add(ambientLight);
 
-        Light thunderLight = (Light) new Light("thunderLight",
+        Light thunderLight = (Light) new Light("light-thunderLight",
                 new Rectangle2D.Double(0, 0, playArea.width, playArea.height), 0.9f)
                 .setColor(Color.WHITE)
                 .setLayer(12)
@@ -193,10 +193,10 @@ public class DemoScene extends AbstractScene {
         add(thunderLight);
 
         // add some spotlights
-        createSpotLights("spot", 10, world);
+        createSpotLights("light-spot", 10, world);
 
         // define Camera to track player.
-        Influencer water = (Influencer) new Influencer("water")
+        Influencer water = (Influencer) new Influencer("influ-water")
                 .setType(EntityType.RECTANGLE)
                 .setPosition(new Vector2D(0, playArea.height))
                 .setSize(new Vector2D(playArea.width, 120))
@@ -210,11 +210,11 @@ public class DemoScene extends AbstractScene {
                 .addBehavior(new WaterEffectBehavior(0.0, 120.0, 0.4));
         add(water);
 
-        Influencer wind = (Influencer) new Influencer("magnetic_field")
+        Influencer wind = (Influencer) new Influencer("influ-magnetic-field")
                 .setType(EntityType.RECTANGLE)
                 .setPosition(new Vector2D(0, 0))
-                .setSize(new Vector2D(playArea.width * 0.10, playArea.width))
-                .setColor(new Color(0.4f, 0.7f, 0.0f, 0.3f))
+                .setSize(new Vector2D(playArea.width * .15, playArea.height))
+                .setColor(new Color(0.9f, 0.7f, 0.1f, 0.5f))
                 .setBorderColor(Color.GREEN)
                 .setBorderWidth(1)
                 .setMaterial(Material.AIR)
@@ -228,7 +228,8 @@ public class DemoScene extends AbstractScene {
         Camera cam = new Camera("camera")
                 .setTarget(player)
                 .setTween(0.1)
-                .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height));
+                .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height))
+                .addBehavior(new CameraRollingBehavior());
         renderer.setCurrentCamera(cam);
 
         // add randomly wind.

@@ -23,9 +23,4 @@ public class ParticlesEntityRenderer implements RendererPlugin<ParticlesEntity> 
             r.drawEntity(g, e);
         });
     }
-
-    @Override
-    public void drawDebug(Renderer r, Graphics2D g, ParticlesEntity e) {
-
-    }
 }
