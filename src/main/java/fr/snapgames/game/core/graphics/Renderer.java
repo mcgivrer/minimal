@@ -167,6 +167,7 @@ public class Renderer {
                 0, 0,
                 (int) (world.getPlayArea().width * scale),
                 (int) (world.getPlayArea().height * scale));
+    }
 
     public void drawEntitesDebug(Graphics2D g) {
         entities.values().stream()
@@ -178,20 +179,14 @@ public class Renderer {
                     }
                     if (plugins.containsKey(v.getClass())) {
                         RendererPlugin rp = ((RendererPlugin) plugins.get(v.getClass()));
-                        rp.drawDebug(this, g, v);
+                        rp.drawDebug(this, g, v, scale);
                     } else {
                         System.err.printf("ERROR: Renderer:Unknown rendering plugin for Entity class %s%n",
                                 v.getClass().getName());
                     }
-        moveToCameraViewport(g, currentCamera, 1.0, 1, true);
-
+                });
     }
 
-    private void drawCameraDebug(Graphics2D g, Camera camera) {
-        g.drawRect(10, 10, (int) camera.viewport.getWidth() - 20, (int) camera.viewport.getHeight() - 20);
-        g.drawString(String.format("cam: %s", camera.name), 20, 20);
-        g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 20, 32);
-        g.drawString(String.format("tgt: %s", camera.target.name), 20, 44);
     private void drawCameraDebug(Graphics2D g, Camera camera, double scale) {
         g.drawRect(20, 20,
                 (int) ((camera.viewport.getWidth() - 20) * scale),
