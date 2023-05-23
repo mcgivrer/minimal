@@ -151,19 +151,21 @@ public class DemoScene extends AbstractScene {
                 .setColor(Color.BLUE)
                 .setBoxOffset(4, 4, -8, -2)
                 .setMaterial(Material.RUBBER)
-                .setAttribute("maxVelocity", 10.0)
-                .setAttribute("maxAcceleration", 8.0)
+                .setAttribute("maxVelX", 16.0)
+                .setAttribute("maxVelY", 20.0)
+                .setAttribute("maxAccelX", 12.0)
+                .setAttribute("maxAccelY", 16.0)
                 .setAttribute("speedStep", 2.0)
-                .setMass(8.0)
+                .setMass(80.0)
                 .setLayer(10)
                 .setPriority(1)
                 .addBehavior(new PlayerInputBehavior())
                 .setAttribute("player_jump", -4.0 * 2.0)
                 // define animations for the player Entity.
                 .add("player_idle", animations.get("player_idle").setSpeed(0.6))
-                .add("player_walk", animations.get("player_walk"))
-                .add("player_fall", animations.get("player_fall"))
-                .add("player_jump", animations.get("player_jump"));
+                .add("player_walk", animations.get("player_walk").setSpeed(0.6))
+                .add("player_fall", animations.get("player_fall").setSpeed(0.6))
+                .add("player_jump", animations.get("player_jump").setSpeed(0.6));
         add(player);
 
         // Create enemies Entity.
@@ -218,7 +220,7 @@ public class DemoScene extends AbstractScene {
                 .setBorderColor(Color.GREEN)
                 .setBorderWidth(1)
                 .setMaterial(Material.AIR)
-                .addForce(new Vector2D(-0.04, 0.0))
+                .addForce(new Vector2D(-0.15, 0.0))
                 .setLayer(10)
                 .setPriority(1);
         add(wind);
@@ -227,7 +229,7 @@ public class DemoScene extends AbstractScene {
 
         Camera cam = (Camera) new Camera("camera")
                 .setTarget(player)
-                .setTween(0.1)
+                .setTween(0.04)
                 .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height))
                 .addBehavior(new CameraRollingBehavior());
         renderer.setCurrentCamera(cam);

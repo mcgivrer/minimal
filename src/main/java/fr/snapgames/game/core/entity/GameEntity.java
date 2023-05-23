@@ -14,6 +14,7 @@ import java.util.Optional;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.graphics.Animation;
 import fr.snapgames.game.core.graphics.Animations;
+import fr.snapgames.game.core.graphics.Window;
 import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.PhysicType;
 import fr.snapgames.game.core.math.Vector2D;
@@ -181,7 +182,7 @@ public class GameEntity {
 
     /**
      * Add internal debug information used by
-     * {@link fr.snapgames.game.core.graphics.Renderer#drawEntitesDebug(Graphics2D)}
+     * {@link fr.snapgames.game.core.graphics.Renderer#drawDebugToWindow(Graphics2D, Window)}
      * to display realtime information.
      *
      * @return the corresponding {@link Collection} of {@link String} containing the
@@ -199,6 +200,8 @@ public class GameEntity {
             ls.add(String.format("anim: %s[%d]", this.currentAnimation, this.animations.get(this.currentAnimation).getIndex()));
         }
         ls.add(String.format("col: %s", this.colliderFlag ? "ON" : "OFF"));
+        ls.add(String.format("contact: %d", this.contact));
+
 
         return ls;
     }
@@ -443,5 +446,14 @@ public class GameEntity {
 
     public Map<String, Animation> getAnimations() {
         return animations;
+    }
+
+    public Shape getBoxOffset() {
+        return this.boxOffset;
+    }
+
+    public GameEntity setContact(int i) {
+        this.contact = i;
+        return this;
     }
 }

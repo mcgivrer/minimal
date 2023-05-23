@@ -4,7 +4,9 @@ import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.io.InputHandler;
+import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.math.Vector2D;
+import fr.snapgames.game.core.math.World;
 
 import java.awt.event.KeyEvent;
 
@@ -19,9 +21,11 @@ public class PlayerInputBehavior implements Behavior<GameEntity> {
 
     @Override
     public void input(Game game, GameEntity entity) {
+        PhysicEngine pe = game.getPhysicEngine();
+        World world = pe.getWorld();
         InputHandler inputHandler = game.getInputHandler();
         boolean move = false;
-        double accel = (double) entity.getAttribute("step", 0.1);
+        double accel = (double) entity.getAttribute("speedStep", 0.1);
         // acceleration on CTRL or SHIFT key pressed
         accel = inputHandler.isShiftPressed() ? (accel * 2.0) : accel;
         accel = inputHandler.isCtrlPressed() ? accel * 1.5 : accel;
@@ -52,7 +56,7 @@ public class PlayerInputBehavior implements Behavior<GameEntity> {
             move = true;
         }
         if (!move) {
-            entity.setSpeed(entity.speed.multiply(entity.material.roughness));
+            entity.speed.x = entity.speed.x * entity.material.roughness;
             if (entity.speed.y > 0.5) {
                 entity.currentAnimation = "player_fall";
             } else {
