@@ -211,7 +211,7 @@ public class DemoScene extends AbstractScene {
         Influencer wind = (Influencer) new Influencer("influ-magnetic-field")
                 .setType(EntityType.RECTANGLE)
                 .setPosition(new Vector2D(0, 0))
-                .setSize(new Vector2D(playArea.width*.15, playArea.height))
+                .setSize(new Vector2D(playArea.width * .15, playArea.height))
                 .setColor(new Color(0.9f, 0.7f, 0.1f, 0.5f))
                 .setBorderColor(Color.GREEN)
                 .setBorderWidth(1)
@@ -221,10 +221,11 @@ public class DemoScene extends AbstractScene {
                 .setPriority(1);
         add(wind);
 
-        Camera cam = new Camera("camera")
+        Camera cam = (Camera) new Camera("camera")
                 .setTarget(player)
                 .setTween(0.1)
-                .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height));
+                .setViewport(new Rectangle2D.Double(0, 0, viewport.width, viewport.height))
+                .addBehavior(new CameraRollingBehavior());
         renderer.setCurrentCamera(cam);
 
         // add randomly wind.
