@@ -43,14 +43,14 @@ public class LightRenderer implements RendererPlugin<Light> {
     }
 
     @Override
-    public void drawDebug(Renderer r, Graphics2D g, Light e, double scale) {
+    public void drawDebug(Renderer r, Graphics2D g, Light e, double scaleX, double scaleY) {
         g.setColor(Color.ORANGE);
         if (e.getType() == EntityType.CIRCLE) {
-            g.translate(-e.box.getBounds2D().getWidth() * 0.5 * scale, -e.box.getBounds2D().getHeight() * 0.5 * scale);
+            g.translate(-e.box.getBounds2D().getWidth() * 0.5 * scaleX, -e.box.getBounds2D().getHeight() * 0.5 * scaleY);
         }
         g.draw(e.collisionBox);
         if (e.getType() == EntityType.CIRCLE) {
-            g.translate(e.box.getBounds2D().getWidth() * 0.5 * scale, e.box.getBounds2D().getHeight() * 0.5 * scale);
+            g.translate(e.box.getBounds2D().getWidth() * 0.5 * scaleX, e.box.getBounds2D().getHeight() * 0.5 * scaleY);
         }
     }
 }

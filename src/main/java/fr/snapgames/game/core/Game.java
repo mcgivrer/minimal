@@ -18,6 +18,7 @@ import fr.snapgames.game.core.math.PhysicEngine;
 import fr.snapgames.game.core.scene.Scene;
 import fr.snapgames.game.core.scene.SceneManager;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -146,7 +147,7 @@ public class Game extends JPanel {
      */
     public void draw(Map<String, Object> stats) {
         renderer.draw(stats);
-        window.drawFrom(renderer, stats, scale);
+        window.drawFrom(renderer, stats, 1.0);
     }
 
     /**
@@ -159,7 +160,14 @@ public class Game extends JPanel {
                 b.input(this, e);
             }
         }
+        // update scene
         scm.getActiveScene().input(this, inputHandler);
+        // update camera
+        if (Optional.ofNullable(renderer.getCurrentCamera()).isPresent()) {
+            for (Behavior b : renderer.getCurrentCamera().behaviors) {
+                b.input(this, renderer.getCurrentCamera());
+            }
+        }
     }
 
     /**
@@ -174,6 +182,12 @@ public class Game extends JPanel {
         }
         scm.getActiveScene().update(this, elapsed);
         scm.getActiveScene().removeEntitiesMarkAsDeleted();
+        // update camera
+        if (Optional.ofNullable(renderer.getCurrentCamera()).isPresent()) {
+            for (Behavior b : renderer.getCurrentCamera().behaviors) {
+                b.update(this, renderer.getCurrentCamera(), elapsed);
+            }
+        }
     }
 
     /**
@@ -250,7 +264,6 @@ public class Game extends JPanel {
     public Animations getAnimations() {
         return this.animations;
     }
-
 
 
     public void setDebug(int debug) {

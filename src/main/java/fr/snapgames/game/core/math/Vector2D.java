@@ -90,12 +90,23 @@ public class Vector2D {
         return this;
     }
 
-    public void maximize(double maxAccelX, double maxAccelY) {
+    public Vector2D maximize(double maxAccelX, double maxAccelY) {
         if (Math.abs(x) > maxAccelX) {
             x = Math.signum(x) * maxAccelX;
         }
         if (Math.abs(y) > maxAccelY) {
             y = Math.signum(y) * maxAccelY;
         }
+        return this;
+    }
+
+    public Vector2D thresholdToZero(double minValue) {
+        if (Math.abs(x) < minValue) {
+            x = 0.0;
+        }
+        if (Math.abs(y) < minValue) {
+            y = 0.0;
+        }
+        return this;
     }
 }

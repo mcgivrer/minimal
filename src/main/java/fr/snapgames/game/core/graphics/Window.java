@@ -9,6 +9,7 @@ import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,7 +53,8 @@ public class Window {
         frame.setFocusTraversalKeysEnabled(false);
 
         // on which Display the Window must appear ?
-        moveToScreen("Display0");
+        frame.setLocationRelativeTo(null);
+        //moveToScreen("Display0");
 
         // define Window content and size.
         frame.setLayout(new GridLayout());
@@ -176,12 +178,16 @@ public class Window {
                 return;
             }
             Graphics2D g2 = (Graphics2D) frame.getBufferStrategy().getDrawGraphics();
+            g2.setColor(Color.BLACK);
+            g2.fillRect(0, 0, frame.getWidth(), frame.getHeight());
+
             g2.scale(scale, scale);
             g2.drawImage(r.getBuffer(),
                     0, 0, frame.getWidth(), frame.getHeight(),
                     0, 0, r.getBuffer().getWidth(), r.getBuffer().getHeight(),
                     null);
             g2.scale(1.0 / scale, 1.0 / scale);
+
             // draw Debug Information
             r.drawDebugToWindow(g2, this);
             // draw information bottom line

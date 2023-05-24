@@ -1,6 +1,7 @@
 package fr.snapgames.game.core.graphics;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
@@ -13,12 +14,7 @@ import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.Camera;
 import fr.snapgames.game.core.entity.GameEntity;
-import fr.snapgames.game.core.graphics.plugins.GameEntityRenderer;
-import fr.snapgames.game.core.graphics.plugins.InfluencerRenderer;
-import fr.snapgames.game.core.graphics.plugins.LightRenderer;
-import fr.snapgames.game.core.graphics.plugins.ParticlesEntityRenderer;
-import fr.snapgames.game.core.graphics.plugins.RendererPlugin;
-import fr.snapgames.game.core.graphics.plugins.TextEntityRenderer;
+import fr.snapgames.game.core.graphics.plugins.*;
 import fr.snapgames.game.core.math.World;
 
 /**
@@ -88,25 +84,45 @@ public class Renderer {
             g.clearRect(0, 0, buffer.getWidth(), buffer.getHeight());
 
             // draw all entities according to Camera
+            // draw Scene
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                currentCamera.preDraw(g);
+            }
             pipeline.stream()
-                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e))
+                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e) && !e.isStickToCamera())
                     .sorted((e1, e2) -> e1.getLayer() == e2.getLayer()
                             ? e1.getPriority() == e2.getPriority() ? 0
                             : Integer.compare(e1.getPriority(), e2.getPriority())
                             : Integer.compare(e1.getLayer(), e2.getLayer()))
                     .forEach(entity -> {
-                        // draw Scene
-                        if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
-                            currentCamera.preDraw(g);
-                        }
+
                         drawEntity(g, entity);
                         for (Behavior b : entity.behaviors) {
                             b.draw(game, g, entity);
                         }
-                        if (Optional.ofNullable(currentCamera).isPresent() && !entity.isStickToCamera()) {
-                            currentCamera.postDraw(g);
+                    });
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                currentCamera.postDraw(g);
+            }
+
+            pipeline.stream()
+                    .filter(e -> e.isActive() && isInViewPort(currentCamera, e) && e.isStickToCamera())
+                    .sorted((e1, e2) -> e1.getLayer() == e2.getLayer()
+                            ? e1.getPriority() == e2.getPriority() ? 0
+                            : Integer.compare(e1.getPriority(), e2.getPriority())
+                            : Integer.compare(e1.getLayer(), e2.getLayer()))
+                    .forEach(entity -> {
+                        drawEntity(g, entity);
+                        for (Behavior b : entity.behaviors) {
+                            b.draw(game, g, entity);
                         }
                     });
+            // update camera
+            if (Optional.ofNullable(currentCamera).isPresent()) {
+                for (Behavior b : currentCamera.behaviors) {
+                    b.draw(game, g, currentCamera);
+                }
+            }
             g.dispose();
         }
         // remove inactive object.
@@ -114,6 +130,7 @@ public class Renderer {
                 .filter(e -> !e.isActive())
                 .toList()
                 .forEach(ed -> entities.remove(ed.getName()));
+
     }
 
     private boolean isInViewPort(Camera currentCamera, GameEntity e) {
@@ -134,12 +151,16 @@ public class Renderer {
         entity.setDrawnBy(null);
         if (plugins.containsKey(entity.getClass())) {
             RendererPlugin rp = plugins.get(entity.getClass());
-            g.rotate(entity.rotation, entity.position.x + entity.size.x * 0.5, entity.position.y + entity.size.y * 0.5);
+            g.rotate(entity.rotation,
+                    entity.position.x + entity.size.x * 0.5,
+                    entity.position.y + entity.size.y * 0.5);
             rp.draw(this, g, entity);
-            g.rotate(-entity.rotation, entity.position.x + entity.size.x * 0.5, entity.position.y + entity.size.y * 0.5);
+            g.rotate(-entity.rotation,
+                    entity.position.x + entity.size.x * 0.5,
+                    entity.position.y + entity.size.y * 0.5);
             entity.setDrawnBy(rp.getClass());
         } else {
-            System.err.printf("Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
+            System.err.printf("ERROR: Renderer:Unknown rendering plugin for Entity class %s%n", entity.getClass().getName());
         }
         entity.getChild().forEach(c -> drawEntity(g, c));
     }
@@ -150,33 +171,36 @@ public class Renderer {
      * @param g    Graphics API
      * @param step Step to draw for grid
      */
-    private void drawDebugGrid(Graphics2D g, int step, double scale) {
+    private void drawDebugGrid(Graphics2D g, int step, double scaleX, double scaleY) {
         World world = game.getPhysicEngine().getWorld();
         g.setFont(g.getFont().deriveFont(8.5f));
 
-        moveToCameraViewport(g, currentCamera, 1.0, -1, true);
+        if (Optional.ofNullable(currentCamera).isPresent()) {
+            g.translate(-currentCamera.position.x * scaleX, -currentCamera.position.y * scaleY);
+        }
 
         g.setColor(Color.LIGHT_GRAY);
         for (int x = 0; x < world.getPlayArea().getWidth(); x += step) {
-            g.drawLine((int) (x * scale), 0, (int) (x * scale), (int) (world.getPlayArea().getHeight() * scale));
+            g.drawLine((int) (x * scaleX), 0, (int) (x * scaleX), (int) (world.getPlayArea().getHeight() * scaleY));
         }
         for (int y = 0; y < world.getPlayArea().getHeight(); y += step) {
-            g.drawLine(0, (int) (y * scale), (int) (world.getPlayArea().getWidth() * scale), (int) (y * scale));
+            g.drawLine(0, (int) (y * scaleY), (int) (world.getPlayArea().getWidth() * scaleX), (int) (y * scaleY));
         }
         g.setColor(Color.CYAN);
         g.drawRect(
                 0, 0,
-                (int) (world.getPlayArea().width * scale),
-                (int) (world.getPlayArea().height * scale));
+                (int) (world.getPlayArea().width * scaleX),
+                (int) (world.getPlayArea().height * scaleY));
 
-        moveToCameraViewport(g, currentCamera, 1.0, 1, true);
-
+        if (Optional.ofNullable(currentCamera).isPresent()) {
+            g.translate(currentCamera.position.x * scaleX, currentCamera.position.y * scaleY);
+        }
     }
 
-    private void drawCameraDebug(Graphics2D g, Camera camera, double scale) {
+    private void drawCameraDebug(Graphics2D g, Camera camera, double scaleX, double scaleY) {
         g.drawRect(20, 20,
-                (int) ((camera.viewport.getWidth() - 20) * scale),
-                (int) ((camera.viewport.getHeight() - 20) * scale));
+                (int) ((camera.viewport.getWidth() - 20) * scaleX),
+                (int) ((camera.viewport.getHeight() - 20) * scaleY));
         g.drawString(String.format("cam: %s", camera.getName()), 20, 20);
         g.drawString(String.format("pos: %04.2f,%04.2f", camera.position.x, camera.position.y), 30, 42);
         g.drawString(String.format("target: %s", camera.target.getName()), 30, 54);
@@ -207,24 +231,28 @@ public class Renderer {
     public void drawDebugToWindow(Graphics2D g, Window window) {
 
         if (game.isDebugGreaterThan(0)) {
-            drawDebugGrid(g, 32, scale);
+            double scaleX = window.getFrame().getWidth() / buffer.getWidth();
+            double scaleY = window.getFrame().getHeight() / buffer.getHeight();
+
+            drawDebugGrid(g, 32, scaleX, scaleY);
+
             Collection<GameEntity> entities = game.getSceneManager().getActiveScene().getEntities().values();
-            double scale = window.getFrame().getWidth() / buffer.getWidth();
-            entities
-                    .stream()
+            entities.stream()
                     .filter(e -> Arrays.stream(debugFilter.split(",")).anyMatch(df -> e.getName().startsWith(df)))
                     .forEach(e -> {
-                        moveToCameraViewport(g, getCurrentCamera(), scale, -1, !e.isStickToCamera());
+                        if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
+                            g.translate(-currentCamera.position.x * scaleX, -currentCamera.position.y * scaleY);
+                        }
                         if (plugins.containsKey(e.getClass())) {
                             RendererPlugin rp = ((RendererPlugin) plugins.get(e.getClass()));
-                            rp.drawDebug(this, g, e, scale);
+                            rp.drawDebug(this, g, e, scaleX, scaleY);
                         }
-                        // if exists call behavior debugging draw operation.
-                        //e.getBehaviors().stream().filter(b-> b.drawDebugInfo(game,g,e,scale));
-                        moveToCameraViewport(g, getCurrentCamera(), scale, 1, !e.isStickToCamera());
+                        if (Optional.ofNullable(currentCamera).isPresent() && !e.isStickToCamera()) {
+                            g.translate(currentCamera.position.x * scaleX, currentCamera.position.y * scaleY);
+                        }
                     });
             if (Optional.ofNullable(currentCamera).isPresent()) {
-                drawCameraDebug(g, currentCamera, scale);
+                drawCameraDebug(g, currentCamera, scaleX, scaleY);
             }
         }
 

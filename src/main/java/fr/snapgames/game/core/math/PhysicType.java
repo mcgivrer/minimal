@@ -5,6 +5,7 @@ package fr.snapgames.game.core.math;
  * @since 0.0.3
  **/
 public enum PhysicType {
+    NONE,
     STATIC,
     DYNAMIC
 }

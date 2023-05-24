@@ -14,6 +14,7 @@ import java.util.Optional;
 import fr.snapgames.game.core.behaviors.Behavior;
 import fr.snapgames.game.core.graphics.Animation;
 import fr.snapgames.game.core.graphics.Animations;
+import fr.snapgames.game.core.graphics.Window;
 import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.PhysicType;
 import fr.snapgames.game.core.math.Vector2D;
@@ -44,9 +45,12 @@ public class GameEntity {
     public Color borderColor;
     public int borderWidth;
 
+    public boolean solid;
+
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior<?>> behaviors = new ArrayList<>();
     public Shape box;
+    public Shape boxOffset;
     public Shape collisionBox;
 
     /**
@@ -105,6 +109,7 @@ public class GameEntity {
         this.priority = 1;
         this.box = new Rectangle2D.Double();
         this.collisionBox = new Rectangle2D.Double();
+        this.boxOffset = new Rectangle2D.Double();
         attributes.put("maxSpeed", 8.0);
         attributes.put("maxAcceleration", 3.0);
 
@@ -126,6 +131,11 @@ public class GameEntity {
 
     public boolean isStickToCamera() {
         return stickToCamera;
+    }
+
+    public GameEntity setBoxOffset(double top, double left, double right, double bottom) {
+        boxOffset = new Rectangle2D.Double(left, top, right, bottom);
+        return this;
     }
 
     public GameEntity setSize(Vector2D s) {
@@ -172,7 +182,7 @@ public class GameEntity {
 
     /**
      * Add internal debug information used by
-     * {@link fr.snapgames.game.core.graphics.Renderer#drawEntitesDebug(Graphics2D)}
+     * {@link fr.snapgames.game.core.graphics.Renderer#drawDebugToWindow(Graphics2D, Window)}
      * to display realtime information.
      *
      * @return the corresponding {@link Collection} of {@link String} containing the
@@ -186,6 +196,13 @@ public class GameEntity {
         ls.add(String.format("spd: %04.2f,%04.2f", this.speed.x, this.speed.y));
         ls.add(String.format("acc: %04.2f,%04.2f", this.acceleration.x, this.acceleration.y));
         ls.add(String.format("mat: %s", this.material));
+        if (null != currentAnimation && currentAnimation != "") {
+            ls.add(String.format("anim: %s[%d]", this.currentAnimation, this.animations.get(this.currentAnimation).getIndex()));
+        }
+        ls.add(String.format("col: %s", this.colliderFlag ? "ON" : "OFF"));
+        ls.add(String.format("contact: %d", this.contact));
+
+
         return ls;
     }
 
@@ -227,6 +244,16 @@ public class GameEntity {
         this.borderWidth = sw;
         return this;
     }
+
+    public GameEntity setSolid(boolean solid) {
+        this.solid = solid;
+        return this;
+    }
+
+    public boolean isSolid() {
+        return this.solid;
+    }
+
 
     public GameEntity addBehavior(Behavior<?> b) {
         this.behaviors.add(b);
@@ -300,11 +327,19 @@ public class GameEntity {
         switch (type) {
             case CIRCLE -> {
                 this.box = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
-                this.collisionBox = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
+                this.collisionBox = new Ellipse2D.Double(
+                        position.x + boxOffset.getBounds2D().getX(),
+                        position.y + boxOffset.getBounds2D().getY(),
+                        size.x + boxOffset.getBounds2D().getWidth(),
+                        size.y + boxOffset.getBounds2D().getHeight());
             }
             case RECTANGLE -> {
                 this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
-                this.collisionBox = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
+                this.collisionBox = new Rectangle2D.Double(
+                        position.x + boxOffset.getBounds2D().getX(),
+                        position.y + boxOffset.getBounds2D().getY(),
+                        size.x + boxOffset.getBounds2D().getWidth() - boxOffset.getBounds2D().getX(),
+                        size.y + boxOffset.getBounds2D().getHeight() - boxOffset.getBounds2D().getY());
             }
         }
     }
@@ -411,5 +446,14 @@ public class GameEntity {
 
     public Map<String, Animation> getAnimations() {
         return animations;
+    }
+
+    public Shape getBoxOffset() {
+        return this.boxOffset;
+    }
+
+    public GameEntity setContact(int i) {
+        this.contact = i;
+        return this;
     }
 }

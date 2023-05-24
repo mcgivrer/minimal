@@ -71,23 +71,6 @@ public class WaterEffectBehavior implements Behavior<Influencer> {
                     g.fill(rectWater);
                 }
             }
-            case CIRCLE -> {
-                Ellipse2D el = new Ellipse2D.Double(
-                        e.position.x, e.position.y,
-                        e.size.x, e.size.y);
-                if (Optional.ofNullable(e.borderColor).isPresent()) {
-                    Stroke b = g.getStroke();
-                    g.setColor(e.borderColor);
-                    g.setColor(e.borderColor);
-                    g.draw(el);
-                    g.setStroke(b);
-                }
-                if (Optional.ofNullable(e.color).isPresent()) {
-                    g.setColor(e.color);
-                    g.setPaint(e.color);
-                    g.fill(el);
-                }
-            }
             default -> {
                 System.err.printf("ERROR: Do not known how to draw this Influencer instance %s%n.", e.getName());
             }
