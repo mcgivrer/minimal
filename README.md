@@ -1,6 +1,6 @@
 # README
 
-[![Drone Build Status](http://nextserver02/api/badges/SnapGames/minimal/status.svg?ref=refs/heads/master)](http://nextserver02/SnapGames/minimal) 
+[![Drone Build Status](http://nextserver02:9080/api/badges/SnapGames/minimal/status.svg?ref=refs/heads/master)](http://nextserver02:9080/SnapGames/minimal) 
 | [![GitHub Build Status](https://github.com/SnapGames/minimal/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/SnapGames/minimal/actions/workflows/maven.yml) 
 | [![Reports Cucumber Collection](https://messages.cucumber.io/api/report-collections/3cc52f6b-8997-4a02-9866-aeed7c91f215/badge)](https://reports.cucumber.io/report-collections/3cc52f6b-8997-4a02-9866-aeed7c91f215)
 
