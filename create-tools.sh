@@ -1,6 +1,9 @@
 #!/bin/bash
 
 curl -s "https://get.sdkman.io" | bash
+
 sdk env install
-sdk end use
+sdk env use
 echo "Read at work!"
+
+source "$HOME/.sdkman/bin/sdkman-init.sh"
