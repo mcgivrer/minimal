@@ -5,9 +5,7 @@ image:
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 tasks:
   - init: echo 'init script' # runs during prebuild
-    command: curl -s "https://get.sdkman.io" | bash
-    command: sdk env install
-    command: sdk end use
+    command: . ./create-tools.sh
 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
 ports:
