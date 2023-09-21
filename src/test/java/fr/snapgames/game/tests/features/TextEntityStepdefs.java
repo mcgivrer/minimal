@@ -28,7 +28,7 @@ public class TextEntityStepdefs implements En {
         });
         And("the TextEntity with name {string} has a text value {string}", (String entityName, String valueText) -> {
             TextEntity te = (TextEntity) game.getSceneManager().getActiveScene().getEntity(entityName);
-            Assertions.assertEquals(valueText, te.text);
+            Assertions.assertEquals(valueText, te.getText());
         });
     }
 

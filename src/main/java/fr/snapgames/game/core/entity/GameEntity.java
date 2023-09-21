@@ -1,7 +1,7 @@
 package fr.snapgames.game.core.entity;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import fr.snapgames.game.core.behaviors.Behavior;
+import fr.snapgames.game.core.graphics.Animation;
+import fr.snapgames.game.core.graphics.Animations;
+import fr.snapgames.game.core.graphics.Window;
 import fr.snapgames.game.core.math.Material;
 import fr.snapgames.game.core.math.PhysicType;
 import fr.snapgames.game.core.math.Vector2D;
@@ -23,8 +26,9 @@ import fr.snapgames.game.core.math.Vector2D;
  * @since 0.0.1
  */
 public class GameEntity {
-    public static long index = 0;
-    public String name = "noname" + (index++);
+    private static long index = 0;
+    private long id = ++index;
+    private String name = "noname" + (id);
     public Vector2D position = new Vector2D(0, 0);
     public Vector2D speed = new Vector2D(0, 0);
     public Vector2D acceleration = new Vector2D(0, 0);
@@ -41,9 +45,13 @@ public class GameEntity {
     public Color borderColor;
     public int borderWidth;
 
+    public boolean solid;
+
     public Map<String, Object> attributes = new HashMap<>();
     public List<Behavior<?>> behaviors = new ArrayList<>();
-    public Rectangle2D box;
+    public Shape box;
+    public Shape boxOffset;
+    public Shape collisionBox;
 
     /**
      * Child entities for this one. Mainly used by {@link ParticlesEntity}.
@@ -51,6 +59,10 @@ public class GameEntity {
     private List<GameEntity> child = new ArrayList<>();
 
     public BufferedImage image;
+
+    public String currentAnimation = "";
+    public Map<String, Animation> animations = new HashMap<>();
+    ;
 
     public boolean active;
     public long life;
@@ -67,6 +79,18 @@ public class GameEntity {
 
     private int layer;
     private int priority;
+    /**
+     * set to true if it can collide with other entities.
+     */
+    private boolean colliderFlag = true;
+    /**
+     * Set if this GameEntity ust be deleted.
+     *
+     * @see fr.snapgames.game.core.math.PhysicEngine
+     */
+    private boolean markAsDelete;
+    public boolean relativeToParent;
+    public GameEntity parent;
 
     /**
      * Create a new {@link GameEntity} with a name, and set all characteristics to
@@ -77,7 +101,6 @@ public class GameEntity {
     public GameEntity(String name) {
         this.name = name;
         this.active = true;
-        this.physicType = PhysicType.DYNAMIC;
         this.material = Material.DEFAULT;
         this.direction = 1;
         this.life = -1;
@@ -85,9 +108,15 @@ public class GameEntity {
         this.layer = 1;
         this.priority = 1;
         this.box = new Rectangle2D.Double();
+        this.collisionBox = new Rectangle2D.Double();
+        this.boxOffset = new Rectangle2D.Double();
         attributes.put("maxSpeed", 8.0);
         attributes.put("maxAcceleration", 3.0);
 
+    }
+
+    public static long getIndex() {
+        return index;
     }
 
     public GameEntity setPosition(Vector2D pos) {
@@ -102,6 +131,11 @@ public class GameEntity {
 
     public boolean isStickToCamera() {
         return stickToCamera;
+    }
+
+    public GameEntity setBoxOffset(double top, double left, double right, double bottom) {
+        boxOffset = new Rectangle2D.Double(left, top, right, bottom);
+        return this;
     }
 
     public GameEntity setSize(Vector2D s) {
@@ -122,10 +156,10 @@ public class GameEntity {
      * @param i the {@link BufferedImage} ti set as {@link GameEntity} image.
      * @return the updated {@link GameEntity}.
      */
+
     public GameEntity setImage(BufferedImage i) {
         if (Optional.ofNullable(i).isPresent()) {
             this.image = i;
-            setType(EntityType.IMAGE);
             setSize(new Vector2D(i.getWidth(), i.getHeight()));
         }
         return this;
@@ -148,12 +182,13 @@ public class GameEntity {
 
     /**
      * Add internal debug information used by
-     * {@link fr.snapgames.game.core.graphics.Renderer#drawEntitesDebug(Graphics2D)}
+     * {@link fr.snapgames.game.core.graphics.Renderer#drawDebugToWindow(Graphics2D, Window)}
      * to display realtime information.
      *
      * @return the corresponding {@link Collection} of {@link String} containing the
-     *         debug information to be displayed.
+     * debug information to be displayed.
      */
+
     public Collection<String> getDebugInfo() {
         List<String> ls = new ArrayList<>();
         ls.add(String.format("name:%s", name));
@@ -161,6 +196,13 @@ public class GameEntity {
         ls.add(String.format("spd: %04.2f,%04.2f", this.speed.x, this.speed.y));
         ls.add(String.format("acc: %04.2f,%04.2f", this.acceleration.x, this.acceleration.y));
         ls.add(String.format("mat: %s", this.material));
+        if (null != currentAnimation && currentAnimation != "") {
+            ls.add(String.format("anim: %s[%d]", this.currentAnimation, this.animations.get(this.currentAnimation).getIndex()));
+        }
+        ls.add(String.format("col: %s", this.colliderFlag ? "ON" : "OFF"));
+        ls.add(String.format("contact: %d", this.contact));
+
+
         return ls;
     }
 
@@ -203,13 +245,23 @@ public class GameEntity {
         return this;
     }
 
+    public GameEntity setSolid(boolean solid) {
+        this.solid = solid;
+        return this;
+    }
+
+    public boolean isSolid() {
+        return this.solid;
+    }
+
+
     public GameEntity addBehavior(Behavior<?> b) {
         this.behaviors.add(b);
         return this;
     }
 
-    public Object getAttribute(String attrName, Object defaultValue) {
-        return attributes.getOrDefault(attrName, defaultValue);
+    public <T> T getAttribute(String attrName, Object defaultValue) {
+        return (T) attributes.getOrDefault(attrName, defaultValue);
     }
 
     public boolean isActive() {
@@ -259,6 +311,7 @@ public class GameEntity {
      * @param pt the {@link PhysicType#STATIC} or {@link PhysicType#DYNAMIC}.
      * @return the updated {@link GameEntity}.
      */
+
     public GameEntity setPhysicType(PhysicType pt) {
         this.physicType = pt;
         return this;
@@ -269,8 +322,26 @@ public class GameEntity {
      *
      * @see Rectangle2D
      */
+
     public void updateBox() {
-        this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
+        switch (type) {
+            case CIRCLE -> {
+                this.box = new Ellipse2D.Double(position.x, position.y, size.x, size.y);
+                this.collisionBox = new Ellipse2D.Double(
+                        position.x + boxOffset.getBounds2D().getX(),
+                        position.y + boxOffset.getBounds2D().getY(),
+                        size.x + boxOffset.getBounds2D().getWidth(),
+                        size.y + boxOffset.getBounds2D().getHeight());
+            }
+            case RECTANGLE -> {
+                this.box = new Rectangle2D.Double(position.x, position.y, size.x, size.y);
+                this.collisionBox = new Rectangle2D.Double(
+                        position.x + boxOffset.getBounds2D().getX(),
+                        position.y + boxOffset.getBounds2D().getY(),
+                        size.x + boxOffset.getBounds2D().getWidth() - boxOffset.getBounds2D().getX(),
+                        size.y + boxOffset.getBounds2D().getHeight() - boxOffset.getBounds2D().getY());
+            }
+        }
     }
 
     /**
@@ -279,6 +350,7 @@ public class GameEntity {
      * @param force a {@link Vector2D} force.
      * @return the updated {@link GameEntity}.
      */
+
     public GameEntity addForce(Vector2D force) {
         this.forces.add(force);
         return this;
@@ -290,17 +362,98 @@ public class GameEntity {
      * @param forces a {@link List} {@link Vector2D} force.
      * @return the updated {@link GameEntity}.
      */
+
     public GameEntity addForces(List<Vector2D> forces) {
         this.forces.addAll(forces);
         return this;
     }
 
-    @Override
     public String toString() {
         return this.getClass().getSimpleName() + ":" + this.name;
     }
 
-    public Rectangle2D getBoundingBox() {
+    public Shape getBoundingBox() {
         return box;
+    }
+
+    public EntityType getType() {
+        return type;
+    }
+
+    public GameEntity setCollisionBox(Shape collisionBox) {
+        this.collisionBox = collisionBox;
+        return this;
+    }
+
+    public Shape getCollisionBox() {
+        return this.collisionBox;
+    }
+
+    public PhysicType getPhysicType() {
+        return this.physicType;
+    }
+
+    public List<Behavior<?>> getBehaviors() {
+        return this.behaviors;
+    }
+
+    public boolean isCollider() {
+        return colliderFlag;
+    }
+
+    public GameEntity setColliderFlag(boolean cf) {
+        this.colliderFlag = cf;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public boolean isMarkedAsDelete() {
+        return markAsDelete;
+    }
+
+    public GameEntity markedAsDeleted(boolean b) {
+        this.markAsDelete = b;
+        return this;
+    }
+
+    public GameEntity setSize(int width, int height) {
+        this.size.x = width;
+        this.size.y = height;
+        return this;
+    }
+
+    public GameEntity add(String name, Animation a) {
+        this.animations.put(name, a);
+        if (currentAnimation.equals("")) {
+            currentAnimation = name;
+            this.size.x = animations.get(currentAnimation).getFrame().getWidth();
+            this.size.y = animations.get(currentAnimation).getFrame().getHeight();
+        }
+        return this;
+    }
+
+    public GameEntity setAnimation(String name) {
+        this.currentAnimation = name;
+        return this;
+    }
+
+    public Map<String, Animation> getAnimations() {
+        return animations;
+    }
+
+    public Shape getBoxOffset() {
+        return this.boxOffset;
+    }
+
+    public GameEntity setContact(int i) {
+        this.contact = i;
+        return this;
     }
 }

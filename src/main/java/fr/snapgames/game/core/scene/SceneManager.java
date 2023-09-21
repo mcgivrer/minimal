@@ -1,12 +1,11 @@
 package fr.snapgames.game.core.scene;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-
 import fr.snapgames.game.core.Game;
-import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.configuration.ConfigAttribute;
 import fr.snapgames.game.core.configuration.Configuration;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 /**
  * <p>The {@link SceneManager} intends to activate one of multiple {@link Scene} instances according
@@ -22,11 +21,11 @@ public class SceneManager {
     /**
      * List of scenes instances
      */
-    private final Map<String, Scene> scenes = new HashMap<>();
+    private Map<String, Scene> scenes = new HashMap<>();
     /**
      * List of available implementations
      */
-    private final Map<String, Class<? extends Scene>> availableScenes = new HashMap<>();
+    private Map<String, Class<? extends Scene>> availableScenes = new HashMap<>();
     /**
      * The parent {@link Game}'s {@link Configuration} instance.
      */
@@ -44,7 +43,7 @@ public class SceneManager {
     }
 
     /**
-     * <p>Initialize the service, taking configuration value from the {@link OldConfiguration} class.
+     * <p>Initialize the service, taking configuration value from the {@link Configuration} class.
      * Load all {@link Scene}'s implementation listed in to the <code>game.scene.list</code> configuration key.</p>
      * <p>After loaded and store all class implementation into the internal scene available list,
      * activates the default {@link Scene}, defined in to the configuration key <code>game.scene.default</code>.</p>
@@ -74,9 +73,9 @@ public class SceneManager {
     public void initialize(Game g) {
         this.game = g;
         config = g.getConfiguration();
-        List<String> scenesList = (List<String>) config.get(ConfigAttribute.SCENE_LIST);
+        String[] scenesList = (String[]) config.get(ConfigAttribute.SCENE_LIST);
 
-        scenesList.forEach(s -> {
+        Arrays.stream(scenesList).toList().forEach(s -> {
             String[] kv = s.split(":");
             try {
                 Class<? extends Scene> sceneToAdd = (Class<? extends Scene>) Class.forName(kv[1]);
@@ -94,7 +93,7 @@ public class SceneManager {
      *
      * @param s the Scene implementation to be added.
      */
-    private void add(Scene s) {
+    public void add(Scene s) {
         scenes.put(s.getName(), s);
     }
 
@@ -139,6 +138,7 @@ public class SceneManager {
                     activeScene = scenes.get(name);
                     System.out.printf("INFO: SceneManager: the Scene %s has been pop from scene cache.%n", activeScene.getName());
                 }
+                game.clearSystem();
                 activeScene.initialize(game);
                 activeScene.loadResources(game);
                 activeScene.create(game);
@@ -165,5 +165,9 @@ public class SceneManager {
      */
     public Scene getActiveScene() {
         return activeScene;
+    }
+
+    public Scene getScene(String sceneName) {
+        return scenes.get(sceneName);
     }
 }

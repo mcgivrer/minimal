@@ -10,7 +10,7 @@ import java.awt.*;
  * @author Frédéric Delorme
  * @since 0.0.1
  */
-public interface Behavior<T> {
+public interface Behavior<T extends Object> {
     default void update(Game game, T entity, double dt) {
     }
 
@@ -18,5 +18,8 @@ public interface Behavior<T> {
     }
 
     default void draw(Game game, Graphics2D g, T entity) {
+    }
+
+    default void drawDebugInfo(Game game, Graphics2D g, T entity, double scale) {
     }
 }

@@ -1,6 +1,8 @@
 # README
 
-[![Drone Build Status](http://nextserver02-1/api/badges/SnapGames/minimal/status.svg?ref=refs/heads/master)](http://nextserver02-1/SnapGames/minimal) | [![GitHub Build Status](https://github.com/SnapGames/minimal/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/SnapGames/minimal/actions/workflows/maven.yml)
+[![Drone Build Status](http://nextserver02/api/badges/SnapGames/minimal/status.svg?ref=refs/heads/master)](http://nextserver02/SnapGames/minimal) 
+| [![GitHub Build Status](https://github.com/SnapGames/minimal/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/SnapGames/minimal/actions/workflows/maven.yml) 
+| [![Reports Cucumber Collection](https://messages.cucumber.io/api/report-collections/3cc52f6b-8997-4a02-9866-aeed7c91f215/badge)](https://reports.cucumber.io/report-collections/3cc52f6b-8997-4a02-9866-aeed7c91f215)
 
 This is a small Minimalistic Game project , based on a master Game Java class, with some subclasses to let keep the code
 ass short as possible.
@@ -46,7 +48,7 @@ $ java -jar target/game-0.0.1-SNAPSHOT-shaded.jar
 
 After starting the latest jar file, the following picture may appear:
 
-![Latest enhanced minimal game framework](docs/docs/illustrations/figure-screenshot-0.0.3.png "Latest enhanced minimal game framework")
+![Latest enhanced minimal game framework](docs/docs/illustrations/figure-new-balls-images.png "Latest enhanced minimal game framework")
 
 _figure 1 - Latest enhanced minimal game framework_
 

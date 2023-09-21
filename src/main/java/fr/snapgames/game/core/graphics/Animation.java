@@ -71,4 +71,12 @@ public class Animation {
         index = 0;
         return this;
     }
+
+    public BufferedImage[] getFrames() {
+        return frames;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
 }

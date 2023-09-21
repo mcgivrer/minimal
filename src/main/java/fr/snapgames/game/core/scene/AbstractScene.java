@@ -1,13 +1,13 @@
 package fr.snapgames.game.core.scene;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.snapgames.game.core.Game;
 import fr.snapgames.game.core.behaviors.Behavior;
-import fr.snapgames.game.core.config.OldConfiguration;
 import fr.snapgames.game.core.configuration.Configuration;
 import fr.snapgames.game.core.entity.GameEntity;
 import fr.snapgames.game.core.graphics.Renderer;
@@ -26,6 +26,8 @@ public abstract class AbstractScene implements Scene {
     protected Renderer renderer;
 
     protected List<Behavior<Scene>> behaviors = new ArrayList<>();
+
+    public Map<String, Object> attributes = new HashMap<>();
 
     @Override
     public String getName() {
@@ -53,8 +55,20 @@ public abstract class AbstractScene implements Scene {
     public void add(GameEntity ge) {
         game.getRenderer().addEntity(ge);
         game.getPhysicEngine().addEntity(ge);
-        this.entities.put(ge.name, ge);
-        ge.getChild().forEach(c -> this.entities.put(c.name, c));
+        this.entities.put(ge.getName(), ge);
+        ge.getChild().forEach(c -> this.entities.put(c.getName(), c));
+    }
+
+    @Override
+    public void removeEntitiesMarkAsDeleted() {
+        List<GameEntity> toBeDeleted = new ArrayList<>();
+        entities.values().stream().filter(t -> t.isMarkedAsDelete()).forEach(t2 -> toBeDeleted.add(t2));
+        // remove entity marked as deleted
+        toBeDeleted.forEach(tbd -> {
+            entities.remove(tbd.getName());
+            game.getRenderer().removeEntity(tbd.getName());
+            game.getPhysicEngine().removeEntity(tbd.getName());
+        });
     }
 
     /**
@@ -92,5 +106,16 @@ public abstract class AbstractScene implements Scene {
     public void draw(Game g, Renderer r) {
         // A default empty implementation.
 
+    }
+
+
+    public <T> T getAttribute(String attrName, Object defaultValue) {
+        return (T) attributes.getOrDefault(attrName, defaultValue);
+    }
+
+
+    public Scene setAttribute(String key, Object value) {
+        attributes.put(key, value);
+        return this;
     }
 }

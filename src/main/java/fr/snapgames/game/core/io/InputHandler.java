@@ -85,4 +85,12 @@ public class InputHandler implements ActionListener {
     public boolean isAltGrPressed() {
         return altGrDown;
     }
+
+    public void reset() {
+        listeners.clear();
+    }
+
+    public List<ActionListener> getListeners() {
+        return this.listeners;
+    }
 }

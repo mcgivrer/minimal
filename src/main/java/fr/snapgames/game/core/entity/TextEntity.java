@@ -1,5 +1,7 @@
 package fr.snapgames.game.core.entity;
 
+import fr.snapgames.game.core.graphics.TextAlign;
+
 import java.awt.*;
 import java.util.Collection;
 
@@ -11,8 +13,9 @@ import java.util.Collection;
  */
 public class TextEntity extends GameEntity {
 
-    public String text;
-    public Font font;
+    private String text;
+    private Font font;
+    private TextAlign textAlign = TextAlign.LEFT;
 
 
     /**
@@ -34,11 +37,28 @@ public class TextEntity extends GameEntity {
         return this;
     }
 
+    public Font getFont() {
+        return this.font;
+    }
+
 
     @Override
     public Collection<String> getDebugInfo() {
         Collection<String> l = super.getDebugInfo();
         l.add(String.format("txt:%s", text));
         return l;
+    }
+
+    public TextEntity setTextAlign(TextAlign textAlign) {
+        this.textAlign = textAlign;
+        return this;
+    }
+
+    public TextAlign getTexAlign() {
+        return this.textAlign;
+    }
+
+    public String getText() {
+        return this.text;
     }
 }
