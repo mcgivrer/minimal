@@ -7,6 +7,11 @@ import fr.snapgames.game.core.gameloop.GameLoop;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A Fixed Frame based {@link GameLoop} implementation.
+ * @author Frédéric Delorme
+ * @since
+ */
 public class FixedFrameGameLoop implements GameLoop {
 
     private final Game game;
