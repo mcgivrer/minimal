@@ -2,7 +2,7 @@
 
 _(TO BE REVIEWED)_
 
-Here is the most complex thing we are going to manage: move of our GameObject according to some common newton's laws.
+Here is the most complex thing we are going to manage: move of our GameObject, according to some common newton's laws.
 
 The Physic Engine is one more service for our application. we will use the same approach.
 
@@ -16,7 +16,7 @@ position of our `Entity`.
 
 ![The acceleration, the spedd and the gravity are used as parameters in physic computation](https://docs.google.com/drawings/d/e/2PACX-1vS1mK0tLz4VBBNbMNIJxtHGTymADBu7emdwWDRA5RIwxEnJQ0DcOFqP4uCc7lFwj77qbLl3Ntm9tzbO/pub?w=549&h=362 "The acceleration, the speed and the gravity are used as parameters in physic computation")
 
-The previous diagram try to illustre the mathematics vectors we will apply to this Entity named "player".
+The previous diagram tries to illustrate the mathematics vectors we will apply to this Entity named "player."
 
 But let's dive into some mathematics.
 
@@ -83,11 +83,11 @@ class PhysicEngine {
 
 - The `game` is a reference to the parent class.
 - `world` is an instance of the following `World` object, defining some context and constrains to the world
-  where `Entity`'s instances are going to moves.
+  where `Entity`'s instances are going to move.
 
 ### The World
 
-To limit the playground of our game and to apply some physic to our entities, we need an object to define the world
+To limit the playground of our game and to apply some physical to our entities, we need an object to define the world
 constrains:
 
 ```java
@@ -100,15 +100,15 @@ public class World {
 }
 ```
 
-We also need to define some maximum speed and acceleration to manage out physic simulation limit, because, and this is
-not the main theme of this chapter and tutorial, Newton's mathematics laws has some limitation, and our game is not a
-nuclear physic simulator !
+We also need to define some maximum speed and acceleration to manage out physic simulation limit, because this is
+not the main theme of this chapter and tutorial, Newton's mathematics laws have some limitations, and our game is not a
+nuclear physic simulator!
 
-> The goals for those threshold limits is also to avoid infinite values driving to unpredictable behaviors of our
+> The goals for those threshold limits are also to avoid infinite values driving to unpredictable behaviors of our
 > entities.
 > **Evil is hidden in details**, and a too large number of decimals in a number closed to 0.0 is a killing detail.
 
-So here are our technical limitation :
+So here is our technical limitation :
 
 ```java
 public class World {
@@ -125,7 +125,7 @@ public class World {
 }
 ```
 
-And we need some specific configuration, so all limitation values are extracted from configuration file (
+And we need some specific configuration, so all limitation values are extracted from the configuration file (
 config.properties):
 
 ```properties
@@ -145,15 +145,15 @@ app.physic.world.acceleration.x.max=0.01
 app.physic.world.acceleration.y.max=0.1
 ```
 
-Corresponding to thos following descriptions :
+Corresponding to those following descriptions :
 
-- `app.physic.world.gravity` defines the default gravity for the world ; any object in the play area takes effect from
+- `app.physic.world.gravity` defines the default gravity for the world; any object in the play area takes effect from
   this value.
-- `app.physic.world.play.area.*` defin ethe play area size in pixels,
+- `app.physic.world.play.area.*` define the play area size in pixels,
 - `app.physic.world.speed.*` set the speed limitation and threshold,
 - `app.physic.world.acceleration.*` set the acceleration limitation and threshold,
 
-The `World` constructor will set all those values to defined through the `Configuration` service:
+The `World` constructor will set all those values to define through the `Configuration` service:
 
 ```java
 public class World {

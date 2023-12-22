@@ -2,9 +2,9 @@
 
 _(TO BE REVIEWED)_
 
-Now I have some tools to diplay thing, it's time to get some object to display !
+Now I have some tools to display things; it's time to get some object to display!
 
-I am going to present a new class; the `Entity` class. And as this chapter's title learn to us, I am goinf to create
+I am going to present a new class; the `Entity` class. And as this chapter's title learns to us, I am goinf to create
 another internal System to manage and take care of those objects; the `EntityManager`.
 
 ![The Entity and its Manager diagram class](https://www.plantuml.com/plantuml/png/ROzDQiCm48NtEiLqbzBc0YA4GEcogvv0yKpj0NaKh77hO7ptAf954NHbp_lXVRf4TPFEepTFEj18SFEEnGoC12Ff432QphiOuLsKzGwh0JZ2cchAtGOiI8jbqII_0AE5-Yzk90kVEh7qMLWiO9Yldl9rRovSslFFtKmSmi--_k74zJHLCYYShUSqJLvdfMGNyiPVyq1FUiY0XU_Pxg5iEiG3sI8avpimrb8McU8XwM_1U-gKWvnAzbnJTV3sYANFgQoyxZ4mcodaoMjuMPIcBzVHForZsdSUpu-GfPt8N4Xm7lql "The Entity and its Manager diagram class")
@@ -17,8 +17,8 @@ This `Entity` will be the base for any object that can be displayed (or not) and
 
 > **Note:** An internal helper usage will consist in providing a fluent API to the Entity setters.
 
-As I could have many of those entity on my screen I need to get some clear way to identify it. I'll use a generated
-internal `id` for unicity, and a `name` for developer usage, to get it more humankind, but this name will be defaultly
+As I could have many of those entities on my screen, I need to get some clear way to identify it. I'll use a generated
+internal `id` for unity, and a `name` for developer usage, to get it more humankind, but this name will be default
 generated.
 
 ```java
@@ -29,14 +29,14 @@ public class Entity {
 }
 ```
 
-In the Entity definition we create the mechanism to initialize the id and name to some default values:
+In the Entity definition, we create the mechanism to initialize the id and name to some default values:
 
-- `id` is initialize with an internal index counter that is incremented on each Entity instantiation,
+- `id` is initialize with an internal index counter incremented on each Entity instantiation,
 - `name` is initialized to "entity_[id]" where id will be the current incremented index value.
 
-But we wan to display our entity, so we need more attributes :
+But we want to display our entity, so we need more attributes :
 
-- `x`,`y` the position on the play area of thiat object,
+- `x`,`y` the position on the play area of a that object,
 - `width` and `height`, the current size of that object (in a Rectangle box first, this will change on the future),
 - `dx`,`dy` some speed information
 
@@ -67,9 +67,9 @@ public class Entity {
 
 ## EntityManager
 
-_One system to rules them all._
+_One system to rule them all._
 
-This System will be a very basic one, based on the Map pattern to maintain the internal entity list.
+This System will be very basic, based on the Map pattern to maintain the internal entity list.
 
 ```java
 public class EntityManager {

@@ -10,8 +10,8 @@ the `Entity` behavior.
 In this diagram, we can identify the following requirement:
 
 - **E1**: this entity is under the magnet yellow influence only,
-- **E2**: the second entity is under both influence water and magnet,
-- **E3**: the 3rd entity is not under influence
+- **E2**: the second entity is under both influence of water and magnet,
+- **E3**: the 3rd entity is not under the influence
 - **E4**: and the fourth entity is only under the water influencer (blue one).
 
 ## Proposed design

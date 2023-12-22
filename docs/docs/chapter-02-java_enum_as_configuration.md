@@ -1,12 +1,12 @@
 # Enum as Configuration
 
-One of the first thing you have to provide, before any game mechanic, it's a way to set configuration values.
+One of the first things you have to provide, before any game mechanic, it's a way to set configuration values.
 
-There is 2 possibilities:
+There is two possibilities:
 
 - the first one consists in using a simple Configuration class loading a properties file, with
   the possibilities to save it with new values.
-- the second one would be more structured by using a well known java structure, the enumeration, to define configuration
+- the second one would be more structured by using a well-known java structure, the enumeration, to define configuration
   keys, values and description with help support.
 
 ## Introduction
@@ -30,13 +30,13 @@ So our implementation will be a little more complex to allow an easy way to mana
 
 ![the configuration attributes implementation](https://www.plantuml.com/plantuml/png/RP1VIyGm4CJVyodYcwAVG4Jkj5KE_rp1qzSZrqxRbMHRaWqYudStfGebtkl-PfQPMGKnNgApwaHwEEZH6cBLKmDjH3mTeY0eOe5lJGszkHsufMxznxwKFjSTP3ey6uVJiykNXBZxlS_o1tpcO38K2BMdKMZW71TeJRJoPcn4Ojl3EsfPM2lZ0tmYTv7hwS7LRB_Gi_Gw5wfl5VhXGsVv5otdrZbta7veWW97zm-I6oqSMCAnOTPLjTzjTe-bqaLvytg_VzeMPSgn0ZTfyXy0)
 
-Ok, first things first let's start with a simple configraition clasee
+Ok, first things first let's start with a simple configuration class.
 
 ## Configuration from properties
 
 ### the properties file as input
 
-To start simple , juste create a properties file:
+To start simple, create a properties file:
 
 ```properties
 game.debug.level=0
@@ -114,7 +114,7 @@ In this first part, we found :
 - `parseArguments(String[])` to read arguments from the Command line,
 - `save()` to save loaded or parsed values to the properties file.
 
-In the second part, we detail only 2 getters, a basic one with boolean and a more intelligent one to convert a string
+In the second part, we detail only two getters, a basic one with boolean and a more intelligent one to convert a string
 value to a Rectangle2D object:
 
 ```java
@@ -145,7 +145,7 @@ public class Configuration {
 ```
 
 - the first getter, `getInteger()` is reading the property value as String and convert it to an `int` type value, for
-  other type like boolean, double, float, you can use the same kind of implementation, relying on the `parse[TYPE]()`
+  another type like boolean, double, float, you can use the same kind of implementation, relying on the `parse[TYPE]()`
   method.
 - the second one, `getRectangle2D`, convert a coded string value `r2d([WIDTH],[HEIGHT]` into an instance
   of `Rectangle2D` class.
@@ -304,7 +304,7 @@ standard java way to set values) :
 
 ### The configuration file :
 
-The properties file is a standard one and our own will figure out as below:
+The properties file is standard and our own will figure out as below:
 
 ```properties
 app.main.title=GDemoApp-test
@@ -366,7 +366,7 @@ the provided new methods are:
 - `parseConfigFile` to parse values from the provided file according to existing defined arguments in
   the `ConfigAttribute` enumeration.
 
-You can notice that error are output on the `System.err` output stream, and information are out on the `System.out`
+You can notice that error is output on the `System.err` output stream, and information is out on the `System.out`
 output stream.
 
 ## Conclusion

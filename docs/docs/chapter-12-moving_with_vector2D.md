@@ -19,7 +19,7 @@ A `Vector2D` is math entity used to define a force on a 2D world. It basically c
 
 ![The Vector2D class diagram](http://www.plantuml.com/plantuml/png/TS-nJWCn30RWFKznR8VO63jrk3T0OlV5Lch9TahYL6qHxmw5eZQ8RB_ovK_iRNKetbJ2W-z8QTeBi8KeKElqIj5pULxUm_Gq7JUOsofqoQUx38ZpONEzYe-_QVasIq93ZSHomwL7v0CZpNZzwIzM1uiqRcVlx3OklJMGsk6Qin3OHOKi-Mw-BoWSMVbCi_uxYZPntijfm4O9dBe7BHS5uND_MjjQlK3qqKwUNxomfQ_MJmWVOKk6JUKJ "The Vector2D class diagram")
 
-This new class must be used to define our Entity position, velocity and acceleration :
+This new class must be used to define our Entity position, velocity, and acceleration :
 
 ```java
 public class Entity<T>{
@@ -29,7 +29,7 @@ public class Entity<T>{
 }
 ```
 
-With this introduction a lot of changes in the global design, thourght multiple systems are impacted: Renderer, PhysicEngine are the most impacted.
+With this introduction, a lot of changes in the global design, through multiple systems are impacted: Renderer, PhysicEngine are the most impacted.
 
 let's dive into those 2 big pals.
 

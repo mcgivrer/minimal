@@ -5,20 +5,20 @@ _(TO BE REVIEWED)_
 Building a game can be a game itself; or a nightmare. Depending on the tools, the team, the skills, … a lot of thing can
 interact badly with the process of creating a game. And this is exactly what we won't talk about!:)
 
-Here I will talk about creating a A-B-AB game with the only weapons provided by the nice Java JDK 19:) And no, I won't
-use JavaFX (beuarrk:)) I'll use the good old AWT and Swing (yes, I am maybe a 50 years old man…).
+Here I will talk about creating an A-B-AB game with the only weapons provided by the nice Java JDK 19:) And no, I won't
+use JavaFX (beuarrk:)) I'll use the good old AWT and Swing (yes, I am maybe a 50-year-old man…).
 
-Anyway let's try it through a series of posts to design some code.
+Anyway, let's try it through a series of posts to design some code.
 
 ## Creating a simple class
 
 The basic Game class will support the famous "triptic" of the game loop: manage input, update objects, and draw
 everything on screen!
-But do you know why this is the basic default pattern for a game ?
+But do you know why this is the basic default pattern for a game?
 
 ## A bit of video game history
 
-Why the game loop exists ? This is a very good question and the reason why is a historically based answer. Everything
+Why the game loop exists? This is an exceptional question and the reason why is a historically based answer. Everything
 starts from the first ever video game: PONG.
 
 ![Pong, where all begin !](https://cdn-images-1.medium.com/max/800/0*ySNC72GHeT19Nq3N "wikipedia PONG screenshot")
@@ -28,23 +28,23 @@ _figure 1 - Pong where all begins (ref:[https://fr.wikipedia.org/wiki/Pong](http
 The original Pong video game from wikipediaAt this very beginning time, the processor to execute tasks is a very a slow
 on, almost some hundreds of Khz as CPU frequency. To understand the scale we are talking about, current processor are
 running at 2 to 4 GHz!
-So processor are very slow, each cycle of CPU is a precious one. So every line of code is very optimized and clearly
+So the processor is very slow, each cycle of CPU is precious. So every line of code is very optimized and clearly
 dedicated to some precise tasks.
 
-And another element must be taken in account: the display process. At this time, screen where not flat one with a bunch
-of LCD, but CRT ones. CRT display screen are based on ionic flow started from a cathode (electronic gun) and moving to
+And another element must be taken in an account: the display process. At this time, the screen is not a flat one with a bunch
+of LCD, but CRT ones. CRT display screen is based on ionic flow started from a cathode (electronic gun) and moving to
 the anode (the screen grid) to excite fluorescent layer in the intern face of the glass bulb.
 
-And swiping the all surface of the screen has a time cost: to display 25 frame per seconds, we need 16ms to swipe a
+And swiping the all surfaces of the screen has a time cost: to display 25 frames per second, we need 16ms to swipe a
 frame.
-A CRT tube with its ions gun!The CRT Tube is nothing more than a big bubble light. (3) the cathode emits ions (1) and
+A CRT tube with its ion gun! The CRT Tube is nothing more than a big bubble light. (3) the cathode emits ions (1) and
 (2) are anodes, deflecting ion ray to screen, lighting a fluorescent dot.
 
 ![A CRT diagram with ions gun and anodes deflectors](illustrations/figure-crt.jpg "A CRT diagram with ions gun and anodes deflectors (c) myself with my own hands !")
 
-_figure 2 - A CRT diagram with ions gun and anodes deflectors_
+_figure 2 - A CRT diagram with ion gun and anode deflectors_
 
-This is the available time for the CPU to prepare next image!
+This is the available time for the CPU to prepare the next image!
 
 So capturing input, moving things and displaying things must be done in 16ms. And loop again for the next frame.
 
@@ -168,7 +168,7 @@ public class Game {
 So to maintain a sustainable frequency for that loop, I use the default current frame-per-second ratio: 60 frames per
 second. here we will get it from the method `getTargetFps()`.
 
-So starting with that , defining the waiting time is a simple calculus.
+So starting with that, defining the waiting time is a simple calculus.
 
 ```java
 
@@ -189,7 +189,7 @@ render();
 - update(elapsed) will compute all the moves and animations for all the game objects,
 - render() will draw the resulting objects and display that on screen.
 
-And when you execute this incredible class… nothing will happen.
+And when you execute this incredible class, nothing will happen.
 BUT… we now have the framework of our future game. I'm not joking, this is a fact ;)
 
 ## Going deeper in concept
@@ -211,8 +211,8 @@ _figure 6 - An overview of my implementation_
 The `GameLoop` interface provides a standard contract to delegate the loop management to a specialized class
 implementation.
 
-We will be able to create a Fixed time frame loop, where graphics are rendered in priority , or a Fixed time update loop
-where physic and gameplay are prioritized first.
+We will be able to create a Fixed time frame loop, where graphics are rendered in priority, or a Fixed time update loop
+where physical and gameplay are prioritized first.
 
 Defining a standard loop to a game with:
 

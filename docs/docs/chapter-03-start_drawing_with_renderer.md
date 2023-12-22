@@ -2,22 +2,22 @@
 
 _(TO BE REVIEWED)_
 
-The first very interesting thing to do in this series is to implement some graphics rendering. And before drawing
+The first alluring thing to do in this series is to implement some graphics rendering. And before drawing
 anything, I will certainly need to create a first window to display some fantastic and beautiful pixel arts:)
 
 ## A Window
 
-Yes, I know, we could have go with Unity, OpenGL or any fancy (and too complex) framework, for game of just graphics
+Yes, I know, we could have go with Unity, OpenGL or any fancy (and too complex) framework, for game of just a graphics
 library, but The goal of this article series is to stick to the Java JDK.
 
-So I am going to do a sacrifice of JavaFX, yes, I won't use it, because, rendering pixel is really too difficult with
+So I am going to do a sacrifice of JavaFX, yes, I won't use it, because, rendering pixel is really too challenging with
 it.
 I'll prefer the good old pals whose are AWT and Swing!
 
 Let's keep it simple, and get minimum number of attributes and methods; the most complex part is the createPanel(),
 creating and initializing
 the  [`JFrame`](https://docs.oracle.com/en/java/javase/19/docs/api/java.desktop/javax/swing/JFrame.html) component
-instance, and setting its parameters..
+instance, and setting its parameters.
 
 ```java
 public class Window {
@@ -64,7 +64,7 @@ The attributes _title_, _width_ and _height_ will describe our Window:
 - `title` is the window title bar
 - `width` and `height`… the size of the window.
 
-I'd like to propose a full screen mode, to splash our window all over the screen, so we need to implement something:
+I'd like to propose a full-screen mode, to splash our window all over the screen, so we need to implement something:
 
 ```java
 public class Window {
@@ -154,7 +154,7 @@ you may get the following window :
 
 ![The new windowed app now !](illustrations/figure-create-window.png "getting a new Window instance now")
 
-It is now time I spent some time coding the Renderer, the system role consists in drawing the all the game objects into
+It is now time I spent some time coding the Renderer; the system role consists in drawing all the game objects into
 the newly created Window.
 
 ## The Renderer
@@ -248,11 +248,11 @@ public class Renderer {
 
 we gather
 the [Graphics2D](https://download.java.net/java/early_access/loom/docs/api/java.desktop/java/awt/Graphics2D.html) API
-instance to draw on the buffer,
+instance to draw on the buffer.
 
 1. we clear the drawing area with the black color,
-2. here, as example, we draw a beautiful red rectangle,
-3. and finally we free API resources.
+2. here, as an example, we draw a beautiful red rectangle,
+3. and finally, we free API resources.
 
 > **Note:** You may have noticed the 'fps' attribute in the `draw(int)` method, it will be used later to display some
 > debug information.
@@ -338,7 +338,7 @@ And here we are, we are able to draw things on our `Window`!
 
 ![Adding a Rendering draing service to our game stack](illustrations/figure-create-renderer.png "Adding a Rendering draing service to our game stack")
 
-Yes,I know a black screen is not exactly what you were expected, but we are ion the road of creating things :)
+Yes, I know a black screen is not exactly what you were expected, but we are an ion the road of creating things :)
 
 ## Conclusion
 

@@ -5,12 +5,12 @@ _(TO BE REVIEWED)_
 
 ## Goal
 
-As we are willing to create some fancy graphics, and maybe use some images as background and some new fonts to write some text, we are going to have manage some resources.
-And those resources maybe reused accross mutiple Scene. So to manage thinly the memory used by our game, we may propose a tool to manahge and store temporarily in the java memory some of those resources.
+As we are willing to create some fancy graphics, and maybe use some images as a background and some new fonts to write some text, we are going to have manage some resources.
+And those resources maybe reused across multiple Scenes. So to manage thinly the memory used by our game, we may propose a tool to manahge and store temporarily in the java memory some of those resources.
 
 This is where a resource manager woudl help a lot.  
 
-It must provide a convinient way to request some resource, load and store it in a cache, and serve this resource when required.
+It must provide a convenient way to request some resource, load and store it in a cache, and serve this resource when required.
 
 ## The proposed Design
 
@@ -31,14 +31,14 @@ public class ResoucreManager {
   private static Map<String,Object> cache = new ConcurrentHashMap<>();
   
   public static BufferedImage getImage(String path){
-    if(!cache.contains(path){
+    if(!cache.contains(path)){
       load(path);      
     }
     return (BufferedImage) cache.get(path);
   }
   
   public static Font getFont(String path){
-    if(!cache.contains(path){
+    if(!cache.contains(path)){
       load(path);      
     }
     return (Font) cache.get(path);
@@ -50,7 +50,7 @@ public class ResoucreManager {
 }
 ``` 
 
-Here are clearely defined the *getImage* and *getFont*, but all the Intelligence remains in the *load* method. Based on the file extension, we will defined what can be done to load the corresponding resource with the right object type.
+Here are clearly defined the *getImage* and *getFont*, but all the Intelligence remains in the *load* method. Based on the file extension, we will defined what can be done to load the corresponding resource with the right object type.
 
 ```java
 public class ResourceManager {
